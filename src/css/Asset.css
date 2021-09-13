@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Work+Sans:300,400,700,900");
+
+.date {
+    position: absolute;
+    top: 2%;
+    left: 14%;
+    background-color: transparent;
+    color: white;
+    border-style: solid;
+    border-color: #1b1b1b67;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 3rem;
+}
+
+.rows {
+    position: absolute;
+    left: 14%;
+    top: 10%;
+    width: 85%;
+    margin-right: 1%;
+}
+
+.rows th,
+td {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.rows th {
+    font-size: 26px;
+    letter-spacing: 0.1em;
+    font-weight: normal;
+}
+
+.rows td {
+    padding: 1rem;
+    font-size: 20px;
+}
+
+.rows td input {
+    width: 85%;
+    background-color: #1b1b1b67;
+    border-style: none;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 1rem;
+    padding-right: 10%;
+}

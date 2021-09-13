@@ -1,0 +1,106 @@
+.HomeData {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 12vw;
+    right: 0;
+    width: 88vw;
+}
+
+.ToDoArea {
+    background-color: #23272add;
+    width: 38%;
+    margin-left: 8%;
+    margin-right: 4%;
+    margin-top: 5%;
+    height: 80%;
+    float: left;
+    border-radius: 5px;
+    overflow-y: scroll;
+}
+
+.StatsArea {
+    background-color: #23272add;
+    width: 38%;
+    margin-right: 8%;
+    margin-left: 4%;
+    margin-top: 5%;
+    height: 80%;
+    float: right;
+    border-radius: 5px;
+    overflow-y: scroll;
+}
+
+.ToDoArea h1 {
+    font-size: 24px;
+    color: #eeeeee;
+    text-align: center;
+    padding: 1rem;
+    padding-bottom: 0;
+}
+
+.ToDoArea h2 {
+    font-size: 20px;
+    color: #eeeeee;
+    text-align: center;
+    padding: 1rem;
+}
+
+.StatsArea h1 {
+    font-size: 24px;
+    color: #eeeeee;
+    text-align: center;
+    padding: 1rem;
+    padding-bottom: 0;
+}
+
+.StatsArea h2 {
+    font-size: 20px;
+    color: #eeeeee;
+    text-align: left;
+    padding: 1rem;
+}
+
+.StatsArea .stat {
+    padding: 1rem;
+    margin: 1rem;
+}
+
+.StatsArea .stat .name {
+    float: left;
+}
+
+.StatsArea .stat .value {
+    float: right;
+}
+
+@media only screen and (max-width: 800px) {
+    .ToDoArea {
+        width: 80%;
+        padding-bottom: 10px;
+        float: none;
+    }
+
+    .StatsArea {
+        width: 80%;
+        padding-bottom: 10px;
+        float: none;
+    }
+
+    .afkText h2 {
+        color: #eeeeee;
+        text-align: left;
+        padding: 4px;
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 1200px) {
+    .afkText h2 {
+        font-size: 18px;
+    }
+}
+
+* {
+    text-decoration: none;
+}
