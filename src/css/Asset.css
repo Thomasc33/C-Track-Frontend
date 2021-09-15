@@ -8,6 +8,7 @@
     color: white;
     border-style: solid;
     border-color: #1b1b1b67;
+    background-color: #1b1b1b67;
     padding: 1rem;
     font-size: 1rem;
     border-radius: 3rem;
@@ -48,4 +49,49 @@ td {
     color: white;
     padding: 1rem;
     padding-right: 10%;
+}
+
+.rows td.invalid {
+    border-color: red;
+    border-style: solid 1px;
+}
+
+.job_list ul {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 31%;
+    z-index: 1;
+    background-color: #1b1b1b;
+    margin-top: -1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    border-radius: 0;
+    align-items: left;
+    max-height: 70vh;
+    overflow: scroll;
+}
+
+.job_list li {
+    list-style-type: none;
+}
+
+.job_list li:hover {
+    background-color: rgba(138, 138, 138, 0.404);
+}
+
+.job_list li button {
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    background: transparent;
+    font-size: 20px;
+    border-style: none;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    width: 100%;
+}
+
+.job_list .is-highlighted {
+    background-color: rgba(138, 138, 138, 0.404);
+
 }
