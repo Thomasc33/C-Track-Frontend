@@ -20,7 +20,7 @@ const useFetch = (url, timeout = 5000) => {
         if (timeout) setInterval(callFetch, timeout)
     }, [url, timeout])
 
-    return { data, loading }
+    return { data, loading, setData, setLoading }
 }
 
 export {

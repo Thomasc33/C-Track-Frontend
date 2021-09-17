@@ -1,5 +1,15 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Work+Sans:300,400,700,900");
 
+.assetarea {
+    position: absolute;
+    left: 14vw;
+    top: 10vh;
+    width: 85vw;
+    height: 90vh;
+    margin-right: 1%;
+    overflow-y: scroll;
+}
+
 .date {
     position: absolute;
     top: 2%;
@@ -16,10 +26,10 @@
 
 .rows {
     position: absolute;
-    left: 14%;
-    top: 10%;
-    width: 85%;
+
+    width: 85vw;
     margin-right: 1%;
+    overflow-y: scroll;
 }
 
 .rows th,
@@ -51,26 +61,13 @@ td {
     padding-right: 10%;
 }
 
-.rows td.invalid {
+.rows td input.invalid {
     border-color: red;
-    border-style: solid 1px;
+    border-style: solid;
+    animation: shake .5s;
 }
 
-.job_list ul {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 31%;
-    z-index: 1;
-    background-color: #1b1b1b;
-    margin-top: -1rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    border-radius: 0;
-    align-items: left;
-    max-height: 70vh;
-    overflow: scroll;
-}
+
 
 .job_list li {
     list-style-type: none;
@@ -83,7 +80,7 @@ td {
 .job_list li button {
     font-family: 'Montserrat', sans-serif;
     color: white;
-    background: transparent;
+    background: #1b1b1b67;
     font-size: 20px;
     border-style: none;
     padding-top: 1rem;
@@ -94,4 +91,15 @@ td {
 .job_list .is-highlighted {
     background-color: rgba(138, 138, 138, 0.404);
 
+}
+
+.job_list ul {
+    position: absolute;
+    width: 31%;
+    z-index: 1;
+    background-color: #1b1b1b;
+    border-radius: 0;
+    align-items: left;
+    max-height: 70vh;
+    overflow: scroll;
 }
