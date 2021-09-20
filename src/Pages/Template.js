@@ -1,68 +1,92 @@
 import React from 'react'
-import { Redirect } from 'react-router-dom'
+import { useMsal } from "@azure/msal-react";
+import CookieConsent from 'react-cookie-consent-notification';
 import ParticlesElement from '../Components/Particles'
+import UserService from '../Services/User'
 import '../css/Page-Template.css';
+import { InteractionRequiredAuthError } from '@azure/msal-common';
 
-class PageTemplate extends React.Component {
-    constructor(props) {
-        super(props)
-        this.props = props
+function PageTemplate(props) {
+    const { instance, accounts } = useMsal()
+    async function getTokenSilently() {
+        const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+        await instance.acquireTokenSilent(SilentRequest)
+            .catch(async er => {
+                if (er instanceof InteractionRequiredAuthError) {
+                    return await instance.acquireTokenPopup(SilentRequest)
+                } else {
+                    console.log('Unable to get token')
+                }
+            })
     }
-    render() {
-        // let username = localStorage.getItem('username')
-        // if (!username) return <Redirect to='/' />
-        const clickHandler = async () => {
-            let search = document.getElementById('search')
-            if (!search) return
-            console.log('searched for:', search)
-        }
+    getTokenSilently()
 
-        const handleKeyDown = e => {
-            if (e.key === 'Enter') clickHandler()
-        }
-        return (
-            <div className="App">
-                <ParticlesElement />
-                <div className='SideBar'>
-                    <ul>
-                        <li>
-                            <a className={this.props.highLight === "0" ? "active" : ""} href='/'>Home</a>
-                        </li>
-                        <li>
-                            <a className={this.props.highLight === "1" ? "active" : ""} href='asset'>Asset Tracking</a>
-                        </li>
-                        <li>
-                            <a className={this.props.highLight === "2" ? "active" : ""} href="hourly">Hourly Tracking</a>
-                        </li>
-                        <li>
-                            <a className={this.props.highLight === "3" ? "active" : ""} href="daily">Daily Dollars</a>
-                        </li>
-                        <li>
-                            <a className={this.props.highLight === "4" ? "active" : ""} href="reports">Reports</a>
-                        </li>
-                        <li>
-                            <div className='dropDownHeader'>
-                                <a className={this.props.highLight === "5" ? "active" : ""} href='tools'>Tools</a>
-                                <div className='dropdown-content'>
-                                    <a href='importer'>Importer</a>
-                                    <a href='admin'>Admin</a>
-                                </div>
+
+
+    const clickHandler = async () => {
+        let search = document.getElementById('search')
+        if (!search) return
+        console.log('searched for:', search)
+    }
+
+    const handleKeyDown = e => {
+        if (e.key === 'Enter') clickHandler()
+    }
+
+    const LogoutHandler = () => {
+        // cookies.remove('uid')
+        instance.logoutPopup({
+            postLogoutRedirectUri: "/",
+            mainWindowRedirectUri: "/"
+        })
+    }
+
+    return (
+        <div className="App">
+            <ParticlesElement />
+            <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
+            <div className='SideBar'>
+                <ul>
+                    <li>
+                        <a className={props.highLight === "0" ? "active" : ""} href='/'>Home</a>
+                    </li>
+                    <li>
+                        <a className={props.highLight === "1" ? "active" : ""} href='asset'>Asset Tracking</a>
+                    </li>
+                    <li>
+                        <a className={props.highLight === "2" ? "active" : ""} href="hourly">Hourly Tracking</a>
+                    </li>
+                    <li>
+                        <a className={props.highLight === "3" ? "active" : ""} href="daily">Daily Dollars</a>
+                    </li>
+                    <li>
+                        <a className={props.highLight === "4" ? "active" : ""} href="reports">Reports</a>
+                    </li>
+                    <li>
+                        <div className='dropDownHeader'>
+                            <a className={props.highLight === "5" ? "active" : ""} href='tools'>Tools</a>
+                            <div className='dropdown-content'>
+                                <a href='importer'>Importer</a>
+                                <a href='admin'>Admin</a>
                             </div>
-                        </li>
-                    </ul>
-                    <div className='AccountButton'>
-                        <p>{/*Place holder for username*/'Thomas'}</p>
+                        </div>
+                    </li>
+                </ul>
+                <div className='AccountButton'>
+                    <button>Thomas</button>
+                    <div className='AccountDropDown'>
+                        <button onClick={() => LogoutHandler()}>Logout</button>
                     </div>
                 </div>
-                <div className="searchBox">
-                    <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
-                    <button className="searchButton" onClick={clickHandler}>
-                        <i className="material-icons">search</i>
-                    </button>
-                </div>
             </div>
-        )
-    }
+            <div className="searchBox">
+                <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
+                <button className="searchButton" onClick={clickHandler}>
+                    <i className="material-icons">search</i>
+                </button>
+            </div>
+        </div>
+    )
 }
 
 export default PageTemplate

@@ -3,13 +3,18 @@ import axios from 'axios'
 const BaseApiUrl = require('../settings.json').APIBase
 
 export default {
-    add: async FormData => {
-        let res = await axios.post(`${BaseApiUrl}/asset/user/new`, FormData)
+    add: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/user/new`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e } })
         return res
     },
-    edit: async FormData => {
-        let res = await axios.post(`${BaseApiUrl}/asset/user/edit`, FormData)
+    edit: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/user/edit`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e } })
+        return res
+    },
+    delete: async (id, date, token) => {
+        let res = await axios.delete(`${BaseApiUrl}/asset/user/del//${id}/${date}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e } })
         return res
     }

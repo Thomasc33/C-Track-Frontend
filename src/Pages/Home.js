@@ -14,7 +14,6 @@ function HomePage() {
      * 
      */
     function renderStatsData(i, v) {
-        console.log(v)
         //TO DO: Add ID or some sorting to split daily dollars from the rest
         return <div className="stat">
             <h2 className='name'>{i}</h2>

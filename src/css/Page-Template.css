@@ -105,14 +105,46 @@
     border-radius: .6rem;
 }
 
-.AccountButton p {
+.AccountButton button {
+    width: 100%;
+    bottom: 100%;
+    background-color: transparent;
+    border-style: none;
     color: #fff;
-    text-transform: uppercase;
-    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
     letter-spacing: 0.2em;
-    display: inline-block;
-    padding: 15px 25px;
-    position: relative;
+    left: 0;
+    padding: 1rem;
+}
+
+.AccountButton:hover .AccountDropDown {
+    display: block;
+    max-height: 300px;
+    transition: all 1.3s linear;
+}
+
+.AccountDropDown {
+    display: none;
+    bottom: 100%;
+}
+
+.AccountDropDown button {
+    width: 100%;
+    bottom: 100%;
+    background-color: #a778ff79;
+    border-style: none;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    left: 0;
+    padding: 1rem;
+}
+
+.AccountDropDown button:hover {
+    text-decoration: underline 2px;
+    transition: width 0.3s ease 0s, left 0.3s ease 0s;
 }
 
 
@@ -186,7 +218,7 @@
     margin: 0px;
     font-family: 'Montserrat', sans-serif;
     -ms-overflow-style: none;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 ::-webkit-scrollbar {

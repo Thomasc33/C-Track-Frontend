@@ -2,11 +2,14 @@ import React from 'react';
 import PageTemplate from './Template'
 import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
+// import Cookies from 'universal-cookie';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
+import { useMsal } from '@azure/msal-react';
+import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/Asset.css'
-import { render } from 'react-dom';
 const settings = require('../settings.json')
+// const cookies = new Cookies(document.cookie);
 
 
 
@@ -14,7 +17,7 @@ const settings = require('../settings.json')
  *      TO DO
  * 
  * 
- * Fix posistioning of selection box (bottom of page)
+ * Delete row
  * 
  * 
  * 
@@ -22,14 +25,26 @@ const settings = require('../settings.json')
  */
 
 function AssetPage() {
-    //Get data, and update every 2 seconds
-    let APILink = `${settings.APIBase}/asset/user/${/* Place holder for user id*/1}/`
+    const { instance, accounts } = useMsal()
+    let APILink = `${settings.APIBase}/asset/user/`
     const [date, setDate] = useState(Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
     const [newAssetTag, setNewAssetTag] = useState('');
     const [newComment, setNewComment] = useState('');
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
+    async function getTokenSilently() {
+        const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+        let res = await instance.acquireTokenSilent(SilentRequest)
+            .catch(async er => {
+                if (er instanceof InteractionRequiredAuthError) {
+                    return await instance.acquireTokenPopup(SilentRequest)
+                } else {
+                    console.log('Unable to get token')
+                }
+            })
+        return res.accessToken
+    }
 
 
     useEffect(() => {
@@ -52,9 +67,7 @@ function AssetPage() {
 
     const handleTextInputChange = async (id, e) => {
         if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
-            console.log(e.target.classList)
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
-            console.log(e.target.classList)
         }
         if (id === 'new') {
             let dateString = new Date(date).toISOString().split('T')[0]
@@ -92,16 +105,15 @@ function AssetPage() {
             //send to api
             let formData = {
                 date: dateString,
-                user: 1, // Place holder for user id
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
             }
-            let res = await assetService.add(formData)
+            let token = await getTokenSilently()
+            let res = await assetService.add(formData, token)
             if (res.isErrored) {
                 document.getElementById('new-assetid').classList.add('invalid')
             } else {
-                console.log('test')
                 setNewComment('')
                 setNewAssetTag('')
                 const response = await fetch(APILink.concat(getDate(date)), {
@@ -118,7 +130,6 @@ function AssetPage() {
                 //data validation
                 let formData = {
                     id: i.id,
-                    user: 1, //place holder for user id
                     change: null
                 }
                 if (!isNaN(parseInt(e))) {
@@ -141,7 +152,8 @@ function AssetPage() {
                 if (!formData.value) formData.value = e.target.value
 
                 //send to api
-                let res = await assetService.edit(formData)
+                let token = await getTokenSilently
+                let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
                     e.target.classList.add('invalid')
                 }
@@ -149,8 +161,19 @@ function AssetPage() {
         }
     }
 
-    const handleKeyDown = async (e) => {
-        console.log(e)
+    const handleKeyDown = async (id, e) => {
+        if (e.key === 'Enter') handleTextInputChange(id, e)
+    }
+
+    const handleDelete = async (id, e) => {
+        let token = await getTokenSilently()
+        let res = await assetService.delete(id, getDate(date), token)
+
+        if (res.isErrored) {
+            e.target.classList.add('invalid')
+        } else {
+            document.getElementById(`${id}-row`).remove()
+        }
     }
 
     const getJobArray = () => {
@@ -167,7 +190,7 @@ function AssetPage() {
      * 
      */
     function RenderRow(row) {
-        return (<tr>
+        return (<tr id={`${row.id}-row`}>
             <td>
                 <SelectSearch
                     options={getJobArray()}
@@ -181,15 +204,26 @@ function AssetPage() {
                     id={`${row.id}-jobcode`}
                 />
             </td>
-            <td><input type='text' defaultValue={row.asset_id} className='asset_id' id={`${row.id}-assetid`} onBlur={e => handleTextInputChange(row.id, e)}></input></td>
-            <td><input type='text' defaultValue={row.notes ? row.notes : ''} className='notes' id={`${row.id}-notes`} onBlur={e => handleTextInputChange(row.id, e)}></input></td>
+            <td><input type='text' defaultValue={row.asset_id} className='asset_id' id={`${row.id}-assetid`} onBlur={e => handleTextInputChange(row.id, e)} onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
+            <td>
+                <input type='text'
+                    defaultValue={row.notes ? row.notes : ''}
+                    className='notes'
+                    id={`${row.id}-notes`}
+                    style={{ width: '79%' }}
+                    onBlur={e => handleTextInputChange(row.id, e)}
+                    onKeyDown={e => handleKeyDown(row.id, e)} />
+                <i className="material-icons delete-icon"
+                    onClickCapture={e => handleDelete(row.id, e)}>
+                    delete_outline</i>
+            </td>
         </tr >)
     }
 
 
 
     //returns blank page if data is loading
-    if (loading || !jobCodes) return <PageTemplate highLight='1' />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='1' />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
@@ -203,7 +237,7 @@ function AssetPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data ? data.records.map(m => RenderRow(m)) : <></>}
+                        {data.records ? data.records.map(m => RenderRow(m)) : <></>}
                         <tr>
                             <td>
                                 <SelectSearch
@@ -217,8 +251,8 @@ function AssetPage() {
                                     id='new-jobcode'
                                 />
                             </td>
-                            <td><input type='text' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)}></input></td>
-                            <td><input type='text' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)}></input></td>
+                            <td><input type='text' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='text' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                     </tbody>
                 </table>
