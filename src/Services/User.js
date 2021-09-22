@@ -3,8 +3,12 @@ import axios from 'axios'
 const BaseApiUrl = require('../settings.json').APIBase
 
 export default {
-    verify: async FormData => {
-        let res = await axios.post(`${BaseApiUrl}/user/verify`, FormData)
+    verify: async token => {
+        let res = await axios.get(`${BaseApiUrl}/user/verify`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .catch(e => { return { isErrored: true, error: e } })
         return res
     },

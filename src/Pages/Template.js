@@ -38,6 +38,7 @@ function PageTemplate(props) {
             postLogoutRedirectUri: "/",
             mainWindowRedirectUri: "/"
         })
+        localStorage.setItem('isVerified', null)
     }
 
     return (
