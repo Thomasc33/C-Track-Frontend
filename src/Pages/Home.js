@@ -6,7 +6,7 @@ const settings = require('../settings.json')
 
 function HomePage() {
     //Get data, and update every 2 seconds
-    let APILink = `${settings.APIBase}/home/user/${/* Place holder for user id*/1}`
+    let APILink = `${settings.APIBase}/home/user`
     const { loading, data = [] } = useFetch(APILink, 30000)
 
     /**

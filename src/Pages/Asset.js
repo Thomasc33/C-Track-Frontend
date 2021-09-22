@@ -2,14 +2,12 @@ import React from 'react';
 import PageTemplate from './Template'
 import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
-// import Cookies from 'universal-cookie';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/Asset.css'
 const settings = require('../settings.json')
-// const cookies = new Cookies(document.cookie);
 
 
 
@@ -89,7 +87,6 @@ function AssetPage() {
                     return
             }
 
-            console.log('job:', job_code, '\nasset:', asset, '\ncomment:', comment)
             //data validation
             let cont = true;
             if (!job_code) {
@@ -114,16 +111,20 @@ function AssetPage() {
             if (res.isErrored) {
                 document.getElementById('new-assetid').classList.add('invalid')
             } else {
-                setNewComment('')
-                setNewAssetTag('')
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
-                    headers: { 'Access-Control-Allow-Origin': '*' }
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Access-Control-Allow-Origin': '*'
+                    }
                 });
-                const data = await response.json();
-                setData(data);
+                const d = await response.json();
+                console.log(d)
                 document.getElementById('new-assetid').value = ''
                 document.getElementById('new-notes').value = ''
+                setData(d);
+                setNewComment('')
+                setNewAssetTag('')
             }
         } else for (let i of data.records) {
             if (id === i.id) {
@@ -152,7 +153,7 @@ function AssetPage() {
                 if (!formData.value) formData.value = e.target.value
 
                 //send to api
-                let token = await getTokenSilently
+                let token = await getTokenSilently()
                 let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
                     e.target.classList.add('invalid')
@@ -168,11 +169,21 @@ function AssetPage() {
     const handleDelete = async (id, e) => {
         let token = await getTokenSilently()
         let res = await assetService.delete(id, getDate(date), token)
+        const response = await fetch(APILink.concat(getDate(date)), {
+            mode: 'cors',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Access-Control-Allow-Origin': '*'
+            }
+        });
+        const d = await response.json();
+        setData(d);
 
         if (res.isErrored) {
             e.target.classList.add('invalid')
         } else {
-            document.getElementById(`${id}-row`).remove()
+            let row = document.getElementById(`${id}-row`)
+            if (row) row.remove()
         }
     }
 

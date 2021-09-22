@@ -2,13 +2,13 @@ import React from 'react'
 import { useMsal } from "@azure/msal-react";
 import CookieConsent from 'react-cookie-consent-notification';
 import ParticlesElement from '../Components/Particles'
-import UserService from '../Services/User'
 import '../css/Page-Template.css';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 
 function PageTemplate(props) {
     const { instance, accounts } = useMsal()
     async function getTokenSilently() {
+        if (!accounts[0]) return
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         await instance.acquireTokenSilent(SilentRequest)
             .catch(async er => {
@@ -33,8 +33,7 @@ function PageTemplate(props) {
         if (e.key === 'Enter') clickHandler()
     }
 
-    const LogoutHandler = () => {
-        // cookies.remove('uid')
+    const LogoutHandler = async () => {
         instance.logoutPopup({
             postLogoutRedirectUri: "/",
             mainWindowRedirectUri: "/"
