@@ -6,12 +6,13 @@ import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
-import '../css/Asset.css'
+import TimeKeeper from 'react-timekeeper';
+import '../css/Hourly.css';
 const settings = require('../settings.json')
 
 function AssetPage() {
     const { instance, accounts } = useMsal()
-    let APILink = `${settings.APIBase}/asset/user/`
+    let APILink = `${settings.APIBase}/hourly/user/`
     const [date, setDate] = useState(Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
@@ -202,7 +203,22 @@ function AssetPage() {
                     id={`${row.id}-jobcode`}
                 />
             </td>
-            <td><input type='text' defaultValue={row.asset_id} className='asset_id' id={`${row.id}-assetid`} onBlur={e => handleTextInputChange(row.id, e)} onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
+            <td><div className="TimeKeeper">.
+                <TimeKeeper
+                    coarseMinutes='15'
+                    forceCoarseMinutes='true'
+                    closeOnMinuteSelect='true'
+                    switchToMinuteOnHourDropdownSelect='true'
+                    switchToMinuteOnHourSelect='true'
+                /></div></td>
+            <td><div className="TimeKeeper">.
+                <TimeKeeper
+                    coarseMinutes='15'
+                    forceCoarseMinutes='true'
+                    closeOnMinuteSelect='true'
+                    switchToMinuteOnHourDropdownSelect='true'
+                    switchToMinuteOnHourSelect='true'
+                /></div></td>
             <td>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
@@ -222,7 +238,7 @@ function AssetPage() {
 
 
     //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='1' />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='2' />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
@@ -231,7 +247,8 @@ function AssetPage() {
                     <thead>
                         <tr>
                             <th>Job Code</th>
-                            <th>Asset Tag</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
                             <th>Comments</th>
                         </tr>
                     </thead>
@@ -250,13 +267,28 @@ function AssetPage() {
                                     id='new-jobcode'
                                 />
                             </td>
-                            <td><input type='text' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><div className="TimeKeeper">.
+                                <TimeKeeper
+                                    coarseMinutes='15'
+                                    forceCoarseMinutes='true'
+                                    closeOnMinuteSelect='true'
+                                    switchToMinuteOnHourDropdownSelect='true'
+                                    switchToMinuteOnHourSelect='true'
+                                /></div></td>
+                            <td><div className="TimeKeeper">.
+                                <TimeKeeper
+                                    coarseMinutes='15'
+                                    forceCoarseMinutes='true'
+                                    closeOnMinuteSelect='true'
+                                    switchToMinuteOnHourDropdownSelect='true'
+                                    switchToMinuteOnHourSelect='true'
+                                /></div></td>
                             <td><input type='text' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='1' />
+            <PageTemplate highLight='2' />
         </>
     )
 }

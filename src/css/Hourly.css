@@ -68,6 +68,48 @@ td {
     animation: shake .3s;
 }
 
+.rows td .TimeKeeper .react-timekeeper {
+    width: 85%;
+    background-color: transparent;
+    padding: 1rem;
+    padding-right: 10%;
+    box-shadow: none;
+}
+
+.rows td .TimeKeeper .react-timekeeper__top-bar {
+    background-color: #1b1b1b67;
+}
+
+.rows td .TimeKeeper .react-timekeeper__clock-wrapper {
+    background-color: #1b1b1b67;
+}
+
+.rows td .TimeKeeper .react-timekeeper__tb-hour {
+    color: white;
+}
+
+.rows td .TimeKeeper .react-timekeeper__tb-hour--active {
+    color: #8730d9;
+}
+
+.rows td .TimeKeeper .react-timekeeper__tb-minute {
+    color: white;
+}
+
+.rows td .TimeKeeper .react-timekeeper__tb-minute--active {
+    color: #8730d9;
+}
+
+.rows td .TimeKeeper .react-timekeeper__clock {
+    background: transparent;
+}
+
+.rows td .TimeKeeper .react-timekeeper__clock-numbers {
+    background: white;
+    color: white;
+
+}
+
 .delete-icon {
     padding-left: 1rem;
     font-size: 32px;

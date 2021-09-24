@@ -8,6 +8,7 @@ import {
 import HomePage from './Pages/Home';
 import AssetPage from './Pages/Asset';
 import LoginPage from './Pages/Login';
+import HourlyPage from './Pages/Hourly';
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
@@ -41,7 +42,7 @@ function App() {
     <BrowserRouter>
       <Switch>
         <Route exact path="/asset" render={props => <AssetPage {...props} />} />
-        <Route exact path="/hourly" render={props => <HomePage {...props} />} />
+        <Route exact path="/hourly" render={props => <HourlyPage {...props} />} />
         <Route exact path="/login" render={props => <HomePage {...props} />} />
         <Route exact path="/logout" render={props => <HomePage {...props} />} />
         <Route exact path="/admin" render={props => <HomePage {...props} />} />
