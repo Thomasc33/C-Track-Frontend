@@ -57,16 +57,15 @@ function PageTemplate(props) {
                         <a className={props.highLight === "2" ? "active" : ""} href="hourly">Hourly Tracking</a>
                     </li>
                     <li>
-                        <a className={props.highLight === "3" ? "active" : ""} href="daily">Daily Dollars</a>
-                    </li>
-                    <li>
-                        <a className={props.highLight === "4" ? "active" : ""} href="reports">Reports</a>
+                        <a className={props.highLight === "3" ? "active" : ""} href="reports">Reports</a>
                     </li>
                     <li>
                         <div className='dropDownHeader'>
-                            <a className={props.highLight === "5" ? "active" : ""} href='tools'>Tools</a>
+                            <a className={props.highLight === "4" ? "active" : ""} href='tools'>Tools</a>
                             <div className='dropdown-content'>
                                 <a href='importer'>Importer</a>
+                                <a href='jobs'>Job Codes</a>
+                                <a href='users'>Users</a>
                                 <a href='admin'>Admin</a>
                             </div>
                         </div>
@@ -79,12 +78,14 @@ function PageTemplate(props) {
                     </div>
                 </div>
             </div>
-            <div className="searchBox">
-                <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
-                <button className="searchButton" onClick={clickHandler}>
-                    <i className="material-icons">search</i>
-                </button>
-            </div>
+            {props.disableSearch ? <></> :
+                <div className="searchBox">
+                    <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
+                    <button className="searchButton" onClick={clickHandler}>
+                        <i className="material-icons">search</i>
+                    </button>
+                </div>
+            }
         </div>
     )
 }

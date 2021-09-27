@@ -26,7 +26,7 @@
 
 .rows {
     position: absolute;
-
+    white-space: nowrap;
     width: 85vw;
     margin-right: 1%;
     overflow-y: scroll;
@@ -68,12 +68,31 @@ td {
     animation: shake .3s;
 }
 
+.rows td .invalid {
+    border-color: red;
+    border-style: solid;
+    animation: shake .3s;
+}
+
+.rows td {
+    text-align: center;
+    align-items: center;
+}
+
+.rows .TimeColumn {
+    width: 15%;
+}
+
 .rows td .TimeKeeper .react-timekeeper {
-    width: 85%;
+    width: 300px;
+    height: 360px;
     background-color: transparent;
-    padding: 1rem;
-    padding-right: 10%;
     box-shadow: none;
+    align-self: center;
+}
+
+.rows td .TimeKeeper .Minimized-Time {
+    height: 150px;
 }
 
 .rows td .TimeKeeper .react-timekeeper__top-bar {
@@ -101,16 +120,14 @@ td {
 }
 
 .rows td .TimeKeeper .react-timekeeper__clock {
-    background: transparent;
+    background: #141414a6;
 }
 
-.rows td .TimeKeeper .react-timekeeper__clock-numbers {
-    background: white;
-    color: white;
-
+.rows td .TimeKeeper .react-timekeeper__clock {
+    background: #141414a6;
 }
 
-.delete-icon {
+.rows td .delete-icon {
     padding-left: 1rem;
     font-size: 32px;
     cursor: pointer;
@@ -147,7 +164,7 @@ td {
 
 .job_list ul {
     position: absolute;
-    width: 29.5%;
+    width: 29.4%;
     z-index: 1;
     background-color: #1b1b1b;
     border-radius: 0;

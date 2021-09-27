@@ -14,10 +14,17 @@ function HomePage() {
      * 
      */
     function renderStatsData(i, v) {
+        if (i === 'Daily Dollars') return <div className='stat'>
+            <h2 className='name'>{i}</h2>
+            <h2 className='value'>{`$${v}`}</h2>
+            <br></br>
+            <br></br>
+            <br></br>
+        </div>
         //TO DO: Add ID or some sorting to split daily dollars from the rest
         return <div className="stat">
             <h2 className='name'>{i}</h2>
-            <h2 className='value'>{(typeof (v) == 'object') ? v.count : v}</h2>
+            <h2 className='value'>{(typeof (v) == 'object') ? v.is_hourly ? v.count == '1' ? `${v.count} hour` : `${v.count} hours` : `${v.count}` : v}</h2>
             <br></br>
         </div>
     }
