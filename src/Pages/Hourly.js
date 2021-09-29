@@ -18,7 +18,7 @@ const settings = require('../settings.json')
 
 
 
-function HourlyPage() {
+function HourlyPage(props) {
     const { instance, accounts } = useMsal()
     let APILink = `${settings.APIBase}/hourly/user/`
     const [date, setDate] = useState(Date.now())
@@ -212,7 +212,7 @@ function HourlyPage() {
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
-            //if (!i.is_hourly) continue
+            if (!i.is_hourly) continue
             ar.push({ name: i.job_code, value: i.id })
         }
         return ar
@@ -312,7 +312,7 @@ function HourlyPage() {
 
     console.log(times)
     //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='2' />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='2' {...props} />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
@@ -370,7 +370,7 @@ function HourlyPage() {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='2' />
+            <PageTemplate highLight='2' {...props} />
         </>
     )
 }
@@ -398,16 +398,16 @@ function getTotalHours(startTime, endTime) {
     let total_hours = 0
     let startHour, endHour, startMinute, endMinute
     let t = startTime.split(':')
-    startHour = t[0]
-    startMinute = t[1]
+    startHour = parseInt(t[0])
+    startMinute = parseInt(t[1])
     t = endTime.split(':')
-    endHour = t[0]
-    endMinute = t[1]
+    endHour = parseInt(t[0])
+    endMinute = parseInt(t[1])
 
     // end - start
     // if start minute > end minute, carry over 60 from the hour and subtract
     if (startMinute > endMinute) {
-        endMinute += 60;
+        endMinute = 60;
         endHour--;
     }
     // Add the hours to total

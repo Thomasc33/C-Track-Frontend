@@ -9,7 +9,7 @@ import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
-function AssetPage() {
+function AssetPage(props) {
     const { instance, accounts } = useMsal()
     let APILink = `${settings.APIBase}/asset/user/`
     const [date, setDate] = useState(Date.now())
@@ -177,7 +177,7 @@ function AssetPage() {
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
-            //if (i.is_hourly) continue
+            if (i.is_hourly) continue
             ar.push({ name: i.job_code, value: i.id })
         }
         return ar
@@ -222,7 +222,7 @@ function AssetPage() {
 
 
     //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='1' />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='1' {...props} />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
@@ -256,7 +256,7 @@ function AssetPage() {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='1' />
+            <PageTemplate highLight='1' {...props} />
         </>
     )
 }

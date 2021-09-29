@@ -6,7 +6,7 @@ import { loginRequest } from "../authConfig";
 import { useMsal } from '@azure/msal-react';
 import '../css/Login.css'
 
-function LoginPage() {
+function LoginPage(props) {
     const { instance } = useMsal()
 
     const handleLogin = () => {

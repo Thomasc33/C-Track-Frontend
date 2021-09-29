@@ -3,25 +3,11 @@ import { useMsal } from "@azure/msal-react";
 import CookieConsent from 'react-cookie-consent-notification';
 import ParticlesElement from '../Components/Particles'
 import '../css/Page-Template.css';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
 
 function PageTemplate(props) {
     const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        if (!accounts[0]) return
-        const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-    }
-    getTokenSilently()
-
-
+    const permissions = props.permissions
+    const isAdmin = props.isAdmin
 
     const clickHandler = async () => {
         let search = document.getElementById('search')
@@ -48,31 +34,34 @@ function PageTemplate(props) {
             <div className='SideBar'>
                 <ul>
                     <li>
-                        <a className={props.highLight === "0" ? "active" : ""} href='/'>Home</a>
+                        <p className={props.highLight === "0" ? "active" : ""} onClickCapture={(e) => props.history.push('/')}>Home</p>
                     </li>
                     <li>
-                        <a className={props.highLight === "1" ? "active" : ""} href='asset'>Asset Tracking</a>
+                        <p className={props.highLight === "1" ? "active" : ""} onClickCapture={(e) => props.history.push('/asset')}>Asset Tracking</p>
                     </li>
                     <li>
-                        <a className={props.highLight === "2" ? "active" : ""} href="hourly">Hourly Tracking</a>
+                        <p className={props.highLight === "2" ? "active" : ""} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
                     </li>
-                    <li>
-                        <a className={props.highLight === "3" ? "active" : ""} href="reports">Reports</a>
-                    </li>
+                    {isAdmin || (permissions && permissions.view_reports) ?
+                        <li>
+                            <p className={props.highLight === "3" ? "active" : ""} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
+                        </li> : <></>}
                     <li>
                         <div className='dropDownHeader'>
-                            <a className={props.highLight === "4" ? "active" : ""} href='tools'>Tools</a>
+                            <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
                             <div className='dropdown-content'>
-                                <a href='importer'>Importer</a>
-                                <a href='jobs'>Job Codes</a>
-                                <a href='users'>Users</a>
-                                <a href='admin'>Admin</a>
+                                <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p>
+                                {isAdmin || (permissions && permissions.view_jobcodes) ?
+                                    <p onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
+                                {isAdmin || (permissions && permissions.view_user) ?
+                                    <p onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
+                                <p onClickCapture={(e) => props.history.push('/admind')}>Admin</p>
                             </div>
                         </div>
                     </li>
                 </ul>
                 <div className='AccountButton'>
-                    <button>Thomas</button>
+                    <button>{accounts[0] ? accounts[0].name : ''}</button>
                     <div className='AccountDropDown'>
                         <button onClick={() => LogoutHandler()}>Logout</button>
                     </div>

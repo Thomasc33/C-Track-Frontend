@@ -1,8 +1,7 @@
 import React from 'react';
 import PageTemplate from './Template'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
 import jobService from '../Services/Job'
 import { useMsal } from '@azure/msal-react';
 import Checkbox from 'react-custom-checkbox';
@@ -12,13 +11,15 @@ import '../css/Asset.css'
 import '../css/Jobs.css'
 const settings = require('../settings.json')
 
-function JobPage() {
+function JobPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = `${settings.APIBase}/job/`
-    const [newJobCode, setNewJobCode] = useState(0);
-    const [newAssetTag, setNewAssetTag] = useState('');
-    const [newComment, setNewComment] = useState('');
+    let APILink = `${settings.APIBase}/job`
+    const [newJobCode, setNewJobCode] = useState('');
+    const [newJobName, setNewJobName] = useState('');
+    const [newPrice, setNewPrice] = useState(0);
+    const [newIsHourly, setNewIsHourly] = useState(false)
     const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
+
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -33,19 +34,28 @@ function JobPage() {
     }
 
     const handleTextInputChange = async (id, e) => {
+        console.log(e)
+        if (!e.isHourly) {
+            if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
+        }
         if (id === 'new') {
             let job_code = newJobCode;
-            let asset = newAssetTag;
-            let comment = newComment;
-            if (!isNaN(parseInt(e))) { setNewJobCode(parseInt(e)); job_code = parseInt(e) }
+            let job_name = newJobName;
+            let price = newPrice;
+            let isHourly = newIsHourly;
+            if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
             else switch (e.target.id) {
-                case 'new-notes':
-                    comment = e.target.value
-                    await setNewComment(e.target.value)
+                case 'new-price':
+                    price = e.target.value
+                    await setNewPrice(e.target.value)
                     break;
-                case 'new-assetid':
-                    asset = e.target.value
-                    await setNewAssetTag(e.target.value)
+                case 'new-jobname':
+                    job_name = e.target.value
+                    await setNewJobName(e.target.value)
+                    break;
+                case 'new-jobcode':
+                    job_code = e.target.value
+                    await setNewJobCode(e.target.value)
                     break;
                 default:
                     console.log('Default Case hit for new')
@@ -55,25 +65,27 @@ function JobPage() {
             //data validation
             let cont = true;
             if (!job_code) {
-                document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
+                document.getElementById('new-jobcode').classList.add('invalid')
                 cont = false
             }
-            if (!asset) {
-                document.getElementById('new-assetid').classList.add('invalid')
+            if (!job_name) {
+                document.getElementById('new-jobname').classList.add('invalid')
+                cont = false
+            }
+            if (!price) {
+                document.getElementById('new-price').classList.add('invalid')
                 cont = false
             }
             if (!cont) return
 
             //send to api
-            let formData = {
-                job_code: job_code,
-                asset_id: asset,
-                notes: comment,
-            }
+            let formData = { job_code, job_name, price, isHourly }
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
             if (res.isErrored) {
-                document.getElementById('new-assetid').classList.add('invalid')
+                document.getElementById('new-jobcode').classList.add('invalid')
+                document.getElementById('new-jobname').classList.add('invalid')
+                document.getElementById('new-price').classList.add('invalid')
             } else {
                 const response = await fetch(`${APILink}/all`, {
                     mode: 'cors',
@@ -83,12 +95,13 @@ function JobPage() {
                     }
                 });
                 const d = await response.json();
-                console.log(d)
-                document.getElementById('new-assetid').value = ''
-                document.getElementById('new-notes').value = ''
+                document.getElementById('new-jobcode').value = ''
+                document.getElementById('new-jobname').value = ''
+                document.getElementById('new-price').value = ''
                 setData(d);
-                setNewComment('')
-                setNewAssetTag('')
+                setNewPrice(0)
+                setNewJobName('')
+                setNewJobCode('')
             }
         } else for (let i of data.job_codes) {
             if (id === i.id) {
@@ -99,9 +112,9 @@ function JobPage() {
                     value: null
                 }
                 // eslint-disable-next-line eqeqeq
-                if (e.toString() == 'false' || e.toString() == 'true') {
+                if (e.isHourly) {
                     formData.change = 'isHourly'
-                    formData.value = e.toString()
+                    formData.value = e.selection.toString()
                     // eslint-disable-next-line default-case
                 } else switch (e.target.className) {
                     case 'price':
@@ -121,7 +134,7 @@ function JobPage() {
                 if (!formData.change) return
 
                 if (!formData.value) formData.value = e.target.value
-                return
+
                 //send to api
                 let token = await getTokenSilently()
                 let res = await jobService.edit(formData, token)
@@ -145,7 +158,6 @@ function JobPage() {
      * 
      */
     function RenderRow(row) {
-        console.log(row)
         return (<tr id={`${row.id}-row`}>
             <td>
                 <input type='text'
@@ -164,7 +176,7 @@ function JobPage() {
                     onKeyDown={e => handleKeyDown(row.id, e)} />
             </td>
             <td>
-                <input type='text'
+                <input type='number'
                     defaultValue={row.price}
                     className='price'
                     id={`${row.id}-price`}
@@ -179,14 +191,14 @@ function JobPage() {
                     borderColor="#8730d9"
                     size='30px'
                     icon={<Icon.FiCheck color='#8730d9' size={30} />}
-                    onChange={e => handleTextInputChange(row.id, e)} />
+                    onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
             </td>
         </tr >)
     }
 
 
     //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='4' disableSearch />
+    if (loading || !data) return <PageTemplate highLight='4' disableSearch {...props} />
     else return (
         <>
             <div className='assetarea'>
@@ -204,13 +216,13 @@ function JobPage() {
                         <tr>
                             <td><input type='text' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><Checkbox id={`new-isHourly`} className='isHourly' checked={false} borderWidth='5px' borderColor="#8730d9" size='30px' icon={<Icon.FiCheck color='#8730d9' size={30} />} onChange={e => handleTextInputChange('new', e)} /></td>
+                            <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><Checkbox id={`new-isHourly`} className='isHourly' checked={newIsHourly} borderWidth='5px' borderColor="#8730d9" size='30px' icon={<Icon.FiCheck color='#8730d9' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} /></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='4' disableSearch />
+            <PageTemplate highLight='4' disableSearch {...props} />
         </>
     )
 }

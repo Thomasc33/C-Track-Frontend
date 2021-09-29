@@ -9,6 +9,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.4",
+    "multiselect-react-dropdown": "^2.0.7",
     "react": "^17.0.2",
     "react-cookie-consent-notification": "^1.1.1",
     "react-custom-checkbox": "^2.0.0",

@@ -34,7 +34,7 @@
     overflow: hidden;
 }
 
-.SideBar a {
+.SideBar p {
     color: #fff;
     text-transform: uppercase;
     text-decoration: none;
@@ -42,9 +42,10 @@
     display: inline-block;
     padding: 15px 25px;
     position: relative;
+    cursor: pointer;
 }
 
-.SideBar a:after {
+.SideBar p:after {
     background: none repeat scroll 0 0 transparent;
     bottom: 0;
     content: "";
@@ -57,16 +58,16 @@
     width: 0;
 }
 
-.SideBar a:hover:after {
+.SideBar p:hover:after {
     width: 100%;
     left: 0;
 }
 
-.SideBar a.active {
+.SideBar p.active {
     color: #a778ff;
 }
 
-.SideBar a.active:after {
+.SideBar p.active:after {
     background: #a778ff;
 }
 
@@ -81,13 +82,14 @@
     padding: 0;
 }
 
-.dropdown-content a {
+.dropdown-content p {
     padding: 12px 16px;
     text-decoration: none;
     display: block;
+    cursor: pointer;
 }
 
-.dropdown-content a:hover {
+.dropdown-content p:hover {
     background-color: #a778ff79;
 
 }

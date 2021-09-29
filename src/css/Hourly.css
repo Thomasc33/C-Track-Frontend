@@ -83,6 +83,15 @@ td {
     width: 15%;
 }
 
+.rows td .Minimized-Time {
+    overflow: hidden;
+    height: 80px;
+}
+
+.rows td .Minimized-Time:hover {
+    height: 360px;
+}
+
 .rows td .TimeKeeper .react-timekeeper {
     width: 300px;
     height: 360px;
