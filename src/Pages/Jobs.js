@@ -198,7 +198,7 @@ function JobPage(props) {
 
 
     //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='4' disableSearch {...props} />
+    if (loading || !data) return <PageTemplate highLight='7' disableSearch {...props} />
     else return (
         <>
             <div className='assetarea'>
@@ -222,7 +222,7 @@ function JobPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='4' disableSearch {...props} />
+            <PageTemplate highLight='7' disableSearch {...props} />
         </>
     )
 }

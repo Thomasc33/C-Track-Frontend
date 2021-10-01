@@ -47,15 +47,18 @@ function PageTemplate(props) {
                             <p className={props.highLight === "3" ? "active" : ""} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
                         </li> : <></>}
                     <li>
+                        <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
+                    </li>
+                    <li>
                         <div className='dropDownHeader'>
-                            <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
+                            <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
                             <div className='dropdown-content'>
                                 <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p>
                                 {isAdmin || (permissions && permissions.view_jobcodes) ?
                                     <p onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_user) ?
                                     <p onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
-                                <p onClickCapture={(e) => props.history.push('/admind')}>Admin</p>
+                                <p onClickCapture={(e) => props.history.push('/admin')}>Admin</p>
                             </div>
                         </div>
                     </li>

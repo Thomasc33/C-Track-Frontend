@@ -12,4 +12,13 @@ export default {
             .catch(e => { return { isErrored: true, error: e } })
         return res
     },
+    updatePermissions: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/user/perm/edit`, FormData, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .catch(e => { return { isErrored: true, error: e } })
+        return res
+    }
 }

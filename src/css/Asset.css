@@ -105,7 +105,7 @@ td {
 
 .job_list ul {
     position: absolute;
-    width: 29.5%;
+    width: 100%;
     z-index: 1;
     background-color: #1b1b1b;
     border-radius: 0;
