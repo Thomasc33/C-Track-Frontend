@@ -1,0 +1,50 @@
+.ImporterArea {
+    position: absolute;
+    top: 8%;
+    left: 14%;
+    width: 84vw;
+    height: 90vh;
+    background-color: #1b1b1b67;
+    color: white;
+    text-align: center;
+    padding-top: 1rem;
+    overflow:scroll;
+}
+
+hr {
+    margin: 4rem;
+}
+
+.csv-input {
+    padding: 10px;
+    display: block;
+    margin: 15px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 20px;
+    background-color: #1b1b1b;
+}
+
+.confirm-alert {
+    position: absolute;
+    top: 3vh;
+    left: 40vh;
+    background-color: #1b1b1bef;
+    padding: 1rem;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    align-items: center;
+    width: 60vw;
+}
+
+.confirm-alert .grid {
+    color: white;
+    height: 75vh;
+    font-size: 20px;
+}
+
+.confirm-alert .grid .MuiTablePagination-root {
+    color: white;
+    font-size: 20px;
+}

@@ -13,6 +13,7 @@ import LoginPage from './Pages/Login';
 import HourlyPage from './Pages/Hourly';
 import JobPage from './Pages/Jobs';
 import UserPage from './Pages/User';
+import ImporterPage from './Pages/Importer'
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
@@ -96,7 +97,7 @@ function App(props) {
         <Route exact path="/login" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/logout" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/admin" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/importer" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/reports" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />

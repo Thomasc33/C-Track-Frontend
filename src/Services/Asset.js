@@ -6,7 +6,7 @@ export default {
     add: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/user/new`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e } })
-            console.log(res)
+        console.log(res)
         return res
     },
     edit: async (FormData, token) => {
@@ -16,6 +16,11 @@ export default {
     },
     delete: async (id, date, token) => {
         let res = await axios.delete(`${BaseApiUrl}/asset/user/del/${id}/${date}`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e } })
+        return res
+    },
+    fetch: async (id, token) => {
+        let res = await axios.get(`${BaseApiUrl}/asset/fetch/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e } })
         return res
     }
