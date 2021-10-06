@@ -50,6 +50,9 @@ function PageTemplate(props) {
                         <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
                     </li>
                     <li>
+                        <p className={props.highLight === "5" ? "active" : ""} onClickCapture={(e) => props.history.push('/models')}>Models</p>
+                    </li>
+                    <li>
                         <div className='dropDownHeader'>
                             <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
                             <div className='dropdown-content'>

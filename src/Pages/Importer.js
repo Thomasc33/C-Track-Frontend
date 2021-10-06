@@ -76,16 +76,37 @@ function ImporterPage(props) {
     }
 
     const sendData = async data => {
-        console.log(data)
+        let d = [...data]
         let token = await getTokenSilently()
-        let res = await axios.post(`${settings.APIBase}/importer/${isAsset ? `asset` : `model`}`, data, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+        let failed = []
+        while (d.length > 0) {
+            if (d.length <= 250) {
+                let r = await req(d)
+                d = []
+                if (r.failed && r.failed.length > 0) failed = [...failed, ...r.failed]
+                break
+            } else {
+                let sect = d.splice(0, 250)
+                let r = await req(sect)
+                if (r.failed && r.failed.length > 0) failed = [...failed, ...r.failed]
             }
-        }).catch(er => { return { isErrored: true, error: er } })
-        if (res.isErrored) return console.error(res.error)
-        props.history.push('/assets')
+        }
+        async function req(section) {
+            let res = await axios.post(`${settings.APIBase}/importer/${isAsset ? `asset` : `model`}`, section, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': '*'
+                }
+            }).catch(er => { return { isErrored: true, error: er, failed: er.response && er.response.data && er.response.data.failed ? er.response.data.failed : [] } })
+            if (res.isErrored) console.error(res.error)
+            else res.failed = res.data && res.data.field ? res.data.failed : []
+            return res
+        }
+        console.log(failed)
+        if (failed.length > 0)
+            if (failed.length > 20) alert(`Many assets failed to import. See list in console: ctrl + shift + j`)
+            else alert(`Some assets failed to import:${failed.map(m => { return `${m.id}: ${m.reason}` }).join('\n')}`)
+        else alert('Successfully Imported')
     }
     return (
         <>

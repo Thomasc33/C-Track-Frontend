@@ -26,7 +26,6 @@
 
 .rows {
     position: absolute;
-
     width: 85vw;
     margin-right: 1%;
     overflow-y: scroll;

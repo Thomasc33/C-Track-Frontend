@@ -9,6 +9,7 @@ import {
 import HomePage from './Pages/Home';
 import AssetPage from './Pages/Asset';
 import AssetsPage from './Pages/AssetPage';
+import ModelPage from './Pages/Models';
 import LoginPage from './Pages/Login';
 import HourlyPage from './Pages/Hourly';
 import JobPage from './Pages/Jobs';
@@ -93,6 +94,7 @@ function App(props) {
       <Switch>
         <Route exact path="/asset" render={props => <AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/login" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/logout" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
