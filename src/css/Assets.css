@@ -1,4 +1,4 @@
-.AssetArea {
+.AssetGridArea {
     position: absolute;
     top: 8%;
     left: 14%;
@@ -7,13 +7,17 @@
     background-color: #1b1b1b67;
 }
 
-.AssetArea .Grid {
+.AssetGridArea .Grid {
     color: white;
     font-size: 24px;
 }
 
-.AssetArea .Grid .MuiTablePagination-root {
+.AssetGridArea .Grid .MuiTablePagination-root {
     color: white;
     font-size: 24px;
-    font-family: 'Montserrat' sans-serif
+    font-family: 'Montserrat'sans-serif
+}
+
+* {
+    padding: 0;
 }

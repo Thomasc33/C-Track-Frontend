@@ -9,7 +9,7 @@ import '../css/SingleAsset.css'
 import axios from 'axios';
 
 const dontRender = ['id', 'image']
-const editable = ['return_reason', 'notes']
+const editable = ['return_reason', 'notes', 'model_number']
 
 function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
@@ -78,11 +78,12 @@ function AssetsPage(props) {
             change: row,
             value: e.target.value
         }
-        if (!formData.value) return e.target.classList.add('invalid')
+        if (!formData.value) formData.value = ''
 
         let token = await getTokenSilently()
         let res = await AssetService.singleEdit(formData, token)
         if (res.isErrored) { e.target.classList.add('invalid'); console.log(res.error) }
+        if(row === 'model_number') getAssetInfo()
     }
 
     const handleKeyDown = (row, e) => {

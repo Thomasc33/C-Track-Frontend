@@ -138,7 +138,7 @@ td {
 
 .rows td .delete-icon {
     padding-left: 1rem;
-    font-size: 32px;
+    font-size: 48px;
     cursor: pointer;
     user-select: none;
     -moz-user-select: none;

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template'
-import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
@@ -31,7 +31,6 @@ function AssetPage(props) {
         return res.accessToken
     }
 
-
     useEffect(() => {
         async function getJobCodes() {
             const response = await fetch(`${settings.APIBase}/job/all`, {
@@ -45,6 +44,8 @@ function AssetPage(props) {
         }
         getJobCodes()
     }, [])
+
+    if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Redirect to='/' />
 
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)

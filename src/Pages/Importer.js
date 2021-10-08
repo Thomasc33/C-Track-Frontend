@@ -80,13 +80,13 @@ function ImporterPage(props) {
         let token = await getTokenSilently()
         let failed = []
         while (d.length > 0) {
-            if (d.length <= 250) {
+            if (d.length <= 500) {
                 let r = await req(d)
                 d = []
                 if (r.failed && r.failed.length > 0) failed = [...failed, ...r.failed]
                 break
             } else {
-                let sect = d.splice(0, 250)
+                let sect = d.splice(0, 500)
                 let r = await req(sect)
                 if (r.failed && r.failed.length > 0) failed = [...failed, ...r.failed]
             }

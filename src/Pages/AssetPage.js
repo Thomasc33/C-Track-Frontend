@@ -61,12 +61,11 @@ function AssetsPage(props) {
         { field: 'status', headerName: 'Status', width: 500, valueGetter: params => job_codes[params.value] || params.value },
         { field: 'model_number', headerName: 'Model', width: 500, },
     ]
-    console.log(job_codes)
 
     return (
         <>
             <PageTemplate highLight='4' {...props} />
-            <div className='AssetArea'>
+            <div className='AssetGridArea'>
                 <DataGrid
                     className='Grid'
                     columns={columns}
