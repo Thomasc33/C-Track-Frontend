@@ -15,10 +15,12 @@ import HourlyPage from './Pages/Hourly';
 import JobPage from './Pages/Jobs';
 import UserPage from './Pages/User';
 import ImporterPage from './Pages/Importer'
+import SingleAssetPage from './Pages/SingleAsset'
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
 import './App.css';
+import Particles from './Components/Particles';
 const settings = require('./settings.json')
 
 function App(props) {
@@ -104,12 +106,16 @@ function App(props) {
         <Route exact path="/reports" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       </Switch>
     </BrowserRouter>
   )
-  else return (
+  if(!isAuthenticated) return (
     <LoginPage />
+  )
+  else return (
+    <Particles />
   )
 }
 

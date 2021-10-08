@@ -2,28 +2,29 @@ import React, { useEffect, useState } from 'react';
 import PageTemplate from './Template';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
+import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json';
 import ModelService from '../Services/Model';
-import Checkbox from 'react-custom-checkbox';
 import Select from 'react-select';
-import * as Icon from 'react-icons/fi';
 import '../css/Asset.css'
+import '../css/Models.css'
 import axios from 'axios';
 
 function ModelPage(props) {
     let APILink = `${settings.APIBase}/model`
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
+    const [pageNumber, setPageNumber] = useState(1)
     const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', category: '' })
 
     useEffect(() => {
         getCatalog()
     }, [])
 
-    async function getCatalog() {
+    async function getCatalog(offset = 0) {
         const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
-            offset: 0,
+            offset,
             limit: 25,
             orderBy: 'model_number'
         }, {
@@ -73,53 +74,42 @@ function ModelPage(props) {
                 document.getElementById('new-model_name').classList.add('invalid')
                 document.getElementById('new-manufacturer').classList.add('invalid')
             } else {
-                getCatalog()
                 document.getElementById('new-model_number').value = ''
                 document.getElementById('new-model_name').value = ''
                 document.getElementById('new-manufacturer').value = ''
+                alert(`Model ${z.model_number} has been added.`)
+                getCatalog((pageNumber - 1) * 25)
+                setNewInfo({ model_number: '', model_name: '', manufacturer: '', category: '' })
             }
-        } else for (let i of catalog.model_number) {
-            if (id === i.id) {
+        } else for (let i of catalog) {
+            if (id === i.model_number) {
+                // Data gathering
+                let formData = {
+                    id,
+                    change: null,
+                    value: null
+                }
 
-                // TO DO: This :^)
+                if (e.isSelect) { formData.change = 'category'; formData.value = e.value }
+                // eslint-disable-next-line default-case
+                else switch (e.target.className) {
+                    case 'model_number':
+                    case 'manufacturer':
+                        formData.change = e.target.className
+                        formData.value = e.target.value
+                        break;
+                    case 'model_name':
+                        formData.change = 'name'
+                        formData.value = e.target.value
+                }
 
+                if (!formData.change || !formData.value) return e.target.classList.add('invalid')
 
-                // //data validation
-                // let formData = {
-                //     id: i.id,
-                //     change: null,
-                //     value: null
-                // }
-                // // eslint-disable-next-line eqeqeq
-                // if (e.isHourly) {
-                //     formData.change = 'isHourly'
-                //     formData.value = e.selection.toString()
-                //     // eslint-disable-next-line default-case
-                // } else switch (e.target.className) {
-                //     case 'price':
-                //         if (e.target.value !== i.price) if (e.target.value) {
-                //             formData.change = 'price'
-                //             formData.value = e.target.value.replace(/[^\d]/g, '')
-                //         }
-                //         break;
-                //     case 'job_name':
-                //         if (e.target.value !== i.job_name) if (e.target.value) formData.change = 'job_name'
-                //         break;
-                //     case 'job_code':
-                //         if (e.target.value !== i.job_code) if (e.target.value) formData.change = 'job_code'
-                //         break;
-                // }
-
-                // if (!formData.change) return
-
-                // if (!formData.value) formData.value = e.target.value
-
-                // //send to api
-                // let token = await getTokenSilently()
-                // let res = await ModelService.edit(formData, token)
-                // if (res.isErrored) {
-                //     e.target.classList.add('invalid')
-                // }
+                let token = await getTokenSilently()
+                let res = await ModelService.edit(formData, token)
+                if (res.isErrored) {
+                    e.target.classList.add('invalid')
+                }
             }
         }
     }
@@ -130,6 +120,19 @@ function ModelPage(props) {
 
     const handleSelectChange = async (e, id) => {
         handleTextInputChange(id, { ...e, isSelect: true })
+    }
+
+    const handlePageChange = async (e) => {
+        if (e.target.id === 'next') {
+            setCatalog([])
+            setPageNumber(pageNumber + 1)
+            getCatalog(pageNumber * 25)
+        }
+        else {
+            setCatalog([])
+            setPageNumber(pageNumber - 1)
+            getCatalog((pageNumber - 2) * 25)
+        }
     }
 
     function RenderRow(row) {
@@ -178,6 +181,18 @@ function ModelPage(props) {
     return (
         <>
             <PageTemplate highLight='5' {...props} />
+            <div className='PageNavigation'>
+                <i className='material-icons PageArrow'
+                    style={pageNumber === 1 ? { color: 'gray' } : {}}
+                    id='previous'
+                    onClick={e => { if (pageNumber > 1) handlePageChange(e) }}
+                >navigate_before</i>
+                <i className='material-icons PageArrow'
+                    style={catalog.length >= 25 ? {} : { color: 'gray' }}
+                    id='next'
+                    onClick={e => catalog.length >= 25 ? handlePageChange(e) : console.log('Next page unavailable')}
+                >navigate_next</i>
+            </div>
             <div className='assetarea'>
                 <table className='rows'>
                     <thead>
@@ -189,6 +204,7 @@ function ModelPage(props) {
                         </tr>
                     </thead>
                     <tbody>
+                        {catalog.length === 0 ? <tr><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td></tr> : <></>}
                         {catalog ? catalog.map(m => RenderRow(m)) : <></>}
                         <tr>
                             <td><input type='text' placeholder='New...' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
@@ -214,7 +230,12 @@ function ModelPage(props) {
 
 export default ModelPage
 
-const multiSelectOptions = [{ value: 'laptop', label: 'Laptop' }, { value: 'tablet', label: 'Tablet' }, { value: 'phone', label: 'Phone' }, { value: 'mifi', label: 'MiFi' }]
+const multiSelectOptions = [
+    { value: 'laptop', label: 'Laptop' },
+    { value: 'tablet', label: 'Tablet' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'mifi', label: 'MiFi' }
+]
 
 const selectStyles = {
     control: (styles, { selectProps: { width } }) => ({

@@ -1,0 +1,17 @@
+.PageNavigation {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    color: white;
+    display: inline-block;
+}
+
+.PageArrow {
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    align-items: center;
+}

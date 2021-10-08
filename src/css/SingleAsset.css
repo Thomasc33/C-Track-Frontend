@@ -1,0 +1,90 @@
+.AssetArea {
+    position: absolute;
+    left: 14vw;
+    top: 10vh;
+    width: 85vw;
+    height: 90vh;
+    margin-right: 1%;
+    overflow-y: scroll;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.AssetArea * {
+    color: white;
+    padding: 1rem;
+}
+
+.AssetArea hr {
+    width: 75vw;
+    padding: 0;
+    margin: 1rem;
+}
+
+.AssetArea td {
+    font-size: 20px;
+}
+
+.AssetArea td input {
+    width: 85%;
+    background-color: #1b1b1b67;
+    border-style: none;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 1rem;
+    padding-right: 10%;
+}
+
+.AssetArea td input.invalid {
+    border-color: red;
+    border-style: solid;
+    animation: shake .3s;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}

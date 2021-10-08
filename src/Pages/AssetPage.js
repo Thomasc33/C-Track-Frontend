@@ -11,15 +11,29 @@ function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
+    const [job_codes, setJobCodes] = useState(null)
 
     useEffect(() => {
+        getJobCodes()
         getCatalog()
     }, [])
+    async function getJobCodes() {
+        const response = await fetch(`${settings.APIBase}/job/full`, {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        });
+        const data = await response.json();
+        let jc = {}
+        for (let i of data.job_codes) { jc[i.id] = i.job_name }
+        setJobCodes(jc)
+    }
     async function getCatalog() {
         const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
             offset: 0,
-            limit: 25,
+            limit: null,
             orderBy: 'model_number'
         }, {
             headers: {
@@ -42,6 +56,12 @@ function AssetsPage(props) {
             })
         return res.accessToken
     }
+    const columns = [
+        { field: 'id', headerName: 'Asset Tag', width: 350 },
+        { field: 'status', headerName: 'Status', width: 500, valueGetter: params => job_codes[params.value] || params.value },
+        { field: 'model_number', headerName: 'Model', width: 500, },
+    ]
+    console.log(job_codes)
 
     return (
         <>
@@ -63,8 +83,3 @@ function AssetsPage(props) {
 
 export default AssetsPage
 
-const columns = [
-    { field: 'id', headerName: 'Asset Tag', width: 250 },
-    { field: 'status', headerName: 'Status', width: 250 },
-    { field: 'model_number', headerName: 'Model', width: 250 },
-]
