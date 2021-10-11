@@ -6,16 +6,22 @@ import {
   BrowserRouter,
   useHistory
 } from "react-router-dom";
-import HomePage from './Pages/Home';
+
+// Import the Pages
+import AdminPage from './Pages/Admin';
 import AssetPage from './Pages/Asset';
 import AssetsPage from './Pages/AssetPage';
-import ModelPage from './Pages/Models';
-import LoginPage from './Pages/Login';
+import HomePage from './Pages/Home';
 import HourlyPage from './Pages/Hourly';
-import JobPage from './Pages/Jobs';
-import UserPage from './Pages/User';
 import ImporterPage from './Pages/Importer'
+import JobPage from './Pages/Jobs';
+import LoginPage from './Pages/Login';
+import ModelPage from './Pages/Models';
+import ReportsPage from './Pages/Reports';
 import SingleAssetPage from './Pages/SingleAsset'
+import UserPage from './Pages/User';
+
+// Import Libraries
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
@@ -98,12 +104,10 @@ function App(props) {
         <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/login" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/logout" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/admin" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/reports" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
@@ -111,7 +115,7 @@ function App(props) {
       </Switch>
     </BrowserRouter>
   )
-  if(!isAuthenticated) return (
+  if (!isAuthenticated) return (
     <LoginPage />
   )
   else return (

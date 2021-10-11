@@ -9,7 +9,7 @@ export default {
                 'Authorization': `Bearer ${token}`
             }
         })
-            .catch(e => { return { isErrored: true, error: e } })
+            .catch(e => { return { isErrored: true, error: e.response } })
         return res
     },
     updatePermissions: async (FormData, token) => {
@@ -18,7 +18,16 @@ export default {
                 'Authorization': `Bearer ${token}`
             }
         })
-            .catch(e => { return { isErrored: true, error: e } })
+            .catch(e => { return { isErrored: true, error: e.response } })
         return res
-    }
+    },
+    setAdmin: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/user/perm/edit/admin`, FormData, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .catch(e => { return { isErrored: true, error: e.response } })
+        return res
+    },
 }

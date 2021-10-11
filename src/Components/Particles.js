@@ -7,6 +7,7 @@ export default () => {
         <Particles
             width='100vw'
             height='100vh'
+            style={{overflow:'hidden'}}
             options={{
                 background: {
                     color: {

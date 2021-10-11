@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -20,6 +21,8 @@ function ModelPage(props) {
     useEffect(() => {
         getCatalog()
     }, [])
+
+    if (!props.permissions.view_models && !props.isAdmin) return <Redirect to='/' />
 
     async function getCatalog(offset = 0) {
         const token = await getTokenSilently()

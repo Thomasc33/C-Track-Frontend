@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template'
 import { DataGrid } from '@mui/x-data-grid';
 import { confirmAlert } from 'react-confirm-alert';
@@ -13,6 +14,7 @@ const settings = require('../settings.json')
 function ImporterPage(props) {
     const { instance, accounts } = useMsal()
     const [isAsset, setIsAsset] = useState(true)
+    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)

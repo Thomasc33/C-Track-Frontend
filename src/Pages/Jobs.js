@@ -1,4 +1,5 @@
 import React from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template'
 import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -16,9 +17,12 @@ function JobPage(props) {
     let APILink = `${settings.APIBase}/job`
     const [newJobCode, setNewJobCode] = useState('');
     const [newJobName, setNewJobName] = useState('');
+    const [inApi, setLoading] = useState(false)
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
     const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
+
+    if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -39,6 +43,7 @@ function JobPage(props) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
+            if (inApi) return
             let job_code = newJobCode;
             let job_name = newJobName;
             let price = newPrice;
@@ -80,13 +85,21 @@ function JobPage(props) {
 
             //send to api
             let formData = { job_code, job_name, price, isHourly }
+            setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
             if (res.isErrored) {
-                document.getElementById('new-jobcode').classList.add('invalid')
-                document.getElementById('new-jobname').classList.add('invalid')
-                document.getElementById('new-price').classList.add('invalid')
+                setLoading(false)
+                if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').classList.add('invalid')
+                if (document.getElementById('new-jobname')) document.getElementById('new-jobname').classList.add('invalid')
+                if (document.getElementById('new-price')) document.getElementById('new-price').classList.add('invalid')
             } else {
+                if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').value = ''
+                if (document.getElementById('new-jobname')) document.getElementById('new-jobname').value = ''
+                if (document.getElementById('new-price')) document.getElementById('new-price').value = ''
+                setNewPrice(0)
+                setNewJobName('')
+                setNewJobCode('')
                 const response = await fetch(`${APILink}/all`, {
                     mode: 'cors',
                     headers: {
@@ -95,13 +108,8 @@ function JobPage(props) {
                     }
                 });
                 const d = await response.json();
-                document.getElementById('new-jobcode').value = ''
-                document.getElementById('new-jobname').value = ''
-                document.getElementById('new-price').value = ''
                 setData(d);
-                setNewPrice(0)
-                setNewJobName('')
-                setNewJobCode('')
+                setLoading(false)
             }
         } else for (let i of data.job_codes) {
             if (id === i.id) {
@@ -181,7 +189,7 @@ function JobPage(props) {
                     className='price'
                     id={`${row.id}-price`}
                     onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
+                    onKeyDown={e => { handleKeyDown(row.id, e); handleTextInputChange(row.id, e) }} />
             </td>
             <td>
                 <Checkbox id={`${row.id}-isHourly`}
@@ -216,7 +224,7 @@ function JobPage(props) {
                         <tr>
                             <td><input type='text' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleTextInputChange('new', e); handleKeyDown('new', e) }}></input></td>
                             <td><Checkbox id={`new-isHourly`} className='isHourly' checked={newIsHourly} borderWidth='5px' borderColor="#8730d9" size='30px' icon={<Icon.FiCheck color='#8730d9' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} /></td>
                         </tr>
                     </tbody>

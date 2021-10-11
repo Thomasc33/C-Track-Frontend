@@ -28,7 +28,10 @@ const useFetch = (url, timeout = 5000) => {
                     'Authorization': `Bearer ${t}`,
                     'Access-Control-Allow-Origin': '*'
                 }
-            });
+            }).catch(er => {
+                return { isErrored: true, error: er.response }
+            })
+            if (response.isErrored) return console.log(response.error)
             const data = await response.json();
             setData(data);
             setLoading(false);

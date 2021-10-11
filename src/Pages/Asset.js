@@ -11,7 +11,8 @@ const settings = require('../settings.json')
 
 function AssetPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = `${settings.APIBase}/asset/user/`
+    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/asset/user/${props.location.state.uid}/` : `${settings.APIBase}/asset/user/`
+
     const [date, setDate] = useState(Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
@@ -78,11 +79,11 @@ function AssetPage(props) {
             //data validation
             let cont = true;
             if (!job_code) {
-                document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
+                if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
                 cont = false
             }
             if (!asset) {
-                document.getElementById('new-assetid').classList.add('invalid')
+                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                 cont = false
             }
             if (!cont) return
@@ -97,7 +98,7 @@ function AssetPage(props) {
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
-                document.getElementById('new-assetid').classList.add('invalid')
+                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
             } else {
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
@@ -108,8 +109,8 @@ function AssetPage(props) {
                 });
                 const d = await response.json();
                 console.log(d)
-                document.getElementById('new-assetid').value = ''
-                document.getElementById('new-notes').value = ''
+                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').value = ''
+                if (document.getElementById('new-notes')) document.getElementById('new-notes').value = ''
                 setData(d);
                 setNewComment('')
                 setNewAssetTag('')
@@ -220,7 +221,7 @@ function AssetPage(props) {
         </tr >)
     }
 
-
+    console.log(props.location.state)
 
     //returns blank page if data is loading
     if (loading || !data || !jobCodes) return <PageTemplate highLight='1' {...props} />

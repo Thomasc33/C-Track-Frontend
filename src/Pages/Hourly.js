@@ -1,4 +1,5 @@
 import React from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template'
 import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -10,17 +11,9 @@ import TimeKeeper from 'react-timekeeper';
 import '../css/Hourly.css';
 const settings = require('../settings.json')
 
-/*
- *  time on click, set style display to show the clock 
- * 
- */
-
-
-
-
 function HourlyPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = `${settings.APIBase}/hourly/user/`
+    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user/${props.location.state.uid}/` : `${settings.APIBase}/hourly/user/`
     const [date, setDate] = useState(Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
@@ -40,7 +33,6 @@ function HourlyPage(props) {
         return res.accessToken
     }
 
-
     useEffect(() => {
         async function getJobCodes() {
             const response = await fetch(`${settings.APIBase}/job/all`, {
@@ -55,6 +47,8 @@ function HourlyPage(props) {
         getJobCodes()
     }, [])
 
+    if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Redirect to='/' />
+
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)
     }
@@ -65,7 +59,7 @@ function HourlyPage(props) {
         } else if (e && isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else { //remove invalid from new job code input
-            document.getElementById('new-jobcode').classList.remove('invalid')
+            if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').classList.remove('invalid')
         }
         if (id === 'new') {
             let dateString = new Date(date).toISOString().split('T')[0]
@@ -158,7 +152,7 @@ function HourlyPage(props) {
                     if (formData.change === 'start') formData.value = dateInfo.startTime
                     else formData.value = dateInfo.endTime
                     let total_hours = getTotalHours(dateInfo.startTime, dateInfo.endTime)
-                    if (total_hours < 0) return document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid')
+                    if (total_hours < 0) if (document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`)) return document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid'); else return
                     formData.total_hours = total_hours
                 } else {
                     if (!isNaN(parseInt(e))) {
@@ -177,7 +171,7 @@ function HourlyPage(props) {
                 let res = await hourlyService.edit(formData, token)
                 if (res.isErrored) {
                     if (target) {
-                        document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid')
+                        if (document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`)) document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid')
                     } else e.target.classList.add('invalid')
                 }
             }

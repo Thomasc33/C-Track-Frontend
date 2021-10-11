@@ -1,0 +1,54 @@
+.AssetArea :hover {
+    border-color: white;
+    border-style: solid;
+    border-width: 3px;
+}
+
+.TopNav {
+    position: absolute;
+    left: 14vw;
+    top: 0;
+    height: 10vh;
+    width: 85vw;
+    display: flex;
+    align-items: center;
+    justify-content:space-evenly;
+}
+
+.ReportDate {
+    color: white;
+    border-style: solid;
+    border-color: #1b1b1b67;
+    background-color: #1b1b1b67;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 3rem;
+}
+
+.UserReports {
+    width: 48%;
+    margin: 1%;
+    background-color: #1b1b1b67;
+    text-align: center;
+    overflow-y: scroll;
+    border-radius: .5rem;
+}
+
+.UserReports :hover {
+    border-width: 0;
+}
+
+.UserReport {
+    width: 94%;
+    height: 4.5rem;
+    margin-left: 3%;
+    margin-right: 3%;
+    padding: 0;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+.UserReport h1 {
+    padding: 1rem;
+    font-size: 2rem;
+}

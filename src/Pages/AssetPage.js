@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Redirect } from 'react-router';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -17,6 +18,9 @@ function AssetsPage(props) {
         getJobCodes()
         getCatalog()
     }, [])
+
+    if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
+
     async function getJobCodes() {
         const response = await fetch(`${settings.APIBase}/job/full`, {
             mode: 'cors',

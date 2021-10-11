@@ -1,4 +1,5 @@
 import React from 'react';
+import { Redirect } from 'react-router'
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import Select from 'react-select';
@@ -13,6 +14,9 @@ function UserPage(props) {
     const { instance, accounts } = useMsal()
     let APILink = `${settings.APIBase}/user/`
     const { loading, data = [] } = useFetch(APILink.concat('all'), null)
+
+    if (!props.permissions.view_users && !props.isAdmin) return <Redirect to='/' />
+
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -25,6 +29,7 @@ function UserPage(props) {
             })
         return res.accessToken
     }
+
     const multiSelectOptions = []
     for (let i of Object.keys(props.permissions)) {
         if (i === 'id') continue

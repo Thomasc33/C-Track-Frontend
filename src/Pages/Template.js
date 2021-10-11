@@ -38,35 +38,40 @@ function PageTemplate(props) {
                     <li>
                         <p className={props.highLight === "0" ? "active" : ""} onClickCapture={(e) => props.history.push('/')}>Home</p>
                     </li>
-                    <li>
-                        <p className={props.highLight === "1" ? "active" : ""} onClickCapture={(e) => props.history.push('/asset')}>Asset Tracking</p>
-                    </li>
-                    <li>
-                        <p className={props.highLight === "2" ? "active" : ""} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
-                    </li>
+                    {isAdmin || (permissions && permissions.use_asset_tracker) ?
+                        <li>
+                            <p className={props.highLight === "1" ? "active" : ""} onClickCapture={(e) => props.history.push('/asset')}>Asset Tracking</p>
+                        </li> : <></>}
+                    {isAdmin || (permissions && permissions.use_hourly_tracker) ?
+                        <li>
+                            <p className={props.highLight === "2" ? "active" : ""} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
+                        </li> : <></>}
                     {isAdmin || (permissions && permissions.view_reports) ?
                         <li>
                             <p className={props.highLight === "3" ? "active" : ""} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
                         </li> : <></>}
-                    <li>
-                        <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
-                    </li>
-                    <li>
-                        <p className={props.highLight === "5" ? "active" : ""} onClickCapture={(e) => props.history.push('/models')}>Models</p>
-                    </li>
-                    <li>
+                    {isAdmin || (permissions && permissions.view_assets) ?
+                        <li>
+                            <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
+                        </li> : <></>}
+                    {isAdmin || (permissions && permissions.view_models) ?
+                        <li>
+                            <p className={props.highLight === "5" ? "active" : ""} onClickCapture={(e) => props.history.push('/models')}>Models</p>
+                        </li> : <></>}
+                    {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users)) ? < li >
                         <div className='dropDownHeader'>
                             <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
                             <div className='dropdown-content'>
-                                <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p>
+                                {isAdmin || (permissions && permissions.use_importer) ?
+                                    <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ?
                                     <p onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
-                                {isAdmin || (permissions && permissions.view_user) ?
+                                {isAdmin || (permissions && permissions.view_users) ?
                                     <p onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
-                                <p onClickCapture={(e) => props.history.push('/admin')}>Admin</p>
+                                {isAdmin ? <p onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
                             </div>
                         </div>
-                    </li>
+                    </li> : <></>}
                 </ul>
                 <div className='AccountButton'>
                     <button>{accounts[0] ? accounts[0].name : ''}</button>
@@ -75,15 +80,16 @@ function PageTemplate(props) {
                     </div>
                 </div>
             </div>
-            {props.disableSearch ? <></> :
-                <div className="searchBox">
-                    <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
-                    <button className="searchButton" onClick={clickHandler}>
-                        <i className="material-icons">search</i>
-                    </button>
-                </div>
+            {
+                props.disableSearch ? <></> :
+                    <div className="searchBox">
+                        <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
+                        <button className="searchButton" onClick={clickHandler}>
+                            <i className="material-icons">search</i>
+                        </button>
+                    </div>
             }
-        </div>
+        </div >
     )
 }
 
