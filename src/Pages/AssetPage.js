@@ -17,15 +17,18 @@ function AssetsPage(props) {
     useEffect(() => {
         getJobCodes()
         getCatalog()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
 
     async function getJobCodes() {
+        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/full`, {
             mode: 'cors',
             headers: {
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
             }
         });
         const data = await response.json();

@@ -1,4 +1,4 @@
 {
     "APIBase": "http://localhost:80/a",
-    "nonce": "9c214790-acda-4cda-a6ee-e255f3ae50aa"
+    "graphUrl": "https://graph.microsoft.com/v1.0"
 }

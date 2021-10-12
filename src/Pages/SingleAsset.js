@@ -23,6 +23,7 @@ function AssetsPage(props) {
         if (!search) return
         getJobCodes()
         getAssetInfo()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
     async function getJobCodes() {
@@ -84,8 +85,8 @@ function AssetsPage(props) {
 
         let token = await getTokenSilently()
         let res = await AssetService.singleEdit(formData, token)
-        if (res.isErrored) { e.target.classList.add('invalid'); console.log(res.error) }
-        if(row === 'model_number') getAssetInfo()
+        if (res.isErrored) { e.target.classList.add('invalid'); console.warn(res.error) }
+        if (row === 'model_number') getAssetInfo()
     }
 
     const handleKeyDown = (row, e) => {
@@ -139,7 +140,7 @@ function AssetsPage(props) {
                                     <table style={{ width: asset.image ? '60%' : '100%' }}><tbody>
                                         {Object.keys(asset).map(m => { if (!dontRender.includes(m)) return renderRow(m); else return <></> })}
                                     </tbody></table>
-                                    <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} />
+                                    <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} alt='Asset' />
                                 </div>
                             </div>
                 }

@@ -209,7 +209,7 @@ function JobPage(props) {
     if (loading || !data) return <PageTemplate highLight='7' disableSearch {...props} />
     else return (
         <>
-            <div className='assetarea'>
+            <div className='AssetArea'style={{top:'3vh', height: '97vh'}}>
                 <table className='rows'>
                     <thead>
                         <tr>

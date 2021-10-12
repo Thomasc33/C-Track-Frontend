@@ -1,7 +1,6 @@
 import React from 'react'
 import { useMsal } from "@azure/msal-react";
 import CookieConsent from 'react-cookie-consent-notification';
-import SingleAssetPage from './SingleAsset';
 import ParticlesElement from '../Components/Particles';
 import '../css/Page-Template.css';
 
@@ -14,7 +13,6 @@ function PageTemplate(props) {
         let search = document.getElementById('search').value
         if (!search) return
         props.history.push(`/search?q=${search}`)
-        console.log('searched for:', search)
     }
 
     const handleKeyDown = e => {

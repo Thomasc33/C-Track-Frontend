@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Switch,
   Route,
-  BrowserRouter,
-  useHistory
+  BrowserRouter
 } from "react-router-dom";
 
 // Import the Pages
@@ -32,7 +31,6 @@ const settings = require('./settings.json')
 function App(props) {
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal()
-  const history = useHistory()
   const [isAuthed, setAuthed] = useState(localStorage.getItem('isVerified'))
   const [{ permissions, isAdmin, loading }, setState] = useState({
     permissions: null,

@@ -1,9 +1,3 @@
-.AssetArea :hover {
-    border-color: white;
-    border-style: solid;
-    border-width: 3px;
-}
-
 .TopNav {
     position: absolute;
     left: 14vw;
@@ -12,7 +6,7 @@
     width: 85vw;
     display: flex;
     align-items: center;
-    justify-content:space-evenly;
+    justify-content: space-evenly;
 }
 
 .ReportDate {
@@ -23,6 +17,11 @@
     padding: 1rem;
     font-size: 1rem;
     border-radius: 3rem;
+}
+
+.AssetArea .ReportDate {
+    padding: 1rem;
+    margin: 1rem;
 }
 
 .UserReports {
@@ -38,17 +37,20 @@
     border-width: 0;
 }
 
-.UserReport {
-    width: 94%;
-    height: 4.5rem;
+.AssetArea .UserReports .UserReport {
+    width: auto;
+    height: 3.2rem;
+    padding: 1rem;
     margin-left: 3%;
     margin-right: 3%;
-    padding: 0;
+    margin-top: 1rem;
     border-radius: .5rem;
     cursor: pointer;
+    display: flex;
+    justify-content:space-between;
 }
 
 .UserReport h1 {
-    padding: 1rem;
+    padding: .4rem;
     font-size: 2rem;
 }

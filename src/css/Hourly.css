@@ -1,94 +1,15 @@
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Work+Sans:300,400,700,900");
-
-.assetarea {
-    position: absolute;
-    left: 14vw;
-    top: 10vh;
-    width: 85vw;
-    height: 90vh;
-    margin-right: 1%;
-    overflow-y: scroll;
-}
-
-.date {
-    position: absolute;
-    top: 2%;
-    left: 14%;
-    background-color: transparent;
-    color: white;
-    border-style: solid;
-    border-color: #1b1b1b67;
-    background-color: #1b1b1b67;
-    padding: 1rem;
-    font-size: 1rem;
-    border-radius: 3rem;
-}
-
-.rows {
-    position: absolute;
-    white-space: nowrap;
-    width: 85vw;
-    margin-right: 1%;
-    overflow-y: scroll;
-}
-
-.rows th,
-td {
-    font-family: 'Montserrat', sans-serif;
-    color: white;
-}
-
-.rows th {
-    font-size: 26px;
-    letter-spacing: 0.1em;
-    font-weight: normal;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 1rem;
-}
-
-.rows td {
-    padding: 1rem;
-    font-size: 20px;
-}
-
-.rows td input {
-    width: 85%;
-    background-color: #1b1b1b67;
-    border-style: none;
-    font-size: 20px;
-    font-family: 'Montserrat', sans-serif;
-    color: white;
-    padding: 1rem;
-    padding-right: 10%;
-}
-
-.rows td input.invalid {
-    border-color: red;
-    border-style: solid;
-    animation: shake .3s;
-}
-
-.rows td .invalid {
-    border-color: red;
-    border-style: solid;
-    animation: shake .3s;
-}
-
-.rows td {
-    text-align: center;
-    align-items: center;
-}
-
 .rows .TimeColumn {
     width: 15%;
 }
 
 .rows td .Minimized-Time {
     overflow: hidden;
+    transition: ease-in-out .5s;
     height: 80px;
 }
 
 .rows td .Minimized-Time:hover {
+    transition: ease-in-out .5s;
     height: 360px;
 }
 
@@ -134,56 +55,6 @@ td {
 
 .rows td .TimeKeeper .react-timekeeper__clock {
     background: #141414a6;
-}
-
-.rows td .delete-icon {
-    padding-left: 1rem;
-    font-size: 48px;
-    cursor: pointer;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    align-items: center;
-}
-
-
-.job_list li {
-    list-style-type: none;
-}
-
-.job_list li:hover {
-    background-color: rgba(138, 138, 138, 0.404);
-}
-
-.job_list li button {
-    font-family: 'Montserrat', sans-serif;
-    color: white;
-    background: #1b1b1b67;
-    font-size: 20px;
-    border-style: none;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    width: 100%;
-}
-
-.job_list .is-highlighted {
-    background-color: rgba(138, 138, 138, 0.404);
-
-}
-
-.job_list ul {
-    position: absolute;
-    width: 29.4%;
-    z-index: 1;
-    background-color: #1b1b1b;
-    border-radius: 0;
-    align-items: left;
-    max-height: 70vh;
-    overflow: scroll;
-}
-
-.job_list__value {
-    background-color: transparent;
 }
 
 @keyframes shake {

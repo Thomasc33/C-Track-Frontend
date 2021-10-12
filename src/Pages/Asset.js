@@ -13,7 +13,7 @@ function AssetPage(props) {
     const { instance, accounts } = useMsal()
     let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/asset/user/${props.location.state.uid}/` : `${settings.APIBase}/asset/user/`
 
-    const [date, setDate] = useState(Date.now())
+    const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
     const [newAssetTag, setNewAssetTag] = useState('');
@@ -34,16 +34,19 @@ function AssetPage(props) {
 
     useEffect(() => {
         async function getJobCodes() {
+            let t = await getTokenSilently()
             const response = await fetch(`${settings.APIBase}/job/all`, {
                 mode: 'cors',
                 headers: {
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${t}`
                 }
             });
             const data = await response.json();
             setJobCodes(data.job_codes)
         }
         getJobCodes()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Redirect to='/' />
@@ -108,7 +111,6 @@ function AssetPage(props) {
                     }
                 });
                 const d = await response.json();
-                console.log(d)
                 if (document.getElementById('new-assetid')) document.getElementById('new-assetid').value = ''
                 if (document.getElementById('new-notes')) document.getElementById('new-notes').value = ''
                 setData(d);
@@ -190,7 +192,7 @@ function AssetPage(props) {
      * 
      */
     function RenderRow(row) {
-        return (<tr id={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <SelectSearch
                     options={getJobArray()}
@@ -205,30 +207,26 @@ function AssetPage(props) {
                 />
             </td>
             <td><input type='text' defaultValue={row.asset_id} className='asset_id' id={`${row.id}-assetid`} onBlur={e => handleTextInputChange(row.id, e)} onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
-            <td>
+            <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
                     className='notes'
                     id={`${row.id}-notes`}
-                    style={{ width: '79%' }}
+                    style={{ width: '79%', marginRight: '1rem' }}
                     onBlur={e => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon"
-                    onClickCapture={e => handleDelete(row.id, e)}
-                    style={{ marginBottom: '-0.4rem' }}>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e)}>
                     delete_outline</i>
             </td>
         </tr >)
     }
-
-    console.log(props.location.state)
 
     //returns blank page if data is loading
     if (loading || !data || !jobCodes) return <PageTemplate highLight='1' {...props} />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
-            <div className='assetarea'>
+            <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>

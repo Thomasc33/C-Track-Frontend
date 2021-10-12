@@ -14,10 +14,7 @@ const settings = require('../settings.json')
 function ReportsPage(props) {
     const [date, setDate] = useState(Date.now())
     const [data, setData] = useState([])
-    const [graphDate, setGraphDate] = useState({
-        from: getDateSubtractMonth(date),
-        to: getDate(date)
-    })
+    const [graphDate, setGraphDate] = useState({ from: getDateSubtractMonth(date), to: getDate(date) })
     const [loading, setLoading] = useState(true)
     const [lineChartData, setLineChartData] = useState({})
     const [onUser, setOnUser] = useState(null)
@@ -34,41 +31,43 @@ function ReportsPage(props) {
             })
         return res.accessToken
     }
-    useEffect(() => {
-        async function sendReq(doSetLoading = true) {
-            if (doSetLoading) setLoading(true)
-            let t = await getTokenSilently()
-            let url = onUser ? `${settings.APIBase}/reports/user/${onUser}/${getDate(date)}` : `${settings.APIBase}/reports/users/daily/${getDate(date)}`
-            let graphUrl = onUser ? `${settings.APIBase}/reports/graph/user/${onUser}/${graphDate.from}/${graphDate.to}` : null
-            const response = await fetch(url, {
-                mode: 'cors',
-                headers: {
-                    'Authorization': `Bearer ${t}`,
-                    'Access-Control-Allow-Origin': '*'
-                }
-            }).catch(er => { return { isErrored: true, error: er.response } })
-            if (response.isErrored) return console.log(response.error)
-            const data = await response.json();
-            let lineReq
-            if (onUser) {
-                lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}` } })
-                    .catch(er => { return { isErrored: true, error: er.response } })
-                if (lineReq.isErrored) return console.log(response.error)
-                lineReq = lineReq.data
-            }
-            setData(data)
-            setLineChartData(lineReq)
-            setLoading(false)
-        }
-        sendReq()
-    }, [onUser, date])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => { sendReq() }, [onUser, graphDate, date])
     if (!props.permissions.view_reports && !props.isAdmin) return <Redirect to='/' />
+
+    async function sendReq(doSetLoading = true) {
+        if (doSetLoading) setLoading(true)
+        let t = await getTokenSilently()
+        let url = onUser ? `${settings.APIBase}/reports/user/${onUser}/${getDate(date)}` : `${settings.APIBase}/reports/users/daily/${getDate(date)}`
+        let graphUrl = onUser ? `${settings.APIBase}/reports/graph/user/${onUser}/${graphDate.from}/${graphDate.to}` : null
+        const response = await fetch(url, {
+            mode: 'cors',
+            headers: {
+                'Authorization': `Bearer ${t}`,
+                'Access-Control-Allow-Origin': '*'
+            }
+        }).catch(er => { return { isErrored: true, error: er.response } })
+        if (response.isErrored) return console.log(response.error)
+        const data = await response.json();
+        let lineReq
+        if (onUser) {
+            lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}` } })
+                .catch(er => { return { isErrored: true, error: er.response } })
+            if (lineReq.isErrored) return console.log(response.error)
+            lineReq = lineReq.data
+        }
+        setData(data)
+        setLineChartData(lineReq)
+        setLoading(false)
+    }
 
     const handleDateChange = (e) => {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleGraphDateChange = () => {
+    const handleGraphDateChange = e => {
+        console.log(e)
         setGraphDate({
             from: document.getElementById('from_selector').value,
             to: document.getElementById('to_selector').value
@@ -87,21 +86,21 @@ function ReportsPage(props) {
     }
 
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .5)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : '#8730d9'
-        return (<div className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
-            <h1 style={{ float: 'left' }}>{row.name}</h1>
-            <h1 style={{ float: 'right' }}>${row.dailydollars}</h1>
-        </div>)
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : '#8730d9'
+        return <div className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
+            <h1>{row.name}</h1>
+            <h1>${row.dailydollars}</h1>
+        </div>
     }
 
     function renderSingleUserRow(k, v) {
         return (
             <div className='UserReport' style={{ cursor: 'default' }}>
-                <h1 style={{ float: 'left' }}>{k}</h1>
-                <h1 style={{ float: 'right' }}>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
+                <h1>{k}</h1>
+                <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
             </div >)
     }
-    console.log(lineChartData)
+
     if (loading) return (<>
         <div className='AssetArea'>
             <div className='UserReports'>
@@ -118,8 +117,8 @@ function ReportsPage(props) {
         <div className='TopNav'>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => handleBackClick()}>Back</Button>
             <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser }) }}>View Asset Tracker</Button>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser }) }}>View Hourly Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
         </div >
         <div className='AssetArea'>
             {onUser ?
@@ -127,10 +126,12 @@ function ReportsPage(props) {
                     <div className='UserReports'>
                         {Object.keys(data).map(k => renderSingleUserRow(k, data[k]))}
                     </div>
-                    <div className='UserReports'>
-                        <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={() => handleGraphDateChange()} />
-                        <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={() => handleGraphDateChange()} />
-                        <LineChart data={lineChartData} />
+                    <div className='UserReports' style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                            <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
+                            <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
+                        </div>
+                        <LineChart data={lineChartData} prefix="$" colors={["#8730d9"]} />
                     </div>
                 </> : <>
                     <div className='UserReports'>
@@ -139,7 +140,7 @@ function ReportsPage(props) {
                             : <></>}
                     </div>
                     <div className='UserReports'>
-                        <h1>Placeholder for future functionality</h1>
+                        <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Placeholder for future functionality</h1>
                     </div>
                 </>
             }

@@ -14,7 +14,7 @@ const settings = require('../settings.json')
 function HourlyPage(props) {
     const { instance, accounts } = useMsal()
     let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user/${props.location.state.uid}/` : `${settings.APIBase}/hourly/user/`
-    const [date, setDate] = useState(Date.now())
+    const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [newJobCode, setNewJobCode] = useState(0);
     const [newComment, setNewComment] = useState('');
@@ -35,16 +35,19 @@ function HourlyPage(props) {
 
     useEffect(() => {
         async function getJobCodes() {
+            let t = await getTokenSilently()
             const response = await fetch(`${settings.APIBase}/job/all`, {
                 mode: 'cors',
                 headers: {
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${t}`
                 }
             });
             const data = await response.json();
             setJobCodes(data.job_codes)
         }
         getJobCodes()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Redirect to='/' />
@@ -125,7 +128,6 @@ function HourlyPage(props) {
                     }
                 });
                 const d = await response.json();
-                console.log(d)
                 document.getElementById('new-notes').value = ''
                 setData(d);
                 setNewComment('')
@@ -213,6 +215,8 @@ function HourlyPage(props) {
     }
 
     const handleTimeSelectChange = async (id, isStart, e) => {
+        let target = document.getElementById(`${id}-${isStart ? 'Start' : 'End'}`)
+        if (target && target.classList && target.classList.contains('invalid')) target.classList.remove('invalid')
         let sendToAPI = false
         if (id === 'new')
             if (times.new) {
@@ -240,8 +244,7 @@ function HourlyPage(props) {
         }
 
         if (sendToAPI) {
-            let target = `${id}-${isStart ? 'start' : 'end'}`
-            handleTextInputChange(id, null, target)
+            handleTextInputChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
         }
     }
 
@@ -259,7 +262,7 @@ function HourlyPage(props) {
      */
     function RenderRow(row) {
         if (data.records.length > Object.keys(times).length) parseTime()
-        return (<tr id={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{verticalAlign:'top'}}>
             <td>
                 <SelectSearch
                     options={getJobArray()}
@@ -270,6 +273,7 @@ function HourlyPage(props) {
                     className='job_list'
                     autoComplete='on'
                     onChange={e => handleTextInputChange(row.id, e)}
+                    menuPlacement='auto'
                     id={`${row.id}-jobcode`}
                 />
             </td>
@@ -303,14 +307,12 @@ function HourlyPage(props) {
         </tr >)
     }
 
-
-    console.log(times)
     //returns blank page if data is loading
     if (loading || !data || !jobCodes) return <PageTemplate highLight='2' {...props} />
     else return (
         <>
             <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
-            <div className='assetarea'>
+            <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>

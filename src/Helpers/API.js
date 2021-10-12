@@ -38,6 +38,7 @@ const useFetch = (url, timeout = 5000) => {
         }
         callFetch()
         if (timeout) setInterval(callFetch, timeout)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [url, timeout])
 
     return { data, loading, setData, setLoading }

@@ -20,6 +20,7 @@ function ModelPage(props) {
 
     useEffect(() => {
         getCatalog()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     if (!props.permissions.view_models && !props.isAdmin) return <Redirect to='/' />
@@ -143,7 +144,7 @@ function ModelPage(props) {
         for (let i of multiSelectOptions) {
             if (i.value === row.category) defaultOption = [i]
         }
-        return (<tr id={`${row.model_number}-row`}>
+        return (<tr id={`${row.model_number}-row`} key={`${row.model_number}-row`}>
             <td>
                 <input type='text'
                     defaultValue={row.model_number}
@@ -196,7 +197,7 @@ function ModelPage(props) {
                     onClick={e => catalog.length >= 25 ? handlePageChange(e) : console.log('Next page unavailable')}
                 >navigate_next</i>
             </div>
-            <div className='assetarea'>
+            <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>
@@ -210,10 +211,10 @@ function ModelPage(props) {
                         {catalog.length === 0 ? <tr><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td></tr> : <></>}
                         {catalog ? catalog.map(m => RenderRow(m)) : <></>}
                         <tr>
-                            <td><input type='text' placeholder='New...' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' placeholder='New...' className='model_name' id={`new-model_name`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' placeholder='New...' className='manufacturer' id={`new-manufacturer`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td>
+                            <td key={`new-model_number`}><input type='text' placeholder='New...' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-model_name`}><input type='text' placeholder='New...' className='model_name' id={`new-model_name`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-manufacturer`}><input type='text' placeholder='New...' className='manufacturer' id={`new-manufacturer`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-category`}>
                                 <Select
                                     options={multiSelectOptions}
                                     closeMenuOnSelect

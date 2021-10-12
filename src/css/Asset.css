@@ -1,15 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Work+Sans:300,400,700,900");
 
-.assetarea {
-    position: absolute;
-    left: 14vw;
-    top: 10vh;
-    width: 85vw;
-    height: 90vh;
-    margin-right: 1%;
-    overflow-y: scroll;
-}
-
 .date {
     position: absolute;
     top: 2%;
@@ -26,6 +16,7 @@
 
 .rows {
     position: absolute;
+    white-space: nowrap;
     width: 85vw;
     margin-right: 1%;
     overflow-y: scroll;
@@ -68,7 +59,6 @@ td {
 }
 
 .delete-icon {
-    padding-left: 1rem;
     font-size: 32px;
     cursor: pointer;
     user-select: none;
@@ -87,6 +77,8 @@ td {
 }
 
 .job_list li button {
+    padding-left: 6rem;
+    padding-right: 6rem;
     font-family: 'Montserrat', sans-serif;
     color: white;
     background: #1b1b1b67;
@@ -99,13 +91,10 @@ td {
 
 .job_list .is-highlighted {
     background-color: rgba(138, 138, 138, 0.404);
-
 }
 
 .job_list ul {
     position: absolute;
-    width: 100%;
-    z-index: 1;
     background-color: #1b1b1b;
     border-radius: 0;
     align-items: left;

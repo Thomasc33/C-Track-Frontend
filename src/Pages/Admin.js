@@ -68,7 +68,7 @@ function AdminPage(props) {
     if (loading || !data) return <PageTemplate highLight='7' {...props} />
     else return (
         <>
-            <div className='assetarea'>
+            <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>
