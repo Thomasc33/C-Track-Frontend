@@ -9,6 +9,7 @@
     border-style: solid;
     border-color: #1b1b1b67;
     background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
     padding: 1rem;
     font-size: 1rem;
     border-radius: 3rem;
@@ -44,12 +45,14 @@ td {
 .rows td input {
     width: 85%;
     background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
     border-style: none;
     font-size: 20px;
     font-family: 'Montserrat', sans-serif;
     color: white;
     padding: 1rem;
     padding-right: 10%;
+    border-radius: .2rem;
 }
 
 .rows td input.invalid {
@@ -104,6 +107,52 @@ td {
 
 .job_list__value {
     background-color: transparent;
+}
+
+.AddAssetPrompt {
+    display: none;
+    position: absolute;
+    top: 50vh;
+    right: 50vw;
+    transform: translate(50%, -50%);
+    min-width: 30vw;
+    max-width: 80vw;
+    min-height: 60vh;
+    max-height: 80vh;
+    background-color: #1b1b1bef;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-radius: 1rem;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.AddAssetPrompt * {
+    color: white;
+    margin: 2rem;
+}
+
+.AddAssetPrompt input {
+    width: 50%;
+    background-color: #1b1b1b;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border: white solid 3px;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 1rem;
+    padding-right: 10%;
+    border-radius: .5rem;
+}
+
+.AddAssetPrompt input.invalid {
+    border-color: red;
+    border-style: solid;
+    animation: shake .3s;
+}
+
+.Show {
+    display: flex;
 }
 
 @keyframes shake {

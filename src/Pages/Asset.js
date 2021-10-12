@@ -7,6 +7,7 @@ import assetService from '../Services/Asset'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/Asset.css'
+import { Button } from '@material-ui/core';
 const settings = require('../settings.json')
 
 function AssetPage(props) {
@@ -102,6 +103,14 @@ function AssetPage(props) {
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
                 if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
+                try {
+                    if (res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
+                        console.log('show')
+                        document.getElementById('missingAssetBox').classList.add('Show')
+                        document.getElementById('missingAssetId').innerText = `${asset}`
+                    }
+                }
+                catch (er) { }
             } else {
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
@@ -151,6 +160,13 @@ function AssetPage(props) {
                 }
             }
         }
+    }
+
+    const handleAssetAdding = async () => {
+        if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
+        let model = document.getElementById('model_input').value
+        if (!model) return document.getElementById('model_input').classList.add('invalid')
+        
     }
 
     const handleKeyDown = async (id, e) => {
@@ -257,6 +273,17 @@ function AssetPage(props) {
                 </table>
             </div>
             <PageTemplate highLight='1' {...props} />
+            <div id='missingAssetBox' className='AddAssetPrompt'>
+                <h1 style={{ textDecoration: 'underline', marginLeft: '3rem', marginRight: '3rem' }}>Asset Does Not Exist:</h1>
+                <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
+                {props.permissions.edit_assets || props.isAdmin ? <input id='model_input' type='text' className='notes' placeholder='Model Number' /> : <></>}
+                <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
+                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: '#8730d9' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
+                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: '#8730d9' }} onClick={() => {
+                        document.getElementById('missingAssetBox').classList.remove('Show')
+                    }}>Back</Button>
+                </div>
+            </div>
         </>
     )
 }

@@ -106,6 +106,7 @@
     background-color: #a778ff93;
     position: absolute;
     border-radius: .6rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
 }
 
 .AccountButton button {
@@ -124,12 +125,13 @@
 .AccountButton:hover .AccountDropDown {
     display: block;
     max-height: 300px;
-    transition: all 1.3s linear;
+    transition: ease-in-out .5s;
 }
 
 .AccountDropDown {
     display: none;
     bottom: 100%;
+    transition: ease-in-out .5s;
 }
 
 .AccountDropDown button {
@@ -143,11 +145,13 @@
     letter-spacing: 0.2em;
     left: 0;
     padding: 1rem;
+    border-bottom-left-radius: .6rem;
+    border-bottom-right-radius: .6rem;
 }
 
 .AccountDropDown button:hover {
     text-decoration: underline 2px;
-    transition: width 0.3s ease 0s, left 0.3s ease 0s;
+    transition: ease-in-out .5s;
 }
 
 

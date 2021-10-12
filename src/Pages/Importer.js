@@ -104,7 +104,6 @@ function ImporterPage(props) {
             else res.failed = res.data && res.data.field ? res.data.failed : []
             return res
         }
-        console.log(failed)
         if (failed.length > 0)
             if (failed.length > 20) alert(`Many assets failed to import. See list in console: ctrl + shift + j`)
             else alert(`Some assets failed to import:${failed.map(m => { return `${m.id}: ${m.reason}` }).join('\n')}`)
