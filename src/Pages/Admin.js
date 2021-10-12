@@ -45,7 +45,7 @@ function AdminPage(props) {
      * 
      */
     function RenderRow(row) {
-        return (<tr id={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <p>{row.name}</p>
             </td>

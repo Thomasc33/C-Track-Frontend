@@ -87,7 +87,7 @@ function ReportsPage(props) {
 
     function renderUserRow(row) {
         let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : '#8730d9'
-        return <div className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
+        return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
         </div>
@@ -95,7 +95,7 @@ function ReportsPage(props) {
 
     function renderSingleUserRow(k, v) {
         return (
-            <div className='UserReport' style={{ cursor: 'default' }}>
+            <div key={k} className='UserReport' style={{ cursor: 'default' }}>
                 <h1>{k}</h1>
                 <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
             </div >)

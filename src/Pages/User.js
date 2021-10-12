@@ -108,7 +108,7 @@ function UserPage(props) {
         if (props.isAdmin || props.permissions.edit_users)
             for (let i of multiSelectOptions)
                 if (row[i.value]) defaultOptions.push(i)
-        return (<tr id={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <p>{row.name}</p>
             </td>

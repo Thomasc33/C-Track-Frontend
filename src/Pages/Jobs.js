@@ -166,7 +166,7 @@ function JobPage(props) {
      * 
      */
     function RenderRow(row) {
-        return (<tr id={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <input type='text'
                     defaultValue={row.job_code}
@@ -209,7 +209,7 @@ function JobPage(props) {
     if (loading || !data) return <PageTemplate highLight='7' disableSearch {...props} />
     else return (
         <>
-            <div className='AssetArea'style={{top:'3vh', height: '97vh'}}>
+            <div className='AssetArea' style={{ top: '3vh', height: '97vh' }}>
                 <table className='rows'>
                     <thead>
                         <tr>
