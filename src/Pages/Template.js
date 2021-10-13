@@ -58,7 +58,7 @@ function PageTemplate(props) {
                         </li> : <></>}
                     {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users)) ? < li >
                         <div className='dropDownHeader'>
-                            <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => props.history.push('/tools')}>Tools</p>
+                            <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => {}}>Tools</p>
                             <div className='dropdown-content'>
                                 {isAdmin || (permissions && permissions.use_importer) ?
                                     <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
