@@ -28,5 +28,18 @@ export default {
         let res = await axios.post(`${BaseApiUrl}/asset/edit`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e.response } })
         return res
+    },
+    /**
+     * 
+     * @param {Object} FormData 
+     * @param {String} FormData.asset_id
+     * @param {String} FormData.model_id
+     * @param {*} token 
+     * @returns 
+     */
+    create: async (FormData, token) => {
+        let res = await axios.put(`${BaseApiUrl}/asset/create`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e.response.data.message } })
+        return res
     }
 }

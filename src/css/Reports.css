@@ -18,6 +18,7 @@
     padding: 1rem;
     font-size: 1rem;
     border-radius: 3rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
 }
 
 .AssetArea .ReportDate {
@@ -49,6 +50,7 @@
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
 }
 
 .UserReport h1 {

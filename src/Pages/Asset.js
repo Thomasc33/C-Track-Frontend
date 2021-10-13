@@ -163,10 +163,23 @@ function AssetPage(props) {
     }
 
     const handleAssetAdding = async () => {
+        // Get model
         if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
         let model = document.getElementById('model_input').value
         if (!model) return document.getElementById('model_input').classList.add('invalid')
 
+        // Get asset
+        let asset = document.getElementById('missingAssetId').innerText
+        if (!asset) { console.log('Asset missing from asset adding function'); document.getElementById('model_input').classList.add('invalid'); return }
+
+        let FormData = { model_id: model, asset_id: asset }
+        const t = await getTokenSilently()
+        let res = await assetService.create(FormData, t)
+        if (res.isErrored) {
+            document.getElementById('model_input').value = `Invalid Model Number`
+            document.getElementById('model_input').classList.add('invalid')
+            console.log(res.error)
+        } else document.getElementById('missingAssetBox').classList.remove('Show')
     }
 
     const handleKeyDown = async (id, e) => {
@@ -270,8 +283,8 @@ function AssetPage(props) {
                                     id='new-jobcode'
                                 />
                             </td>
-                            <td><input type='text' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='text' placeholder='Asset Tag' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                     </tbody>
                 </table>

@@ -66,7 +66,6 @@ function ModelPage(props) {
             }
 
             // Check to see if its ready to send to DB
-            console.log(z)
             if (!(z.model_number && z.model_name && z.manufacturer && z.category)) return
 
             //send to api
@@ -166,7 +165,8 @@ function ModelPage(props) {
                     defaultValue={row.manufacturer}
                     className='manufacturer'
                     id={`${row.model_number}-manufacturer`}
-                    onKeyDown={e => handleKeyDown(row.model_number, e)} />
+                    onKeyDown={e => handleKeyDown(row.model_number, e)}
+                    onBlur={e => handleTextInputChange(row.model_number, e)} />
             </td>
             <td>
                 <Select
