@@ -38,7 +38,6 @@ function JobPage(props) {
     }
 
     const handleTextInputChange = async (id, e) => {
-        console.log(e)
         if (!e.isHourly) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }

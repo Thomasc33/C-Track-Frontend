@@ -35,3 +35,9 @@
 .AssetArea * {
   padding: 0;
 }
+
+.DateArrows {
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}

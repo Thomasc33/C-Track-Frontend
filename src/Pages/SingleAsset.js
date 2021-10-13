@@ -9,13 +9,14 @@ import AssetService from '../Services/Asset'
 import '../css/SingleAsset.css'
 import axios from 'axios';
 
-const dontRender = ['id', 'image']
+const dontRender = ['id', 'image', 'status']
 const editable = ['return_reason', 'notes', 'model_number']
 
 function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
     const { instance, accounts } = useMsal()
     const [asset, setAsset] = useState()
+    const [assetHistory, setHistory] = useState([])
     const [job_codes, setJobCodes] = useState(null)
     const search = props.searchTerm || new URLSearchParams(props.location.search).get('q')
 
@@ -27,10 +28,12 @@ function AssetsPage(props) {
     }, [])
     if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
     async function getJobCodes() {
+        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/full`, {
             mode: 'cors',
             headers: {
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
             }
         });
         const data = await response.json();
@@ -48,7 +51,9 @@ function AssetsPage(props) {
             }
         })
         if (res.isErrored) return console.log(res)
-        data = { ...res.data }
+        if (res.data.notFound) return setAsset(res.data)
+        setHistory(res.data.history)
+        data = { ...res.data.info }
         res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -57,6 +62,7 @@ function AssetsPage(props) {
         })
         if (res.isErrored) console.log(res)
         else data = { ...data, ...res.data, image: 'https://cpoc.snipe-it.io/uploads/models/assetmodel-image-HbUU9iqzqS.png' } // remove this later
+        console.log(data)
         setAsset(data)
     }
     async function getTokenSilently() {
@@ -103,17 +109,28 @@ function AssetsPage(props) {
                 val = asset[row]
         }
         return (
-            <tr>
+            <tr key={row}>
                 <td style={{ width: '30%' }}>{titleCase(row.replace('_', ' '))}</td>
                 <td style={{ width: '70%' }}>
                     <input type='text'
                         defaultValue={val}
                         id={`${row}`}
                         style={{ width: '79%' }}
-                        readOnly={editable.includes(row) && props.permissions.edit_assets ? false : true}
+                        readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
                         onBlur={e => handleTextInputChange(row, e)}
                         onKeyDown={e => handleKeyDown(row, e)} />
                 </td>
+            </tr>
+        )
+    }
+    function renderHistoryRow(row) {
+        let d = new Date(row.date)
+        let date = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`
+        return (
+            <tr key={row.id}>
+                <td><p>{row.name}</p></td>
+                <td><p>{job_codes[row.job_code]}</p></td>
+                <td><p>{date}</p></td>
             </tr>
         )
     }
@@ -132,7 +149,7 @@ function AssetsPage(props) {
                                 </div>
                                     : <></>}
                             </div>
-                            : <div>
+                            : <div style={{ overflow: 'scroll' }}>
                                 <h1>Asset Information For:</h1>
                                 <h1>{search}</h1>
                                 <hr />
@@ -141,6 +158,12 @@ function AssetsPage(props) {
                                         {Object.keys(asset).map(m => { if (!dontRender.includes(m)) return renderRow(m); else return <></> })}
                                     </tbody></table>
                                     <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} alt='Asset' />
+                                </div>
+                                <br />
+                                <h1>Status History</h1>
+                                <hr />
+                                <div style={{ display: 'flex' }}>
+                                    {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th></thead>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
                                 </div>
                             </div>
                 }

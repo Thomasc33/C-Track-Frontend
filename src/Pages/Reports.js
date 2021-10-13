@@ -116,7 +116,11 @@ function ReportsPage(props) {
     return (<>
         <div className='TopNav'>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => handleBackClick()}>Back</Button>
-            <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
+            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
+                <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
+            </div>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
         </div >
@@ -160,6 +164,18 @@ function getDate(date) {
 function getDateSubtractMonth(date) {
     date = new Date(date)
     date.setMonth(date.getMonth() - 1)
+    return date.toISOString().split('T')[0]
+}
+
+function addDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() + 86400000)
+    return date.toISOString().split('T')[0]
+}
+
+function removeDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() - 86400000)
     return date.toISOString().split('T')[0]
 }
 

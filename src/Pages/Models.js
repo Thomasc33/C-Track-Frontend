@@ -245,6 +245,8 @@ const selectStyles = {
     control: (styles, { selectProps: { width } }) => ({
         ...styles,
         backgroundColor: '#1b1b1b67',
+        boxShadow: ' 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)',
+        borderRadius: '.25rem',
         padding: '.5rem',
         border: 'none',
         width

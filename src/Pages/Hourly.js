@@ -262,7 +262,7 @@ function HourlyPage(props) {
      */
     function RenderRow(row) {
         if (data.records.length > Object.keys(times).length) parseTime()
-        return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{verticalAlign:'top'}}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{ verticalAlign: 'top' }}>
             <td>
                 <SelectSearch
                     options={getJobArray()}
@@ -311,7 +311,12 @@ function HourlyPage(props) {
     if (loading || !data || !jobCodes) return <PageTemplate highLight='2' {...props} />
     else return (
         <>
-            <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
+            <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
+                <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
+            </div>
+
             <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
@@ -324,7 +329,7 @@ function HourlyPage(props) {
                     </thead>
                     <tbody>
                         {data.records ? data.records.map(m => RenderRow(m)) : <></>}
-                        <tr>
+                        <tr style={{ verticalAlign: 'top' }}>
                             <td>
                                 <SelectSearch
                                     options={getJobArray()}
@@ -344,7 +349,7 @@ function HourlyPage(props) {
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
                                     doneButton={(newTime) => (
-                                        <div style={{ textAlign: 'center', padding: '9px 0', backgroundColor: '#141414a6' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
+                                        <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
                                             <i className="material-icons">done</i>
                                         </div>
                                     )}
@@ -356,7 +361,7 @@ function HourlyPage(props) {
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', false, e)}
                                     doneButton={(newTime) => (
-                                        <div style={{ textAlign: 'center', padding: '9px 0', backgroundColor: '#141414a6' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
+                                        <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
                                             <i className="material-icons">done</i>
                                         </div>
                                     )}
@@ -420,4 +425,16 @@ function getTotalHours(startTime, endTime) {
     //add that to total hours
     total_hours += t;
     return total_hours
+}
+
+function addDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() + 86400000)
+    return date.toISOString().split('T')[0]
+}
+
+function removeDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() - 86400000)
+    return date.toISOString().split('T')[0]
 }

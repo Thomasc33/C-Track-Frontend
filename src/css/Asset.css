@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Work+Sans:300,400,700,900");
 
 .date {
-    position: absolute;
-    top: 2%;
-    left: 14%;
     background-color: transparent;
     color: white;
     border-style: solid;

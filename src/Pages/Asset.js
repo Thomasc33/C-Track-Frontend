@@ -166,7 +166,7 @@ function AssetPage(props) {
         if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
         let model = document.getElementById('model_input').value
         if (!model) return document.getElementById('model_input').classList.add('invalid')
-        
+
     }
 
     const handleKeyDown = async (id, e) => {
@@ -241,7 +241,11 @@ function AssetPage(props) {
     if (loading || !data || !jobCodes) return <PageTemplate highLight='1' {...props} />
     else return (
         <>
-            <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
+            <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
+                <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
+                <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
+            </div>
             <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
@@ -297,5 +301,17 @@ export default AssetPage
  */
 function getDate(date) {
     date = new Date(date)
+    return date.toISOString().split('T')[0]
+}
+
+function addDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() + 86400000)
+    return date.toISOString().split('T')[0]
+}
+
+function removeDay(date) {
+    date = new Date(date)
+    date.setTime(date.getTime() - 86400000)
     return date.toISOString().split('T')[0]
 }

@@ -11,6 +11,8 @@
 .AssetArea td input {
     width: 85%;
     background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-radius: .25rem;
     border-style: none;
     font-size: 20px;
     font-family: 'Montserrat', sans-serif;
@@ -23,6 +25,27 @@
     border-color: red;
     border-style: solid;
     animation: shake .3s;
+}
+
+.AssetArea .HistoryTable {
+    width: 100%;
+}
+
+.AssetArea .HistoryTable th {
+    font-size: 1.5rem;
+    padding: .5rem;
+    margin: .5rem;
+}
+
+.AssetArea .HistoryTable td {
+    padding: .5rem;
+}
+
+.AssetArea .HistoryTable td p {
+    padding: .75rem;
+    background-color: #1b1b1b67;
+    border-radius: .25rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
 }
 
 @keyframes shake {

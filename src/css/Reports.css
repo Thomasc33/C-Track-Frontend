@@ -7,6 +7,7 @@
     display: flex;
     align-items: center;
     justify-content: space-evenly;
+    align-items: 'center';
 }
 
 .ReportDate {
@@ -47,7 +48,7 @@
     border-radius: .5rem;
     cursor: pointer;
     display: flex;
-    justify-content:space-between;
+    justify-content: space-between;
 }
 
 .UserReport h1 {

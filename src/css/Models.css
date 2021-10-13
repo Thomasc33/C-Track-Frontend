@@ -15,3 +15,7 @@
     -webkit-user-select: none;
     align-items: center;
 }
+
+.MuiSvgIcon-root { 
+    color:white;
+}
