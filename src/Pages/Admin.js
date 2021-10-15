@@ -49,7 +49,7 @@ function AdminPage(props) {
             <td>
                 <p>{row.name}</p>
             </td>
-            <td>
+            <td style={{display:'flex', justifyContent:"center"}}>
                 <Checkbox
                     id={`${row.id}-isAdmin`}
                     className='isHourly'
@@ -57,7 +57,7 @@ function AdminPage(props) {
                     borderWidth='5px'
                     borderColor="#8730d9"
                     size='30px'
-                    icon={<Icon.FiCheck color='#8730d9' size={30} />}
+                    icon={<Icon.FiCheck color='#8730d9' size={36} />}
                     onChange={e => handlePermissionChange(e, row.id)} />
             </td>
         </tr >)

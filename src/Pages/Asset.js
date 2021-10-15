@@ -105,7 +105,6 @@ function AssetPage(props) {
                 if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                 try {
                     if (res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
-                        console.log('show')
                         document.getElementById('missingAssetBox').classList.add('Show')
                         document.getElementById('missingAssetId').innerText = `${asset}`
                     }
