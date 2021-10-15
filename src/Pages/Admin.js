@@ -49,7 +49,7 @@ function AdminPage(props) {
             <td>
                 <p>{row.name}</p>
             </td>
-            <td style={{display:'flex', justifyContent:"center"}}>
+            <td style={{ display: 'flex', justifyContent: "center" }}>
                 <Checkbox
                     id={`${row.id}-isAdmin`}
                     className='isHourly'
