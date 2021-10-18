@@ -41,7 +41,7 @@
 
 .AssetArea .UserReports .UserReport {
     width: auto;
-    height: 3.2rem;
+    min-height: 2.8rem;
     padding: 1rem;
     margin-left: 3%;
     margin-right: 3%;
@@ -55,5 +55,6 @@
 
 .UserReport h1 {
     padding: .4rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    text-align: left;
 }

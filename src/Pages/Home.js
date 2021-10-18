@@ -63,7 +63,7 @@ function HomePage(props) {
         if (row.percentComplete) background = `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${row.percentComplete}%, #1b1b1b 100%)`
         return <div key={row.id} className='UserReport' style={{ background: background, cursor: 'default' }}>
             <h1 style={{ float: 'left' }}>{row.title}</h1>
-            <h1 style={{ fontSize: '1.75rem', float: 'right' }}>Created: {1 + created.getMonth()}-{created.getDate()}{row.dueDateTime ? `, Due: ${1 + due.getMonth()}-${due.getDate()}` : ''}</h1>
+            <h1 style={{ float: 'right', textAlign: 'right' }}>Created: {1 + created.getMonth()}-{created.getDate()}{row.dueDateTime ? `, Due: ${1 + due.getMonth()}-${due.getDate()}` : ''}</h1>
         </div >
     }
 

@@ -20,7 +20,7 @@ function LoginPage(props) {
             <ParticlesElement />
             <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
             <div className='login'>
-                <img src='http://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RWEJ0w?ver=a65e' alt='microsoft logo' />
+                <img src='https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RWEJ0w?ver=a65e' alt='microsoft logo' />
                 <button onClick={() => handleLogin()}>Login with Microsoft</button>
                 <br />
                 <br />
