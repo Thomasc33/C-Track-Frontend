@@ -35,21 +35,7 @@
     background-color: #1b1b1b67;
 }
 
-.rows td .TimeKeeper .react-timekeeper__tb-hour {
-    color: white;
-}
 
-.rows td .TimeKeeper .react-timekeeper__tb-hour--active {
-    color: #8730d9;
-}
-
-.rows td .TimeKeeper .react-timekeeper__tb-minute {
-    color: white;
-}
-
-.rows td .TimeKeeper .react-timekeeper__tb-minute--active {
-    color: #8730d9;
-}
 
 .rows td .TimeKeeper .react-timekeeper__clock {
     background: #141414a6;

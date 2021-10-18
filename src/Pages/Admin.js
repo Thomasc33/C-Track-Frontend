@@ -55,9 +55,9 @@ function AdminPage(props) {
                     className='isHourly'
                     checked={row.is_admin}
                     borderWidth='5px'
-                    borderColor="#8730d9"
+                    borderColor={localStorage.getItem('accentColor') || '#c9c622'}
                     size='30px'
-                    icon={<Icon.FiCheck color='#8730d9' size={36} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#c9c622'} size={36} />}
                     onChange={e => handlePermissionChange(e, row.id)} />
             </td>
         </tr >)

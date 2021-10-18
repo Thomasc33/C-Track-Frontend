@@ -2,12 +2,12 @@
 import React from 'react'
 import Particles from 'react-tsparticles'
 
-export default () => {
+export default (props) => {
     return (
         <Particles
             width='100vw'
             height='100vh'
-            style={{overflow:'hidden'}}
+            style={{ overflow: 'hidden' }}
             options={{
                 background: {
                     color: {
@@ -41,7 +41,7 @@ export default () => {
                         value: 60,
                     },
                     color: {
-                        value: "#8730d9"
+                        value: props.color
                     },
                     links: {
                         color: "#99AAB5",

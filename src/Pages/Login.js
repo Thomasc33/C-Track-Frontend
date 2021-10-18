@@ -17,7 +17,7 @@ function LoginPage(props) {
 
     return (
         <div className="App">
-            <ParticlesElement />
+            <ParticlesElement color={localStorage.getItem('accentColor') || '#e3de00'} />
             <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
             <div className='login'>
                 <img src='https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RWEJ0w?ver=a65e' alt='microsoft logo' />

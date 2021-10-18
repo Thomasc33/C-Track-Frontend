@@ -86,7 +86,7 @@ function ReportsPage(props) {
     }
 
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : '#8730d9'
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .8)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#524e00'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
@@ -94,8 +94,10 @@ function ReportsPage(props) {
     }
 
     function renderSingleUserRow(k, v) {
+        console.log(v)
+        let accent = localStorage.getItem('accentColor') || '#524e00'
         return (
-            <div key={k} className='UserReport' style={{ cursor: 'default' }}>
+            <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .8)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : accent : 'inherit' }}>
                 <h1>{k}</h1>
                 <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
             </div >)
@@ -115,14 +117,14 @@ function ReportsPage(props) {
     )
     return (<>
         <div className='TopNav'>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => handleBackClick()}>Back</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => handleBackClick()}>Back</Button>
             <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: '#8730d9' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
         </div >
         <div className='AssetArea'>
             {onUser ?
@@ -135,7 +137,7 @@ function ReportsPage(props) {
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
-                        <LineChart data={lineChartData} prefix="$" colors={["#8730d9"]} />
+                        <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#e3de00']} />
                     </div>
                 </> : <>
                     <div className='UserReports'>

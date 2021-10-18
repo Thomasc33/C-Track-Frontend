@@ -263,7 +263,7 @@ function AssetPage(props) {
                     <thead>
                         <tr>
                             <th>Job Code</th>
-                            <th>Asset Tag</th>
+                            <th>Asset Tag / IMEI</th>
                             <th>Comments</th>
                         </tr>
                     </thead>
@@ -282,7 +282,7 @@ function AssetPage(props) {
                                     id='new-jobcode'
                                 />
                             </td>
-                            <td><input type='text' placeholder='Asset Tag' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                     </tbody>
@@ -294,8 +294,8 @@ function AssetPage(props) {
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
                 {props.permissions.edit_assets || props.isAdmin ? <input id='model_input' type='text' className='notes' placeholder='Model Number' /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
-                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: '#8730d9' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
-                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: '#8730d9' }} onClick={() => {
+                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
+                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => {
                         document.getElementById('missingAssetBox').classList.remove('Show')
                     }}>Back</Button>
                 </div>

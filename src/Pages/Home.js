@@ -48,7 +48,7 @@ function HomePage(props) {
      * 
      */
     function renderStatsData(k, v) {
-        return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : '#8730d9' : '#1b1b1b67' }}>
+        return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .8)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : '#524e00' : '#1b1b1b67' }}>
             <h1 style={{ float: 'left' }}>{k}</h1>
             <h1 style={{ float: 'right' }}>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
         </div >
@@ -58,9 +58,9 @@ function HomePage(props) {
         let created = new Date(row.createdDateTime)
         let due = new Date(row.dueDateTime)
         let now = new Date()
-        let background = '#8730d9'
-        if (row.dueDateTime && (due.getMonth() < now.getMonth() || due.getDate() < now.getDate())) background = 'red'
-        if (row.percentComplete) background = `linear-gradient(90deg, #8730d9 0%, ${blendColors('#8730d9', '#1b1b1b', .3)} ${row.percentComplete}%, #1b1b1b 100%)`
+        let background = localStorage.getItem('accentColor') || '#524e00'
+        if (row.dueDateTime && (due.getMonth() < now.getMonth() || due.getDate() < now.getDate())) background = '#a33c00e2'
+        if (row.percentComplete) background = `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#e3de00', '#1b1b1b', .3)} ${row.percentComplete}%, #1b1b1b 100%)`
         return <div key={row.id} className='UserReport' style={{ background: background, cursor: 'default' }}>
             <h1 style={{ float: 'left' }}>{row.title}</h1>
             <h1 style={{ float: 'right', textAlign: 'right' }}>Created: {1 + created.getMonth()}-{created.getDate()}{row.dueDateTime ? `, Due: ${1 + due.getMonth()}-${due.getDate()}` : ''}</h1>

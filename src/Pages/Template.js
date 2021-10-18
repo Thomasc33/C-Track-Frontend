@@ -4,10 +4,17 @@ import CookieConsent from 'react-cookie-consent-notification';
 import ParticlesElement from '../Components/Particles';
 import '../css/Page-Template.css';
 
+const dropDownHoverStyle = {
+    ':hover': {
+        color: localStorage.getItem('accentColor') || '#524e00'
+    }
+}
+
 function PageTemplate(props) {
     const { instance, accounts } = useMsal()
     const permissions = props.permissions
     const isAdmin = props.isAdmin
+    const accent = localStorage.getItem('accentColor') || '#e3de00'
 
     const clickHandler = async () => {
         let search = document.getElementById('search').value
@@ -29,52 +36,52 @@ function PageTemplate(props) {
 
     return (
         <div className="App">
-            <ParticlesElement />
+            <ParticlesElement color={accent} />
             <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
             <div className='SideBar'>
                 <ul>
                     <li>
-                        <p className={props.highLight === "0" ? "active" : ""} onClickCapture={(e) => props.history.push('/')}>Home</p>
+                        <p style={{ color: props.highLight === "0" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/')}>Home</p>
                     </li>
                     {isAdmin || (permissions && permissions.use_asset_tracker) ?
                         <li>
-                            <p className={props.highLight === "1" ? "active" : ""} onClickCapture={(e) => props.history.push('/asset')}>Asset Tracking</p>
+                            <p style={{ color: props.highLight === "1" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/asset')}>Asset Tracking</p>
                         </li> : <></>}
                     {isAdmin || (permissions && permissions.use_hourly_tracker) ?
                         <li>
-                            <p className={props.highLight === "2" ? "active" : ""} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
+                            <p style={{ color: props.highLight === "2" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
                         </li> : <></>}
                     {isAdmin || (permissions && permissions.view_reports) ?
                         <li>
-                            <p className={props.highLight === "3" ? "active" : ""} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
+                            <p style={{ color: props.highLight === "3" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
                         </li> : <></>}
                     {isAdmin || (permissions && permissions.view_assets) ?
                         <li>
-                            <p className={props.highLight === "4" ? "active" : ""} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
+                            <p style={{ color: props.highLight === "4" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/assets')}>Assets</p>
                         </li> : <></>}
                     {isAdmin || (permissions && permissions.view_models) ?
                         <li>
-                            <p className={props.highLight === "5" ? "active" : ""} onClickCapture={(e) => props.history.push('/models')}>Models</p>
+                            <p style={{ color: props.highLight === "5" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/models')}>Models</p>
                         </li> : <></>}
                     {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users)) ? < li >
                         <div className='dropDownHeader'>
-                            <p className={props.highLight === "7" ? "active" : ""} onClickCapture={(e) => {}}>Tools</p>
+                            <p style={{ color: props.highLight === "7" ? accent : 'white' }} onClickCapture={(e) => { }}>Tools</p>
                             <div className='dropdown-content'>
                                 {isAdmin || (permissions && permissions.use_importer) ?
-                                    <p onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
+                                    <p style={{ '&:hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ?
-                                    <p onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_users) ?
-                                    <p onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
-                                {isAdmin ? <p onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
+                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
                             </div>
                         </div>
                     </li> : <></>}
                 </ul>
                 <div className='AccountButton'>
-                    <button>{accounts[0] ? accounts[0].name : ''}</button>
+                    <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}>{accounts[0] ? accounts[0].name : ''}</button>
                     <div className='AccountDropDown'>
-                        <button onClick={() => LogoutHandler()}>Logout</button>
+                        <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => LogoutHandler()}>Logout</button>
                     </div>
                 </div>
             </div>

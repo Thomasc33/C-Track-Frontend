@@ -195,9 +195,9 @@ function JobPage(props) {
                     className='isHourly'
                     checked={row.is_hourly}
                     borderWidth='5px'
-                    borderColor="#8730d9"
+                    borderColor=""
                     size='30px'
-                    icon={<Icon.FiCheck color='#8730d9' size={30} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#524e00'} size={30} />}
                     onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
             </td>
         </tr >)
@@ -224,7 +224,7 @@ function JobPage(props) {
                             <td><input type='text' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleTextInputChange('new', e); handleKeyDown('new', e) }}></input></td>
-                            <td><Checkbox id={`new-isHourly`} className='isHourly' checked={newIsHourly} borderWidth='5px' borderColor="#8730d9" size='30px' icon={<Icon.FiCheck color='#8730d9' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} /></td>
+                            <td><Checkbox id={`new-isHourly`} className='isHourly' checked={newIsHourly} borderWidth='5px' borderColor={localStorage.getItem('accentColor') || '#524e00'} size='30px' icon={<Icon.FiCheck color='#e3de00' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} /></td>
                         </tr>
                     </tbody>
                 </table>
