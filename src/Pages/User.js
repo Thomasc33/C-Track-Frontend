@@ -124,7 +124,7 @@ function UserPage(props) {
                         <Select
                             options={multiSelectOptions}
                             isMulti
-                            width='38vw'
+                            width='33vw'
                             closeMenuOnSelect={false}
                             styles={selectStyles}
                             defaultValue={defaultOptions}

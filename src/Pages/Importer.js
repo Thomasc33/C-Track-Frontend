@@ -113,7 +113,7 @@ function ImporterPage(props) {
         <>
             <div className='ImporterArea'>
                 <h1>CSV Format - {isAsset ? `Assets` : `Models`}</h1>
-                <div style={{ display: 'inline-block', padding: '1rem' }}><h3 style={{ padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', fontFamily: 'Consolas, monaco, monospace' }}>
+                <div style={{ display: 'inline-block', padding: '1rem' }}><h3 style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', fontFamily: 'Consolas, monaco, monospace' }}>
                     {isAsset ?
                         asset_columns.map(m => m.field).join(',') :
                         model_columns.map(m => m.field).join(',')
@@ -125,11 +125,11 @@ function ImporterPage(props) {
                 <CSVReader cssClass="react-csv-input" onFileLoaded={handleData} />
                 <hr />
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Or Paste It</h3>
-                <textarea id='csv-text' style={{ width: '90%', height: '10rem', padding: '1rem', margin: '1rem', backgroundColor: '#1b1b1b', borderColor: 'white', borderWidth: '3px', boxShadow: 'none', color: 'white', fontSize: '16px', verticalAlign: 'top' }} />
+                <textarea id='csv-text' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', width: '90%', height: '10rem', padding: '1rem', margin: '1rem', backgroundColor: '#1b1b1b', borderColor: 'white', borderWidth: '3px', color: 'white', fontSize: '16px', verticalAlign: 'top' }} />
                 <br />
-                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#8730d9' }} onClick={e => handleButtonClick(e)}>Parse</Button>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: '#8730d9' }} onClick={e => handleButtonClick(e)}>Parse</Button>
                 <hr style={{ marginTop: '2rem', marginBottom: '2rem' }} />
-                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#8730d9' }} onClick={e => setIsAsset(!isAsset)}>Switch to Model Importer</Button>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: '#8730d9' }} onClick={e => setIsAsset(!isAsset)}>Switch to Model Importer</Button>
             </div>
             <PageTemplate highLight='7' disableSearch {...props} />
         </>
