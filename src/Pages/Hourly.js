@@ -317,7 +317,7 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
 
-            <div className='AssetArea'>
+            <div className='AssetArea' style={{overflowX:'scroll'}}>
                 <table className='rows'>
                     <thead>
                         <tr>
