@@ -281,6 +281,7 @@ function HourlyPage(props) {
                 <TimeKeeper
                     coarseMinutes='15'
                     time={row.start_time.substr(11, 5)}
+                    css={{ color: localStorage.getItem('accentColor') || '#E3DE00' }}
                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                     onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
                 /></div></td>
@@ -317,7 +318,7 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
 
-            <div className='AssetArea' style={{overflowX:'scroll'}}>
+            <div className='AssetArea' style={{ overflowX: 'scroll' }}>
                 <table className='rows'>
                     <thead>
                         <tr>

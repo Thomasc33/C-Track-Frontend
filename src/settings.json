@@ -1,4 +1,4 @@
 {
-    "APIBase": "http://localhost:80/a",
+    "APIBase": "http://localhost:3005/a",
     "graphUrl": "https://graph.microsoft.com/v1.0"
 }

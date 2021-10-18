@@ -4,12 +4,6 @@ import CookieConsent from 'react-cookie-consent-notification';
 import ParticlesElement from '../Components/Particles';
 import '../css/Page-Template.css';
 
-const dropDownHoverStyle = {
-    ':hover': {
-        color: localStorage.getItem('accentColor') || '#524e00'
-    }
-}
-
 function PageTemplate(props) {
     const { instance, accounts } = useMsal()
     const permissions = props.permissions
