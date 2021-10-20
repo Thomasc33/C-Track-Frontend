@@ -61,7 +61,7 @@ function AssetsPage(props) {
             }
         })
         if (res.isErrored) console.log(res)
-        else data = { ...data, ...res.data, image: 'https://cpoc.snipe-it.io/uploads/models/assetmodel-image-HbUU9iqzqS.png' } // remove this later
+        else data = { ...data, ...res.data }
         console.log(data)
         setAsset(data)
     }
@@ -125,7 +125,7 @@ function AssetsPage(props) {
     }
     function renderHistoryRow(row) {
         let d = new Date(row.date)
-        let date = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`
+        let date = `${parseInt(d.getMonth()) + 1}-${d.getDate()}-${d.getFullYear()}`
         return (
             <tr key={row.id}>
                 <td><p>{row.name}</p></td>
