@@ -61,18 +61,18 @@ function UserPage(props) {
                 color: 'white',
                 ':active': {
                     ...styles[':active'],
-                    backgroundColor: "purple",
+                    backgroundColor: localStorage.getItem('accentColor') || '#524e00',
                 },
                 ':hover': {
                     ...styles[':hover'],
-                    backgroundColor: 'purple'
+                    backgroundColor: localStorage.getItem('accentColor') || '#524e00'
                 }
             };
         },
         multiValue: (styles, { data }) => {
             return {
                 ...styles,
-                backgroundColor: 'purple',
+                backgroundColor: localStorage.getItem('accentColor') || '#524e00',
             };
         },
         multiValueLabel: (styles, { data }) => ({

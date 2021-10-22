@@ -94,11 +94,10 @@ function ReportsPage(props) {
     }
 
     function renderSingleUserRow(k, v) {
-        console.log(v)
         let accent = localStorage.getItem('accentColor') || '#524e00'
         return (
             <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .8)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : accent : 'inherit' }}>
-                <h1>{k}</h1>
+                <h1>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
                 <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
             </div >)
     }
