@@ -13,6 +13,7 @@ function PageTemplate(props) {
     const clickHandler = async () => {
         let search = document.getElementById('search').value
         if (!search) return
+        if (props.setSearch) props.setSearch(search)
         props.history.push(`/search?q=${search}`)
     }
 

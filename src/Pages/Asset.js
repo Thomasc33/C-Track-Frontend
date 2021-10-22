@@ -19,6 +19,7 @@ function AssetPage(props) {
     const [newJobCode, setNewJobCode] = useState(0);
     const [newAssetTag, setNewAssetTag] = useState('');
     const [newComment, setNewComment] = useState('');
+    const [missingAssetId, setMissingAssetId] = useState(null)
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -107,6 +108,7 @@ function AssetPage(props) {
                     if (res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
                         document.getElementById('missingAssetBox').classList.add('Show')
                         document.getElementById('missingAssetId').innerText = `${asset}`
+                        setMissingAssetId({ id: 'new', e })
                     }
                 }
                 catch (er) { }
@@ -156,6 +158,15 @@ function AssetPage(props) {
                 let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
                     e.target.classList.add('invalid')
+                    try {
+                        console.log(e.target.className)
+                        if (e.target.className.includes('asset_id') && res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
+                            document.getElementById('missingAssetBox').classList.add('Show')
+                            document.getElementById('missingAssetId').innerText = `${e.target.value}`
+                            setMissingAssetId({ id, e })
+                        }
+                    }
+                    catch (er) { }
                 }
             }
         }
@@ -179,6 +190,8 @@ function AssetPage(props) {
             document.getElementById('model_input').classList.add('invalid')
             console.log(res.error)
         } else document.getElementById('missingAssetBox').classList.remove('Show')
+
+        if (missingAssetId.id && missingAssetId.e) handleTextInputChange(missingAssetId.id, missingAssetId.e).then(() => { setMissingAssetId(null) })
     }
 
     const handleKeyDown = async (id, e) => {

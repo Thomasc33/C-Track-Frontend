@@ -16,7 +16,7 @@ function ModelPage(props) {
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
     const [pageNumber, setPageNumber] = useState(1)
-    const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', category: '' })
+    const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
 
     useEffect(() => {
         getCatalog()
@@ -80,9 +80,10 @@ function ModelPage(props) {
                 document.getElementById('new-model_number').value = ''
                 document.getElementById('new-model_name').value = ''
                 document.getElementById('new-manufacturer').value = ''
+                document.getElementById('new-image').value = ''
                 alert(`Model ${z.model_number} has been added.`)
                 getCatalog((pageNumber - 1) * 25)
-                setNewInfo({ model_number: '', model_name: '', manufacturer: '', category: '' })
+                setNewInfo({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
             }
         } else for (let i of catalog) {
             if (id === i.model_number) {
@@ -98,6 +99,7 @@ function ModelPage(props) {
                 else switch (e.target.className) {
                     case 'model_number':
                     case 'manufacturer':
+                    case 'image':
                         formData.change = e.target.className
                         formData.value = e.target.value
                         break;
@@ -169,6 +171,14 @@ function ModelPage(props) {
                     onBlur={e => handleTextInputChange(row.model_number, e)} />
             </td>
             <td>
+                <input type='text'
+                    defaultValue={row.image}
+                    className='image'
+                    id={`${row.model_number}-image`}
+                    onKeyDown={e => handleKeyDown(row.model_number, e)}
+                    onBlur={e => handleTextInputChange(row.model_number, e)} />
+            </td>
+            <td>
                 <Select
                     options={multiSelectOptions}
                     closeMenuOnSelect
@@ -201,10 +211,11 @@ function ModelPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th>Model Number</th>
-                            <th>Model Name</th>
-                            <th>Manufacturer</th>
-                            <th>Category</th>
+                            <th style={{ width: '20%' }}>Model Number</th>
+                            <th style={{ width: '30%' }}>Model Name</th>
+                            <th style={{ width: '15%' }}>Manufacturer</th>
+                            <th style={{ width: '20%' }}>Image</th>
+                            <th style={{ width: '15%' }}>Category</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -214,6 +225,7 @@ function ModelPage(props) {
                             <td key={`new-model_number`}><input type='text' placeholder='New...' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td key={`new-model_name`}><input type='text' placeholder='New...' className='model_name' id={`new-model_name`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td key={`new-manufacturer`}><input type='text' placeholder='New...' className='manufacturer' id={`new-manufacturer`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-image`}><input type='text' placeholder='New...' className='image' id={`new-image`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td key={`new-category`}>
                                 <Select
                                     options={multiSelectOptions}

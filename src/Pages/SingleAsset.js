@@ -15,17 +15,18 @@ const editable = ['return_reason', 'notes', 'model_number']
 function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
     const { instance, accounts } = useMsal()
-    const [asset, setAsset] = useState()
+    const [asset, setAsset] = useState(null)
     const [assetHistory, setHistory] = useState([])
     const [job_codes, setJobCodes] = useState(null)
-    const search = props.searchTerm || new URLSearchParams(props.location.search).get('q')
+    const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
 
     useEffect(() => {
         if (!search) return
+        setAsset(null)
         getJobCodes()
         getAssetInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [search])
     if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
     async function getJobCodes() {
         let t = await getTokenSilently()
@@ -131,12 +132,13 @@ function AssetsPage(props) {
                 <td><p>{row.name}</p></td>
                 <td><p>{job_codes[row.job_code]}</p></td>
                 <td><p>{date}</p></td>
+                <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
             </tr>
         )
     }
     return (
         <>
-            <PageTemplate highLight='4' {...props} />
+            <PageTemplate highLight='4' {...props} setSearch={setSearch} />
             <div className='AssetArea'>
                 {!search ? <h1>No search term provided</h1> :
                     !asset ? <CircularProgress size='6rem' /> :
@@ -157,13 +159,13 @@ function AssetsPage(props) {
                                     <table style={{ width: asset.image ? '60%' : '100%' }}><tbody>
                                         {Object.keys(asset).map(m => { if (!dontRender.includes(m)) return renderRow(m); else return <></> })}
                                     </tbody></table>
-                                    <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} alt='Asset' />
+                                    {asset.image ? <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} alt='Asset' /> : <></>}
                                 </div>
                                 <br />
                                 <h1>Status History</h1>
                                 <hr />
                                 <div style={{ display: 'flex' }}>
-                                    {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th></thead>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
+                                    {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
                                 </div>
                             </div>
                 }
