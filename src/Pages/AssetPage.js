@@ -81,6 +81,8 @@ function AssetsPage(props) {
                     disableSelectionOnClick
                     hideFooterSelectedRowCount
                     autoPageSize
+                    onCellClick={(params) => { props.history.push(`/search?q=${params.id}`) }}
+                    style={{ cursor: 'pointer' }}
                 />
             </div>
         </>
