@@ -22,7 +22,7 @@ function JobPage(props) {
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
-    const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
+    const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
 
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
 
