@@ -6,8 +6,8 @@ import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
-import '../css/Asset.css'
 import { Button } from '@material-ui/core';
+import '../css/Asset.css'
 const settings = require('../settings.json')
 
 function AssetPage(props) {
@@ -91,7 +91,7 @@ function AssetPage(props) {
                 cont = false
             }
             console.log(jobCodes, job_code)
-            for (let i of jobCodes) if (job_code == i.id)
+            for (let i of jobCodes) if (job_code === i.id)
                 if (!i.requires_asset && !asset) asset = '.';
                 else break
 

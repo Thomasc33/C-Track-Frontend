@@ -6,7 +6,6 @@ export default {
     add: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/user/new`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e.response } })
-        console.log(res)
         return res
     },
     edit: async (FormData, token) => {
@@ -39,7 +38,7 @@ export default {
      */
     create: async (FormData, token) => {
         let res = await axios.put(`${BaseApiUrl}/asset/create`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { return { isErrored: true, error: e.response.data.message } })
+            .catch(e => { return { isErrored: true, error: e.response } })
         return res
     }
 }

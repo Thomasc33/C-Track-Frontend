@@ -48,6 +48,26 @@
     box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
 }
 
+.AssetArea .ModelInput {
+    width: 12rem;
+    background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-style: none;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 1rem;
+    margin:1rem;
+    text-align: center;
+    border-radius: .2rem;
+}
+
+input .invalid {
+    border-color: red;
+    border-style: solid;
+    animation: shake .3s;
+}
+
 @keyframes shake {
     0% {
         transform: translate(1px, 1px) rotate(0deg);

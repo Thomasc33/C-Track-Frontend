@@ -6,8 +6,9 @@ import { InteractionRequiredAuthError } from '@azure/msal-common';
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json'
 import AssetService from '../Services/Asset'
-import '../css/SingleAsset.css'
+import { Button } from '@material-ui/core';
 import axios from 'axios';
+import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
 const editable = ['return_reason', 'notes', 'model_number']
@@ -96,6 +97,22 @@ function AssetsPage(props) {
         if (row === 'model_number') getAssetInfo()
     }
 
+    const handleAssetAdding = async () => {
+        // Get model
+        if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
+        let model = document.getElementById('model_input').value
+        if (!model) return document.getElementById('model_input').classList.add('invalid')
+
+        let FormData = { model_id: model, asset_id: search }
+        const t = await getTokenSilently()
+        console.log(FormData)
+        let res = await AssetService.create(FormData, t)
+        if (res.isErrored) {
+            document.getElementById('model_input').classList.add('invalid')
+            console.log(res.error)
+        } else setSearch(search)
+    }
+
     const handleKeyDown = (row, e) => {
         if (e.code === 'Enter') handleTextInputChange(row, e)
     }
@@ -148,6 +165,9 @@ function AssetsPage(props) {
                                 {props.permissions.edit_models || props.isAdmin ? <div>
                                     <hr />
                                     <h2>Add it?</h2>
+                                    <input id='model_input' type='text' className='ModelInput' placeholder='Model Number' />
+                                    <br />
+                                    <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { handleAssetAdding() }}>Add</Button>
                                 </div>
                                     : <></>}
                             </div>

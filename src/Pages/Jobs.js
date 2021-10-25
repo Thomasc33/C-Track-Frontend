@@ -143,7 +143,7 @@ function JobPage(props) {
             if (!cont) return
 
             //send to api
-            let formData = { job_code, job_name, price, isHourly, applies }
+            let formData = { job_code, job_name, price, isHourly, applies, isAsset }
             setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
