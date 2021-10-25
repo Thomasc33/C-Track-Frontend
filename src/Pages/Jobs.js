@@ -205,8 +205,10 @@ function JobPage(props) {
                 //send to api
                 let token = await getTokenSilently()
                 let res = await jobService.edit(formData, token)
-                if (res.isErrored && !e.isHourly && !e.isSelect) e.target.classList.add('invalid')
-
+                if (res.isErrored) {
+                    console.error(res.error.response)
+                    if (!e.isHourly && !e.isSelect) e.target.classList.add('invalid')
+                }
             }
         }
     }
@@ -267,15 +269,17 @@ function JobPage(props) {
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                     onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
             </td>
-            <td>
-                <Select menuPlacement='auto' options={multiSelectOptions}
-                    isMulti
-                    closeMenuOnSelect={false}
-                    styles={selectStyles}
-                    defaultValue={defaultOptions}
-                    isSearchable
-                    onChange={e => selectionChange(row.id, e)} />
-            </td>
+            {!row.is_hourly || defaultOptions.length > 0 ?
+                <td>
+                    <Select menuPlacement='auto' options={multiSelectOptions}
+                        isMulti
+                        closeMenuOnSelect={false}
+                        styles={selectStyles}
+                        defaultValue={defaultOptions}
+                        isSearchable
+                        onChange={e => selectionChange(row.id, e)} />
+                </td>
+                : <></>}
         </tr >)
     }
 
