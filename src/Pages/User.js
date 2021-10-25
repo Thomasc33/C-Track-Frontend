@@ -130,6 +130,7 @@ function UserPage(props) {
                             defaultValue={defaultOptions}
                             isSearchable
                             onChange={e => handlePermissionChange(e, row.id)}
+                            menuPlacement='auto'
                         />
                     </div>
                 </td>

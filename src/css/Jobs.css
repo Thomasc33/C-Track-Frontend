@@ -1,4 +1,6 @@
-.rows td .isHourly {
-    margin-left:2rem;
-    margin-right:0;
+.rows .isHourly {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: .75rem;
 }

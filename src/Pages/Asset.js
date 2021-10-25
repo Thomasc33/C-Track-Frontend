@@ -60,6 +60,9 @@ function AssetPage(props) {
     const handleTextInputChange = async (id, e) => {
         if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
+        } else {
+            let ele = document.getElementById(`${id}-jobcode`)
+            if (ele && ele.classList.contains('invalid')) ele.classList.remove('invalid')
         }
         if (id === 'new') {
             let dateString = new Date(date).toISOString().split('T')[0]
@@ -103,15 +106,18 @@ function AssetPage(props) {
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
-                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
-                try {
-                    if (res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
-                        document.getElementById('missingAssetBox').classList.add('Show')
-                        document.getElementById('missingAssetId').innerText = `${asset}`
-                        setMissingAssetId({ id: 'new', e })
+                if (res.error && res.error.status === 406) alert(`Job code not compatable with asset's model type`)
+                else {
+                    if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
+                    try {
+                        if (res.error.data.message.includes('Asset id not found')) {
+                            document.getElementById('missingAssetBox').classList.add('Show')
+                            document.getElementById('missingAssetId').innerText = `${asset}`
+                            setMissingAssetId({ id: 'new', e })
+                        }
                     }
+                    catch (er) { }
                 }
-                catch (er) { }
             } else {
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
@@ -121,8 +127,9 @@ function AssetPage(props) {
                     }
                 });
                 const d = await response.json();
-                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').value = ''
-                if (document.getElementById('new-notes')) document.getElementById('new-notes').value = ''
+                let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes')
+                if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
+                if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
                 setData(d);
                 setNewComment('')
                 setNewAssetTag('')
@@ -157,16 +164,21 @@ function AssetPage(props) {
                 let token = await getTokenSilently()
                 let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
-                    e.target.classList.add('invalid')
-                    try {
-                        console.log(e.target.className)
-                        if (e.target.className.includes('asset_id') && res.error.data.error.originalError.info.message.includes('FOREIGN KEY')) {
-                            document.getElementById('missingAssetBox').classList.add('Show')
-                            document.getElementById('missingAssetId').innerText = `${e.target.value}`
-                            setMissingAssetId({ id, e })
-                        }
+                    if (res.error.status === 406) {
+                        alert(`Job code not compatable with asset's model type`)
+                        if (document.getElementById(`${id}-jobcode`)) document.getElementById(`${id}-jobcode`).classList.add('invalid')
                     }
-                    catch (er) { }
+                    if (e.target) {
+                        e.target.classList.add('invalid')
+                        try {
+                            if (e.target.className.includes('asset_id') && res.error.data.message.includes('Asset id not found')) {
+                                document.getElementById('missingAssetBox').classList.add('Show')
+                                document.getElementById('missingAssetId').innerText = `${e.target.value}`
+                                setMissingAssetId({ id, e })
+                            }
+                        }
+                        catch (er) { }
+                    }
                 }
             }
         }

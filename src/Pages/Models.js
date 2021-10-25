@@ -113,7 +113,8 @@ function ModelPage(props) {
                 let token = await getTokenSilently()
                 let res = await ModelService.edit(formData, token)
                 if (res.isErrored) {
-                    e.target.classList.add('invalid')
+                    console.log(res.error)
+                    if (!e.isSelect) e.target.classList.add('invalid')
                 }
             }
         }
@@ -247,10 +248,11 @@ function ModelPage(props) {
 export default ModelPage
 
 const multiSelectOptions = [
-    { value: 'laptop', label: 'Laptop' },
-    { value: 'tablet', label: 'Tablet' },
-    { value: 'phone', label: 'Phone' },
-    { value: 'mifi', label: 'MiFi' }
+    { value: 'IGEL', label: 'IGEL' },
+    { value: 'Thick', label: 'Thick' },
+    { value: 'Tablet', label: 'Tablet' },
+    { value: 'Phone', label: 'Phone' },
+    { value: 'MiFi', label: 'MiFi' }
 ]
 
 const selectStyles = {

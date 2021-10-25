@@ -31,7 +31,7 @@ function PageTemplate(props) {
 
     return (
         <div className="App">
-            <ParticlesElement color={accent} />
+            <ParticlesElement {...props} color={accent} />
             <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
             <div className='SideBar'>
                 <ul>

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
 import jobService from '../Services/Job'
 import { useMsal } from '@azure/msal-react';
+import Select from 'react-select';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -20,7 +21,8 @@ function JobPage(props) {
     const [inApi, setLoading] = useState(false)
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
-    const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
+    const [newAppliesSelection, setNewAppliesSelection] = useState([])
+    const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
 
@@ -37,8 +39,61 @@ function JobPage(props) {
         return res.accessToken
     }
 
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({
+            ...styles,
+            backgroundColor: 'transparent',
+            width
+        }),
+        menu: (provided, state) => ({
+            ...provided,
+            width: state.selectProps.width,
+        }),
+        noOptionsMessage: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        menuList: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            return {
+                ...styles,
+                backgroundColor: '#1b1b1b',
+                color: 'white',
+                ':active': {
+                    ...styles[':active'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+                },
+                ':hover': {
+                    ...styles[':hover'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#524e00'
+                }
+            };
+        },
+        multiValue: (styles, { data }) => {
+            return {
+                ...styles,
+                backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: 'white',
+            ':hover': {
+                color: 'red',
+            },
+        }),
+
+    }
+
     const handleTextInputChange = async (id, e) => {
-        if (!e.isHourly) {
+        if (!e.isHourly && !e.isSelect) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
@@ -47,7 +102,9 @@ function JobPage(props) {
             let job_name = newJobName;
             let price = newPrice;
             let isHourly = newIsHourly;
+            let applies = newAppliesSelection;
             if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
+            else if (e.isSelect) { applies = e.selection.map(m => m.value).join(',') }
             else switch (e.target.id) {
                 case 'new-price':
                     price = e.target.value
@@ -83,7 +140,7 @@ function JobPage(props) {
             if (!cont) return
 
             //send to api
-            let formData = { job_code, job_name, price, isHourly }
+            let formData = { job_code, job_name, price, isHourly, applies }
             setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
@@ -122,6 +179,9 @@ function JobPage(props) {
                 if (e.isHourly) {
                     formData.change = 'isHourly'
                     formData.value = e.selection.toString()
+                } else if (e.isSelect) {
+                    formData.change = 'applies'
+                    formData.value = e.selection.map(m => m.value).join(',')
                     // eslint-disable-next-line default-case
                 } else switch (e.target.className) {
                     case 'price':
@@ -140,16 +200,20 @@ function JobPage(props) {
 
                 if (!formData.change) return
 
-                if (!formData.value) formData.value = e.target.value
+                if (!formData.value && !e.isSelect) formData.value = e.target.value
 
                 //send to api
                 let token = await getTokenSilently()
                 let res = await jobService.edit(formData, token)
-                if (res.isErrored) {
-                    e.target.classList.add('invalid')
-                }
+                if (res.isErrored && !e.isHourly && !e.isSelect) e.target.classList.add('invalid')
+
             }
         }
+    }
+
+    const selectionChange = async (id, e) => {
+        if (id === 'new') setNewAppliesSelection(e)
+        handleTextInputChange(id, { selection: e, isSelect: true })
     }
 
     const numberValidatorEventListener = (e) => {
@@ -165,6 +229,8 @@ function JobPage(props) {
      * 
      */
     function RenderRow(row) {
+        let defaultOptions = []
+        if (row.applies) for (let i of row.applies) if (multiSelectIndexer[i] !== null) defaultOptions.push(multiSelectOptions[multiSelectIndexer[i]])
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <input type='text'
@@ -188,17 +254,27 @@ function JobPage(props) {
                     className='price'
                     id={`${row.id}-price`}
                     onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
-                    onKeyDown={e => { handleKeyDown(row.id, e); handleTextInputChange(row.id, e) }} />
+                    onKeyDown={e => { handleKeyDown(row.id, e); handleTextInputChange(row.id, e) }}
+                    style={{ width: '5rem', padding: '1rem' }} />
+            </td>
+            <td className='isHourly'>
+                <Checkbox id={`${row.id}-isHourly`}
+                    checked={row.is_hourly}
+                    borderWidth='2px'
+                    borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                    style={{ backgroundColor: '#1b1b1b67' }}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                    onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
             </td>
             <td>
-                <Checkbox id={`${row.id}-isHourly`}
-                    className='isHourly'
-                    checked={row.is_hourly}
-                    borderWidth='5px'
-                    borderColor=""
-                    size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#524e00'} size={30} />}
-                    onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
+                <Select menuPlacement='auto' options={multiSelectOptions}
+                    isMulti
+                    closeMenuOnSelect={false}
+                    styles={selectStyles}
+                    defaultValue={defaultOptions}
+                    isSearchable
+                    onChange={e => selectionChange(row.id, e)} />
             </td>
         </tr >)
     }
@@ -212,10 +288,11 @@ function JobPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th>Job Code</th>
-                            <th>Job Name</th>
-                            <th>Price</th>
-                            <th>Hourly</th>
+                            <th style={{ width: '30%' }}>Job Code</th>
+                            <th style={{ width: '30%' }}>Job Name</th>
+                            <th style={{ width: '5%' }}>Price</th>
+                            <th style={{ width: '5%' }}>Hourly</th>
+                            <th style={{ width: '30%' }}>Applies To</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -223,8 +300,14 @@ function JobPage(props) {
                         <tr>
                             <td><input type='text' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleTextInputChange('new', e); handleKeyDown('new', e) }}></input></td>
-                            <td><Checkbox id={`new-isHourly`} className='isHourly' checked={newIsHourly} borderWidth='5px' borderColor={localStorage.getItem('accentColor') || '#524e00'} size='30px' icon={<Icon.FiCheck color='#e3de00' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} /></td>
+                            <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleTextInputChange('new', e); handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }}></input></td>
+                            <td className='isHourly'><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e3de00'} size='30px' icon={<Icon.FiCheck color='#e3de00' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                            <td><Select menuPlacement='auto' options={multiSelectOptions}
+                                isMulti
+                                closeMenuOnSelect={false}
+                                styles={selectStyles}
+                                isSearchable
+                                onChange={e => selectionChange('new', e)} /></td>
                         </tr>
                     </tbody>
                 </table>
@@ -235,3 +318,13 @@ function JobPage(props) {
 }
 
 export default JobPage
+
+const multiSelectOptions = [
+    { value: 'IGEL', label: 'IGEL' },
+    { value: 'Thick', label: 'Thick' },
+    { value: 'Phone', label: 'Phone' },
+    { value: 'Tablet', label: 'Tablet' },
+    { value: 'MiFi', label: 'MiFi' },
+]
+
+const multiSelectIndexer = { 'IGEL': 0, 'Thick': 1, 'Phone': 2, 'Tablet': 3, 'MiFi': 4 }

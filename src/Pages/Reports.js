@@ -86,7 +86,7 @@ function ReportsPage(props) {
     }
 
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .8)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#524e00'
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100)/2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#524e00'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
@@ -96,9 +96,10 @@ function ReportsPage(props) {
     function renderSingleUserRow(k, v) {
         let accent = localStorage.getItem('accentColor') || '#524e00'
         return (
-            <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .8)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : accent : 'inherit' }}>
+            <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .95)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((parseInt(v) / 650 * 100) + 100)/2)}%, #1b1b1b 100%)` : accent : 'inherit' }}>
                 <h1>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
                 <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
+                {k !== 'Daily Dollars' ? <h1>${v.dd}</h1> : <></>}
             </div >)
     }
 

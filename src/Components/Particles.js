@@ -3,7 +3,7 @@ import React from 'react'
 import Particles from 'react-tsparticles'
 
 export default (props) => {
-    return (
+    if (props.permissions && props.permissions.view_particles) return (
         <Particles
             width='100vw'
             height='100vh'
@@ -60,4 +60,5 @@ export default (props) => {
             }}
         />
     )
+    return <div style={{ overflow: 'hidden', width: '100vw', height: '100vh', background: '#2C2F33' }} />
 }
