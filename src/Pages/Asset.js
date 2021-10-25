@@ -80,7 +80,7 @@ function AssetPage(props) {
                     await setNewAssetTag(e.target.value)
                     break;
                 default:
-                    console.log('Default Case hit for new')
+                    console.log('Default Case hit for new in new asset')
                     return
             }
 
@@ -90,12 +90,9 @@ function AssetPage(props) {
                 if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
                 cont = false
             }
-            console.log(jobCodes, job_code)
             for (let i of jobCodes) if (job_code === i.id)
                 if (!i.requires_asset && !asset) asset = '.';
                 else break
-
-            console.log(asset)
 
             if (!asset) {
                 if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
@@ -134,9 +131,10 @@ function AssetPage(props) {
                     }
                 });
                 const d = await response.json();
-                let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes')
+                let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes'), new_job = document.getElementById('new-jobcode')
                 if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
                 if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
+                if (new_job && new_job.classList.includes('invalid')) new_job.classList.remove('invalid')
                 setData(d);
                 setNewComment('')
                 setNewAssetTag('')
@@ -271,6 +269,7 @@ function AssetPage(props) {
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
                     className='notes'
+                    placeholder='Notes / Comments'
                     id={`${row.id}-notes`}
                     style={{ width: '79%', marginRight: '1rem' }}
                     onBlur={e => handleTextInputChange(row.id, e)}

@@ -292,17 +292,16 @@ function HourlyPage(props) {
                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                     onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
                 /></div></td>
-            <td>
+            <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
                     className='notes'
+                    placeholder='Notes / Comments'
                     id={`${row.id}-notes`}
-                    style={{ width: '79%' }}
+                    style={{ width: '79%', marginRight: '1rem' }}
                     onBlur={e => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon"
-                    onClickCapture={e => handleDelete(row.id, e)}
-                    style={{ marginBottom: '-.5rem' }}>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e)}>
                     delete_outline</i>
             </td>
         </tr >)
@@ -367,7 +366,7 @@ function HourlyPage(props) {
                                         </div>
                                     )}
                                 /></div></td>
-                            <td><input type='text' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><input type='text' className='notes' id={`new-notes`} placeholder='Notes / Comments' onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                     </tbody>
                 </table>

@@ -67,7 +67,6 @@ function ReportsPage(props) {
     }
 
     const handleGraphDateChange = e => {
-        console.log(e)
         setGraphDate({
             from: document.getElementById('from_selector').value,
             to: document.getElementById('to_selector').value

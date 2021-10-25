@@ -64,7 +64,6 @@ function AssetsPage(props) {
         })
         if (res.isErrored) console.log(res)
         else data = { ...data, ...res.data }
-        console.log(data)
         setAsset(data)
     }
     async function getTokenSilently() {
@@ -82,7 +81,6 @@ function AssetsPage(props) {
 
     const handleTextInputChange = async (row, e) => {
         if (!editable.includes(row) || !props.permissions.edit_assets) return
-
         if (e.target.value === asset[row]) return
         let formData = {
             id: search,
@@ -105,7 +103,6 @@ function AssetsPage(props) {
 
         let FormData = { model_id: model, asset_id: search }
         const t = await getTokenSilently()
-        console.log(FormData)
         let res = await AssetService.create(FormData, t)
         if (res.isErrored) {
             document.getElementById('model_input').classList.add('invalid')

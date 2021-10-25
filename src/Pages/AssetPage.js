@@ -13,7 +13,7 @@ function AssetsPage(props) {
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
     const [job_codes, setJobCodes] = useState(null)
-    
+
     useEffect(() => {
         getJobCodes()
         getCatalog()
@@ -51,6 +51,7 @@ function AssetsPage(props) {
         if (res.isErrored) return console.log(res)
         setCatalog(res.data.records)
     }
+    console.log(catalog)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -64,9 +65,10 @@ function AssetsPage(props) {
         return res.accessToken
     }
     const columns = [
-        { field: 'id', headerName: 'Asset Tag', width: 350 },
-        { field: 'status', headerName: 'Status', width: 500, valueGetter: params => job_codes[params.value] || params.value },
-        { field: 'model_number', headerName: 'Model', width: 500, },
+        { field: 'id', headerName: 'Asset Tag', width: 250 },
+        { field: 'status', headerName: 'Status', width: 350, valueGetter: params => job_codes[params.value] || params.value },
+        { field: 'model_number', headerName: 'Model', width: 400 },
+        { field: 'notes', headerName: 'Notes', width: 800 }
     ]
 
     return (

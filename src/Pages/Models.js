@@ -174,6 +174,7 @@ function ModelPage(props) {
             <td>
                 <input type='text'
                     defaultValue={row.image}
+                    placeholder='https://res.cloudindary.com/'
                     className='image'
                     id={`${row.model_number}-image`}
                     onKeyDown={e => handleKeyDown(row.model_number, e)}
@@ -223,10 +224,10 @@ function ModelPage(props) {
                         {catalog.length === 0 ? <tr><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td><td><CircularProgress /></td></tr> : <></>}
                         {catalog ? catalog.map(m => RenderRow(m)) : <></>}
                         <tr>
-                            <td key={`new-model_number`}><input type='text' placeholder='New...' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td key={`new-model_name`}><input type='text' placeholder='New...' className='model_name' id={`new-model_name`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td key={`new-manufacturer`}><input type='text' placeholder='New...' className='manufacturer' id={`new-manufacturer`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td key={`new-image`}><input type='text' placeholder='New...' className='image' id={`new-image`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-model_number`}><input type='text' placeholder='Model Number' className='model_number' id={`new-model_number`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-model_name`}><input type='text' placeholder='Model Name' className='model_name' id={`new-model_name`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-manufacturer`}><input type='text' placeholder='Manufacturer' className='manufacturer' id={`new-manufacturer`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td key={`new-image`}><input type='text' placeholder='https://res.cloudindary.com/' className='image' id={`new-image`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td key={`new-category`}>
                                 <Select
                                     options={multiSelectOptions}
