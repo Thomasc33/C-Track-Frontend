@@ -13,7 +13,7 @@ function AssetsPage(props) {
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
     const [job_codes, setJobCodes] = useState(null)
-
+    
     useEffect(() => {
         getJobCodes()
         getCatalog()

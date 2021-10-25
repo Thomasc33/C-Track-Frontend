@@ -90,6 +90,13 @@ function AssetPage(props) {
                 if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
                 cont = false
             }
+            console.log(jobCodes, job_code)
+            for (let i of jobCodes) if (job_code == i.id)
+                if (!i.requires_asset && !asset) asset = '.';
+                else break
+
+            console.log(asset)
+
             if (!asset) {
                 if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                 cont = false

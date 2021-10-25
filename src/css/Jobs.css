@@ -4,3 +4,10 @@
     align-items: center;
     margin: .75rem;
 }
+
+.rows .hasAsset {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: .75rem;
+}

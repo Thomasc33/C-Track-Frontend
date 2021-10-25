@@ -21,6 +21,7 @@ function JobPage(props) {
     const [inApi, setLoading] = useState(false)
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
+    const [newIsAsset, setNewIsAsset] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
     const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
 
@@ -93,7 +94,7 @@ function JobPage(props) {
     }
 
     const handleTextInputChange = async (id, e) => {
-        if (!e.isHourly && !e.isSelect) {
+        if (!e.isHourly && !e.isSelect && !e.isAsset) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
@@ -102,8 +103,10 @@ function JobPage(props) {
             let job_name = newJobName;
             let price = newPrice;
             let isHourly = newIsHourly;
+            let isAsset = newIsAsset
             let applies = newAppliesSelection;
             if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
+            else if (e.isAsset) { isAsset = e.selection; setNewIsAsset(e.selection) }
             else if (e.isSelect) { applies = e.selection.map(m => m.value).join(',') }
             else switch (e.target.id) {
                 case 'new-price':
@@ -179,6 +182,10 @@ function JobPage(props) {
                 if (e.isHourly) {
                     formData.change = 'isHourly'
                     formData.value = e.selection.toString()
+                }
+                else if (e.isAsset) {
+                    formData.change = 'isAsset'
+                    formData.value = e.selection.toString()
                 } else if (e.isSelect) {
                     formData.change = 'applies'
                     formData.value = e.selection.map(m => m.value).join(',')
@@ -207,7 +214,7 @@ function JobPage(props) {
                 let res = await jobService.edit(formData, token)
                 if (res.isErrored) {
                     console.error(res.error.response)
-                    if (!e.isHourly && !e.isSelect) e.target.classList.add('invalid')
+                    if (!e.isHourly && !e.isSelect && !e.isAsset) e.target.classList.add('invalid')
                 }
             }
         }
@@ -269,17 +276,27 @@ function JobPage(props) {
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                     onChange={e => handleTextInputChange(row.id, { isHourly: true, selection: e })} />
             </td>
+
             {!row.is_hourly || defaultOptions.length > 0 ?
-                <td>
-                    <Select menuPlacement='auto' options={multiSelectOptions}
-                        isMulti
-                        closeMenuOnSelect={false}
-                        styles={selectStyles}
-                        defaultValue={defaultOptions}
-                        isSearchable
-                        onChange={e => selectionChange(row.id, e)} />
+                <><td>
+                    <Checkbox id={`${row.id}-isAsset`}
+                        checked={row.requires_asset}
+                        borderWidth='2px'
+                        borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                        style={{ backgroundColor: '#1b1b1b67' }}
+                        size='30px'
+                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                        onChange={e => handleTextInputChange(row.id, { isAsset: true, selection: e })} />
                 </td>
-                : <></>}
+                    <td>
+                        <Select menuPlacement='auto' options={multiSelectOptions}
+                            isMulti
+                            closeMenuOnSelect={false}
+                            styles={selectStyles}
+                            defaultValue={defaultOptions}
+                            isSearchable
+                            onChange={e => selectionChange(row.id, e)} />
+                    </td></> : <></>}
         </tr >)
     }
 
@@ -296,7 +313,8 @@ function JobPage(props) {
                             <th style={{ width: '30%' }}>Job Name</th>
                             <th style={{ width: '5%' }}>Price</th>
                             <th style={{ width: '5%' }}>Hourly</th>
-                            <th style={{ width: '30%' }}>Applies To</th>
+                            <th style={{ width: '5%' }}>Asset</th>
+                            <th style={{ width: '25%' }}>Applies To</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -306,6 +324,7 @@ function JobPage(props) {
                             <td><input type='text' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='number' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleTextInputChange('new', e); handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }}></input></td>
                             <td className='isHourly'><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e3de00'} size='30px' icon={<Icon.FiCheck color='#e3de00' size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                            <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e3de00'} size='30px' icon={<Icon.FiCheck color='#e3de00' size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             <td><Select menuPlacement='auto' options={multiSelectOptions}
                                 isMulti
                                 closeMenuOnSelect={false}
