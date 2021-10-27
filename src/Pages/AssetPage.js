@@ -51,7 +51,6 @@ function AssetsPage(props) {
         if (res.isErrored) return console.log(res)
         setCatalog(res.data.records)
     }
-    console.log(catalog)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -83,7 +82,7 @@ function AssetsPage(props) {
                     disableSelectionOnClick
                     hideFooterSelectedRowCount
                     autoPageSize
-                    onCellClick={(params) => { props.history.push(`/search?q=${params.id}`) }}
+                    onCellClick={(params) => { props.history.push(`/search?q=${params.id}`, { assetOnly: true }) }}
                     style={{ cursor: 'pointer' }}
                 />
             </div>

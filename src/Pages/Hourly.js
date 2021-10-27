@@ -242,6 +242,7 @@ function HourlyPage(props) {
             setTimes(temp)
             sendToAPI = true
         }
+        console.log(e)
 
         if (sendToAPI) {
             handleTextInputChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
@@ -408,7 +409,7 @@ function getTotalHours(startTime, endTime) {
     // end - start
     // if start minute > end minute, carry over 60 from the hour and subtract
     if (startMinute > endMinute) {
-        endMinute = 60;
+        endMinute += 60;
         endHour--;
     }
     // Add the hours to total
@@ -424,6 +425,7 @@ function getTotalHours(startTime, endTime) {
     t = Math.round(t / 15) * .25
     //add that to total hours
     total_hours += t;
+    console.log(total_hours)
     return total_hours
 }
 

@@ -18,7 +18,9 @@ function AssetsPage(props) {
     const { instance, accounts } = useMsal()
     const [asset, setAsset] = useState(null)
     const [assetHistory, setHistory] = useState([])
-    const [job_codes, setJobCodes] = useState(null)
+    const [results, setResults] = useState([])
+    const [jobCodes, setJobCodes] = useState(null)
+    const [jobIndex, setJobIndex] = useState(null)
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
 
     useEffect(() => {
@@ -28,7 +30,9 @@ function AssetsPage(props) {
         getAssetInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search])
+
     if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
+
     async function getJobCodes() {
         let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/full`, {
@@ -43,6 +47,7 @@ function AssetsPage(props) {
         for (let i of data.job_codes) { jc[i.id] = i.job_name }
         setJobCodes(jc)
     }
+
     async function getAssetInfo() {
         let data = {}
         const token = await getTokenSilently()
@@ -53,19 +58,42 @@ function AssetsPage(props) {
             }
         })
         if (res.isErrored) return console.log(res)
-        if (res.data.notFound) return setAsset(res.data)
-        setHistory(res.data.history)
-        data = { ...res.data.info }
-        res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+        if (res.data.notFound) return setAsset(res.data) // Not found
+        console.log(props.assetOnly)
+        if (res.data.length === 1 || props.assetOnly) { //1 result found
+            setHistory(res.data[0].history)
+            data = { ...res.data[0].info }
+            res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': '*'
+                }
+            })
+            if (res.isErrored) console.log(res)
+            else data = { ...data, ...res.data }
+            setAsset(data)
+        } else {
+            let assets = new Set()
+            let results = []
+            for (let i of res.data) {
+                if (assets.has(i.info.id)) continue
+                assets.add(i.info.id)
+                let info = { history: i.history, type: i.type }
+                res = await axios.get(`${settings.APIBase}/model/get/${i.info.model_number}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                })
+                if (res.isErrored) console.log(res)
+                else info.data = { ...i.info, ...res.data }
+                results.push(info)
             }
-        })
-        if (res.isErrored) console.log(res)
-        else data = { ...data, ...res.data }
-        setAsset(data)
+            console.log(results)
+            setResults(results)
+        }
     }
+
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -80,7 +108,7 @@ function AssetsPage(props) {
     }
 
     const handleTextInputChange = async (row, e) => {
-        if (!editable.includes(row) || !props.permissions.edit_assets) return
+        if (!editable.includes(row) || !(props.permissions.edit_assets || props.isAdmin)) return
         if (e.target.value === asset[row]) return
         let formData = {
             id: search,
@@ -118,7 +146,7 @@ function AssetsPage(props) {
         let val = 'Unknown'
         switch (row) {
             case 'status':
-                val = job_codes[asset[row]] || asset[row]
+                val = jobCodes[asset[row]] || asset[row]
                 break;
             default:
                 val = asset[row]
@@ -127,35 +155,76 @@ function AssetsPage(props) {
             <tr key={row}>
                 <td style={{ width: '30%' }}>{titleCase(row.replace('_', ' '))}</td>
                 <td style={{ width: '70%' }}>
-                    <input type='text'
-                        defaultValue={val}
-                        id={`${row}`}
-                        style={{ width: '79%' }}
-                        readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
-                        onBlur={e => handleTextInputChange(row, e)}
-                        onKeyDown={e => handleKeyDown(row, e)} />
+                    {row.toLowerCase() === 'notes' ?
+                        <textarea
+                            defaultValue={val}
+                            id={`${row}`}
+                            style={{ padding: '1rem', margin: '.5rem', height: '10rem' }}
+                            readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                            onBlur={e => handleTextInputChange(row, e)}
+                            onKeyDown={e => handleKeyDown(row, e)} />
+                        :
+                        <input type='text'
+                            defaultValue={val}
+                            id={`${row}`}
+                            style={{ margin: '.5rem', width: '79%' }}
+                            readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                            onBlur={e => handleTextInputChange(row, e)}
+                            onKeyDown={e => handleKeyDown(row, e)} />
+                    }
+
                 </td>
             </tr>
         )
     }
+
     function renderHistoryRow(row) {
         let d = new Date(row.date)
         let date = `${parseInt(d.getMonth()) + 1}-${d.getDate()}-${d.getFullYear()}`
         return (
             <tr key={row.id}>
                 <td><p>{row.name}</p></td>
-                <td><p>{job_codes[row.job_code]}</p></td>
+                <td><p>{jobCodes[row.job_code]}</p></td>
                 <td><p>{date}</p></td>
                 <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
             </tr>
         )
     }
+
+    function nextAsset() {
+        let j
+        for (let i in results) {
+            if (results[i].data.id == asset.id) {
+                console.log(i)
+                if (`${i}` === `${results.length - 1}`) j = 0;
+                else j = `${parseInt(i)+1}`
+            }
+        }
+        if (isNaN(j)) return alert("Error going to next")
+        setHistory(results[j].history)
+        setAsset(results[j].data)
+    }
+
+    function renderResultsRow(row) {
+        return <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
+            onClick={() => { setAsset(row.data); setHistory(row.history) }}>
+            <h2 style={{ fontWeight: '300' }}>Asset: {row.data.id}</h2>
+            <h2 style={{ fontWeight: '200' }}>Model: {row.data.name}</h2>
+            <h2 style={{ fontWeight: '200' }}>Status Changes: {row.history ? row.history.length : '0'}</h2>
+            <h2 style={{ fontWeight: '200' }}>Matched: {row.type === 'asset' ? 'Asset' : 'Tracker Comment'}</h2>
+        </div>
+    }
+
     return (
         <>
             <PageTemplate highLight='4' {...props} setSearch={setSearch} />
             <div className='AssetArea'>
                 {!search ? <h1>No search term provided</h1> :
-                    !asset ? <CircularProgress size='6rem' /> :
+                    !asset ? results.length > 0 ? <div>
+                        <h1>Search Results:</h1>
+                        <hr />
+                        {results.map(m => renderResultsRow(m))}
+                    </div > : <CircularProgress size='6rem' /> :
                         asset.notFound ?
                             <div>
                                 <h1>{search} not found</h1>
@@ -169,8 +238,11 @@ function AssetsPage(props) {
                                     : <></>}
                             </div>
                             : <div style={{ overflow: 'scroll' }}>
-                                <h1>Asset Information For:</h1>
-                                <h1>{search}</h1>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
+                                    <h1>Asset Information For: {asset.id} </h1>
+                                    {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
+                                </div>
                                 <hr />
                                 <div style={{ display: 'flex' }}>
                                     <table style={{ width: asset.image ? '60%' : '100%' }}><tbody>
