@@ -134,7 +134,7 @@ function AssetPage(props) {
                 let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes'), new_job = document.getElementById('new-jobcode')
                 if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
                 if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
-                if (new_job && new_job.classList.includes('invalid')) new_job.classList.remove('invalid')
+                if (new_job && new_job.classList.contains('invalid')) new_job.classList.remove('invalid')
                 setData(d);
                 setNewComment('')
                 setNewAssetTag('')
