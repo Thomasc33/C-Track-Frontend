@@ -242,7 +242,6 @@ function HourlyPage(props) {
             setTimes(temp)
             sendToAPI = true
         }
-        console.log(e)
 
         if (sendToAPI) {
             handleTextInputChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
@@ -345,7 +344,7 @@ function HourlyPage(props) {
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'>.
                                 <TimeKeeper
-                                    time={times.new ? times.new.startTime ? times.new.startTime : Date.now() : Date.now()}
+                                    time={times.new && times.new.startTime ? times.new.startTime : Date.now()}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
@@ -357,7 +356,7 @@ function HourlyPage(props) {
                                 /></div></td>
                             <td><div className="TimeKeeper" id='new-End'>.
                                 <TimeKeeper
-                                    time={times.new ? times.new.endTime ? times.new.endTime : Date.now() : Date.now()}
+                                    time={times.new && times.new.endTime ? times.new.endTime : Date.now()}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', false, e)}
@@ -425,7 +424,6 @@ function getTotalHours(startTime, endTime) {
     t = Math.round(t / 15) * .25
     //add that to total hours
     total_hours += t;
-    console.log(total_hours)
     return total_hours
 }
 

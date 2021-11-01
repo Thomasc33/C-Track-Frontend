@@ -20,7 +20,6 @@ function AssetsPage(props) {
     const [assetHistory, setHistory] = useState([])
     const [results, setResults] = useState([])
     const [jobCodes, setJobCodes] = useState(null)
-    const [jobIndex, setJobIndex] = useState(null)
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
 
     useEffect(() => {
@@ -59,7 +58,6 @@ function AssetsPage(props) {
         })
         if (res.isErrored) return console.log(res)
         if (res.data.notFound) return setAsset(res.data) // Not found
-        console.log(props.assetOnly)
         if (res.data.length === 1 || props.assetOnly) { //1 result found
             setHistory(res.data[0].history)
             data = { ...res.data[0].info }
@@ -89,7 +87,6 @@ function AssetsPage(props) {
                 else info.data = { ...i.info, ...res.data }
                 results.push(info)
             }
-            console.log(results)
             setResults(results)
         }
     }
@@ -194,10 +191,9 @@ function AssetsPage(props) {
     function nextAsset() {
         let j
         for (let i in results) {
-            if (results[i].data.id == asset.id) {
-                console.log(i)
+            if (results[i].data.id === asset.id) {
                 if (`${i}` === `${results.length - 1}`) j = 0;
-                else j = `${parseInt(i)+1}`
+                else j = `${parseInt(i) + 1}`
             }
         }
         if (isNaN(j)) return alert("Error going to next")
@@ -238,7 +234,7 @@ function AssetsPage(props) {
                                     : <></>}
                             </div>
                             : <div style={{ overflow: 'scroll' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                                     {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
                                     <h1>Asset Information For: {asset.id} </h1>
                                     {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
