@@ -20,6 +20,7 @@ function AssetsPage(props) {
     const [assetHistory, setHistory] = useState([])
     const [results, setResults] = useState([])
     const [jobCodes, setJobCodes] = useState(null)
+    const [editName, setEditName] = useState(false)
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
 
     useEffect(() => {
@@ -188,6 +189,19 @@ function AssetsPage(props) {
         )
     }
 
+    async function changeAssetName(e, oldName) {
+        if (!props.permissions.edit_models && !props.isAdmin) return console.log('missing perms')
+        let newName = document.getElementById('newNameInput').value
+        if (!newName) return
+        let token = await getTokenSilently()
+        if (!token) return
+        let res = await AssetService.rename({ oldName, newName }, token)
+        if (res.isErrored) return alert(`Error changing name: ${res.error.status}`)
+        setEditName(false)
+        setAsset({ ...asset, id: newName })
+        props.history.push(`/search?q=${newName}`)
+    }
+
     function nextAsset() {
         let j
         for (let i in results) {
@@ -236,7 +250,17 @@ function AssetsPage(props) {
                             : <div style={{ overflow: 'scroll' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                                     {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
-                                    <h1>Asset Information For: {asset.id} </h1>
+                                    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                        <h1>Asset Information For: </h1>
+                                        {editName ?
+                                            <><input id='newNameInput' type='text' defaultValue={asset.id} style={{ fontSize: '2rem', marginLeft: '.5rem', width: 'auto', background: '#1b1b1b67', border: 'none', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', color: 'white' }} />
+                                                <i className="material-icons" style={{ padding: '.2em', cursor: 'pointer' }} onClick={(e) => {
+                                                    changeAssetName(e, asset.id)
+                                                }}>done</i></> : <>
+                                                <h1 style={{ padding: '.2em' }}>{asset.id}</h1>
+                                                {props.permissions.edit_models || props.isAdmin ?
+                                                    <i className="material-icons" style={{ padding: '.2em', cursor: 'pointer' }} onClick={(e) => { setEditName(true) }}>edit</i> : <></>} </>}
+                                    </div>
                                     {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
                                 </div>
                                 <hr />

@@ -40,5 +40,10 @@ export default {
         let res = await axios.put(`${BaseApiUrl}/asset/create`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e.response } })
         return res
+    },
+    rename: async (FormData, token) => {
+        let res = await axios.patch(`${BaseApiUrl}/asset/rename`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e.response } })
+        return res
     }
 }
