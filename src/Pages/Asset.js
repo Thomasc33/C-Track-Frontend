@@ -87,15 +87,16 @@ function AssetPage(props) {
             //data validation
             let cont = true;
             if (!job_code) {
-                if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
+                //if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
                 cont = false
             }
-            for (let i of jobCodes) if (job_code === i.id)
-                if (!i.requires_asset && !asset) asset = '.';
-                else break
+            for (let i of jobCodes)
+                if (job_code === i.id)
+                    if (!i.requires_asset && !asset) asset = '.';
+                    else break
 
             if (!asset) {
-                if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
+                //if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                 cont = false
             }
             if (!cont) return
