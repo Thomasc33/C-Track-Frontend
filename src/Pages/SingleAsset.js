@@ -93,7 +93,7 @@ function AssetsPage(props) {
     }
 
     async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
             .catch(async er => {
                 if (er instanceof InteractionRequiredAuthError) {
@@ -133,7 +133,7 @@ function AssetsPage(props) {
         if (res.isErrored) {
             document.getElementById('model_input').classList.add('invalid')
             console.log(res.error)
-        } else setSearch(search)
+        } else { let s = search; setSearch(null); setSearch(s) }
     }
 
     const handleKeyDown = (row, e) => {

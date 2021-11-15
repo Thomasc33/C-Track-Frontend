@@ -28,7 +28,7 @@ function JobPage(props) {
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
 
     async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
             .catch(async er => {
                 if (er instanceof InteractionRequiredAuthError) {

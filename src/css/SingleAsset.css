@@ -22,7 +22,7 @@ textarea {
     padding-right: 10%;
 }
 
-.AssetArea td input.invalid {
+.AssetArea input.invalid {
     border-color: red;
     border-style: solid;
     animation: shake .3s;

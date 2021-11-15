@@ -42,7 +42,7 @@ function App(props) {
 
   useEffect(() => {
     async function getTokenSilently() {
-      const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+      const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
       let res = await instance.acquireTokenSilent(SilentRequest)
         .catch(async er => {
           if (er instanceof InteractionRequiredAuthError) {
@@ -70,7 +70,7 @@ function App(props) {
 
   async function validateUser() {
     //Get token
-    const SilentRequest = { scopes: ['User.Read'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+    const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
     let res = await instance.acquireTokenSilent(SilentRequest)
       .catch(async er => {
         if (er instanceof InteractionRequiredAuthError) {
@@ -117,7 +117,7 @@ function App(props) {
     <LoginPage />
   )
   else return (
-    <Particles color={localStorage.getItem('accentColor') || '#e3de00'}/>
+    <Particles color={localStorage.getItem('accentColor') || '#e3de00'} />
   )
 }
 
