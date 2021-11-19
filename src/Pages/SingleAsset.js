@@ -64,8 +64,8 @@ function AssetsPage(props) {
         if (res.data.notFound) return setAsset(res.data) // Not found
         setUid(res.data.uid)
         if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
-            setHistory(res.data[0].history)
-            data = { ...res.data[0].info }
+            setHistory(res.data[0].resu.history)
+            data = { ...res.data[0].resu.info }
             res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,

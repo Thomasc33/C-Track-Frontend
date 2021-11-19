@@ -113,7 +113,10 @@ function AssetPage(props) {
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
-                if (res.error && res.error.status === 406) alert(`Job code not compatable with asset's model type`)
+                if (res.error && res.error.status === 406) {
+                    document.getElementById(`${id}-assetid`).value = '';
+                    alert(`Job code not compatable with asset's model type`)
+                }
                 else {
                     if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                     try {
@@ -174,6 +177,7 @@ function AssetPage(props) {
                 if (res.isErrored) {
                     if (res.error.status === 406) {
                         alert(`Job code not compatable with asset's model type`)
+                        document.getElementById(`${id}-assetid`).value = ''
                         if (document.getElementById(`${id}-jobcode`)) document.getElementById(`${id}-jobcode`).classList.add('invalid')
                     }
                     if (e.target) {
