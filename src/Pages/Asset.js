@@ -20,6 +20,7 @@ function AssetPage(props) {
     const [newAssetTag, setNewAssetTag] = useState('');
     const [newComment, setNewComment] = useState('');
     const [missingAssetId, setMissingAssetId] = useState(null)
+    const noAssetJobCounts = {}
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -90,9 +91,10 @@ function AssetPage(props) {
                 //if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
                 cont = false
             }
+
             for (let i of jobCodes)
                 if (job_code === i.id)
-                    if (!i.requires_asset && !asset) asset = '.';
+                    if (!i.requires_asset && !asset) asset = '.'
                     else break
 
             if (!asset) {
@@ -251,6 +253,14 @@ function AssetPage(props) {
      * 
      */
     function RenderRow(row) {
+        let asset = row.asset_id
+        for (let i of jobCodes) {
+            if (i.id === row.job_code)
+                if (!i.requires_asset) {
+                    if (noAssetJobCounts[i.id]) { noAssetJobCounts[i.id]++; asset = noAssetJobCounts[i.id] }
+                    else { noAssetJobCounts[i.id] = 1; asset = 1 }
+                }
+        }
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <SelectSearch
@@ -265,7 +275,12 @@ function AssetPage(props) {
                     id={`${row.id}-jobcode`}
                 />
             </td>
-            <td><input type='text' defaultValue={row.asset_id} className='asset_id' id={`${row.id}-assetid`} onBlur={e => handleTextInputChange(row.id, e)} onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
+            <td><input type='text'
+                defaultValue={asset}
+                className='asset_id'
+                id={`${row.id}-assetid`}
+                onBlur={e => handleTextInputChange(row.id, e)}
+                onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
             <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
