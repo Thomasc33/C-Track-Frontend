@@ -7,6 +7,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json'
 import AssetService from '../Services/Asset'
 import { Button } from '@material-ui/core';
+import Checkbox from 'react-custom-checkbox';
+import * as Icon from 'react-icons/fi';
 import axios from 'axios';
 import '../css/SingleAsset.css'
 
@@ -21,6 +23,7 @@ function AssetsPage(props) {
     const [results, setResults] = useState([])
     const [jobCodes, setJobCodes] = useState(null)
     const [editName, setEditName] = useState(false)
+    const [uid, setUid] = useState(null)
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
 
     useEffect(() => {
@@ -59,7 +62,8 @@ function AssetsPage(props) {
         })
         if (res.isErrored) return console.log(res)
         if (res.data.notFound) return setAsset(res.data) // Not found
-        if (res.data.length === 1 || props.assetOnly) { //1 result found
+        setUid(res.data.uid)
+        if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
             setHistory(res.data[0].history)
             data = { ...res.data[0].info }
             res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
@@ -74,7 +78,7 @@ function AssetsPage(props) {
         } else {
             let assets = new Set()
             let results = []
-            for (let i of res.data) {
+            for (let i of res.data.resu) {
                 if (assets.has(i.info.id)) continue
                 assets.add(i.info.id)
                 let info = { history: i.history, type: i.type }
@@ -121,6 +125,14 @@ function AssetsPage(props) {
         if (row === 'model_number') getAssetInfo()
     }
 
+    const handleWatchUnWatch = async e => {
+        const token = await getTokenSilently()
+        const FormData = { id: asset.id }
+        console.log(e)
+        if (e) await AssetService.watch(FormData, token)
+        else await AssetService.unwatch(FormData, token)
+    }
+
     const handleAssetAdding = async () => {
         // Get model
         if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
@@ -141,6 +153,7 @@ function AssetsPage(props) {
     }
 
     function renderRow(row) {
+        console.log(asset)
         let val = 'Unknown'
         switch (row) {
             case 'status':
@@ -150,25 +163,34 @@ function AssetsPage(props) {
                 val = asset[row]
         }
         return (
-            <tr key={row}>
+            <tr key={row} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <td style={{ width: '30%' }}>{titleCase(row.replace('_', ' '))}</td>
                 <td style={{ width: '70%' }}>
                     {row.toLowerCase() === 'notes' ?
                         <textarea
                             defaultValue={val}
                             id={`${row}`}
-                            style={{ padding: '1rem', margin: '.5rem', height: '10rem' }}
+                            style={{ padding: '1rem', margin: '.5rem', height: '10rem', width: '87.5%' }}
                             readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
                             onBlur={e => handleTextInputChange(row, e)}
                             onKeyDown={e => handleKeyDown(row, e)} />
-                        :
-                        <input type='text'
-                            defaultValue={val}
-                            id={`${row}`}
-                            style={{ margin: '.5rem', width: '79%' }}
-                            readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
-                            onBlur={e => handleTextInputChange(row, e)}
-                            onKeyDown={e => handleKeyDown(row, e)} />
+                        : row.toLowerCase() === 'watching' ?
+                            <Checkbox id={`${row}`}
+                                checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
+                                borderWidth='2px'
+                                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                style={{ backgroundColor: '#1b1b1b67' }}
+                                size='30px'
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                onChange={(e) => handleWatchUnWatch(e)} />
+                            :
+                            <input type='text'
+                                defaultValue={val}
+                                id={`${row}`}
+                                style={{ margin: '.5rem', width: '79%' }}
+                                readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                onBlur={e => handleTextInputChange(row, e)}
+                                onKeyDown={e => handleKeyDown(row, e)} />
                     }
 
                 </td>

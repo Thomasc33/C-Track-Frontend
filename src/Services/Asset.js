@@ -5,7 +5,7 @@ const BaseApiUrl = require('../settings.json').APIBase
 export default {
     add: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/user/new`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { return { isErrored: true, error: e.response } })
+            .catch(e => { return { isErrored: true, error: e.response.data } })
         return res
     },
     edit: async (FormData, token) => {
@@ -44,6 +44,16 @@ export default {
     rename: async (FormData, token) => {
         let res = await axios.patch(`${BaseApiUrl}/asset/rename`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { return { isErrored: true, error: e.response } })
+        return res
+    },
+    watch: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/watch`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    unwatch: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/unwatch`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { return { isErrored: true, error: e.response.data } })
         return res
     }
 }
