@@ -120,7 +120,7 @@ function AssetPage(props) {
                 else {
                     if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                     try {
-                        if (res.error.data.message.includes('Asset id not found')) {
+                        if (res.error.message.includes('Asset id not found')) {
                             document.getElementById('missingAssetBox').classList.add('Show')
                             document.getElementById('missingAssetId').innerText = `${asset}`
                             setMissingAssetId({ id: 'new', e })

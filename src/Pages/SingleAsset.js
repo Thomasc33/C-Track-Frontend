@@ -61,7 +61,7 @@ function AssetsPage(props) {
             }
         })
         if (res.isErrored) return console.log(res)
-        if (res.data.notFound) return setAsset(res.data) // Not found
+        if (res.data.resu.notFound) return setAsset(res.data.resu) // Not found
         setUid(res.data.uid)
         if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
             setHistory(res.data.resu[0].history)
@@ -73,7 +73,7 @@ function AssetsPage(props) {
                 }
             })
             if (res.isErrored) console.log(res)
-            else data = { ...data, ...res.data }
+            else data = { ...data, ...res.data.resu }
             setAsset(data)
         } else {
             let assets = new Set()
@@ -89,7 +89,7 @@ function AssetsPage(props) {
                     }
                 })
                 if (res.isErrored) console.log(res)
-                else info.data = { ...i.info, ...res.data }
+                else info.data = { ...i.info, ...res.data.resu }
                 results.push(info)
             }
             setResults(results)
