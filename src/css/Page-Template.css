@@ -64,6 +64,10 @@
     width: 0;
 }
 
+.SideBar * {
+    transition: ease-in-out .5s;
+}
+
 .SideBar p:hover:after {
     width: 100%;
     left: 0;
@@ -87,6 +91,9 @@
     cursor: pointer;
 }
 
+.dropdown-content * {
+    transition: ease-in-out .5s;
+}
 
 .dropDownHeader:hover .dropdown-content {
     display: block;
@@ -118,13 +125,11 @@
 .AccountButton:hover .AccountDropDown {
     display: block;
     max-height: 300px;
-    transition: ease-in-out .5s;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .AccountButton:hover .AccountDropDown button {
-    transition: ease-in-out .5s;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     border-bottom-left-radius: .6rem;
@@ -132,16 +137,13 @@
 }
 
 .AccountButton:hover button {
-    transition: ease-in-out .5s;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-
 .AccountDropDown {
     display: none;
     bottom: 100%;
-    transition: ease-in-out .5s;
 }
 
 .AccountDropDown button {
@@ -161,7 +163,6 @@
 
 .AccountDropDown button:hover {
     text-decoration: underline 2px;
-    transition: ease-in-out .5s;
 }
 
 

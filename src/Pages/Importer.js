@@ -96,8 +96,8 @@ function ImporterPage(props) {
         async function req(section) {
             let res = await axios.post(`${settings.APIBase}/importer/${isAsset ? `asset` : `model`}`, section, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': `Bearer ${token}`
                 }
             }).catch(er => { return { isErrored: true, error: er, failed: er.response && er.response.data && er.response.data.failed ? er.response.data.failed : [] } })
             if (res.isErrored) console.error(res.error)

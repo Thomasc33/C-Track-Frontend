@@ -10,22 +10,22 @@ export default {
     },
     edit: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/user/edit`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     delete: async (id, date, token) => {
         let res = await axios.delete(`${BaseApiUrl}/asset/user/del/${id}/${date}`, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     fetch: async (id, token) => {
         let res = await axios.get(`${BaseApiUrl}/asset/fetch/${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     singleEdit: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/edit`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     /**
@@ -38,12 +38,12 @@ export default {
      */
     create: async (FormData, token) => {
         let res = await axios.put(`${BaseApiUrl}/asset/create`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     rename: async (FormData, token) => {
         let res = await axios.patch(`${BaseApiUrl}/asset/rename`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
-            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     watch: async (FormData, token) => {
