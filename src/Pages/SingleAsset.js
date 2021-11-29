@@ -10,6 +10,7 @@ import { Button } from '@material-ui/core';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import axios from 'axios';
+import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
@@ -25,6 +26,7 @@ function AssetsPage(props) {
     const [editName, setEditName] = useState(false)
     const [uid, setUid] = useState(null)
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
+    const [modelSelect, setModelSelect] = useState(null)
 
     useEffect(() => {
         if (!search) return
@@ -134,17 +136,14 @@ function AssetsPage(props) {
     }
 
     const handleAssetAdding = async () => {
-        // Get model
-        if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
-        let model = document.getElementById('model_input').value
-        if (!model) return document.getElementById('model_input').classList.add('invalid')
+        if (!modelSelect) return
 
-        let FormData = { model_id: model, asset_id: search }
+        let FormData = { model_id: modelSelect, asset_id: search }
         const t = await getTokenSilently()
         let res = await AssetService.create(FormData, t)
         if (res.isErrored) {
-            document.getElementById('model_input').classList.add('invalid')
-            console.log(res.error)
+            alert(`Model not added: ${res.error.message}`)
+            console.warn(res.error)
         } else { let s = search; setSearch(null); setSearch(s) }
     }
 
@@ -153,7 +152,6 @@ function AssetsPage(props) {
     }
 
     function renderRow(row) {
-        console.log(asset)
         let val = 'Unknown'
         switch (row) {
             case 'status':
@@ -263,7 +261,7 @@ function AssetsPage(props) {
                                 {props.permissions.edit_models || props.isAdmin ? <div>
                                     <hr />
                                     <h2>Add it?</h2>
-                                    <input id='model_input' type='text' className='ModelInput' placeholder='Model Number' />
+                                    <ModelSelect setModelSelect={setModelSelect} />
                                     <br />
                                     <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { handleAssetAdding() }}>Add</Button>
                                 </div>

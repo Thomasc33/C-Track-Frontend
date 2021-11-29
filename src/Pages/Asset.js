@@ -7,6 +7,7 @@ import assetService from '../Services/Asset'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import { Button } from '@material-ui/core';
+import ModelSelect from '../Components/ModelSelect';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
@@ -22,6 +23,8 @@ function AssetPage(props) {
     const [missingAssetId, setMissingAssetId] = useState(null)
     const noAssetJobCounts = {}
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
+    const [modelSelect, setModelSelect] = useState(null)
+
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -343,7 +346,7 @@ function AssetPage(props) {
             <div id='missingAssetBox' className='AddAssetPrompt'>
                 <h1 style={{ textDecoration: 'underline', marginLeft: '3rem', marginRight: '3rem' }}>Asset Does Not Exist:</h1>
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
-                {props.permissions.edit_assets || props.isAdmin ? <input id='model_input' type='text' className='notes' placeholder='Model Number' /> : <></>}
+                {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
                     {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
                     <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => {

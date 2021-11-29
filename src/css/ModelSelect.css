@@ -1,0 +1,58 @@
+.model_select li {
+    list-style-type: none;
+}
+
+.model_select li:hover {
+    background-color: rgba(138, 138, 138, 0.404);
+}
+
+.model_select li button {
+    padding-left: 4rem;
+    padding-right: 4rem;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    background: #1b1b1b67;
+    font-size: 20px;
+    border-style: none;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    width: 100%;
+}
+
+.model_select .is-highlighted {
+    background-color: rgba(138, 138, 138, 0.404);
+}
+
+.model_select ul {
+    position: absolute;
+    background-color: #1b1b1b;
+    border-radius: 0;
+    max-height: 60vh;
+    overflow: scroll;
+    z-index: 3;
+}
+
+.model_select__value {
+    background-color: transparent;
+}
+
+.SelectContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.SelectContainer input {
+    background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-style: none;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 0;
+    margin: 0;
+    border-radius: .2rem;
+    text-align: center;
+}
