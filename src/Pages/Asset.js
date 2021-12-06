@@ -284,7 +284,7 @@ function AssetPage(props) {
                 id={`${row.id}-assetid`}
                 onBlur={e => handleTextInputChange(row.id, e)}
                 onKeyDown={e => handleKeyDown(row.id, e)}></input>
-                {row.image ? <img src={row.image} alt={row.asset_id} style={{ maxWidth: '3rem', maxHeight: '3rem' }} /> : <></>}
+                {row.image ? <img src={row.image} alt={row.asset_id} style={{ maxWidth: '2.5rem', maxHeight: '2.5rem', paddingTop: '.5rem', marginLeft: '1rem' }} /> : <></>}
             </div></td>
             <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <input type='text'
