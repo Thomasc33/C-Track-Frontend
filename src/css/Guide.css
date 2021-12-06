@@ -1,0 +1,29 @@
+.GuidePage {
+    position: absolute;
+    left: 14vw;
+    top: 0;
+    width: 85vw;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin-top: 4rem;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.GuidePage h1 {
+    font-weight: 400;
+    font-size: 2rem;
+    padding: 1rem;
+}
+
+.GuidePage p {
+    font-weight: 300;
+    font-size: 1rem;
+}
+
+.GuidePage hr {
+    margin: 2rem;
+}

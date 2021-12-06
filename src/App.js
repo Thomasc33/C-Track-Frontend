@@ -17,8 +17,9 @@ import JobPage from './Pages/Jobs';
 import LoginPage from './Pages/Login';
 import ModelPage from './Pages/Models';
 import ReportsPage from './Pages/Reports';
-import SingleAssetPage from './Pages/SingleAsset'
+import SingleAssetPage from './Pages/SingleAsset';
 import UserPage from './Pages/User';
+import GuidePage from './Pages/Guide';
 
 // Import Libraries
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
@@ -109,6 +110,7 @@ function App(props) {
         <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       </Switch>
     </BrowserRouter>

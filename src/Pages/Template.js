@@ -58,6 +58,9 @@ function PageTemplate(props) {
                         <li>
                             <p style={{ color: props.highLight === "5" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/models')}>Models</p>
                         </li> : <></>}
+                    <li>
+                        <p style={{ color: props.highLight === "6" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/guide')}>Guide</p>
+                    </li>
                     {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users)) ? < li >
                         <div className='dropDownHeader'>
                             <p style={{ color: props.highLight === "7" ? accent : 'white' }} onClickCapture={(e) => { }}>Tools</p>
