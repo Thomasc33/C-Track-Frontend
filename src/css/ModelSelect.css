@@ -36,6 +36,14 @@
     background-color: transparent;
 }
 
+.model_select {
+    margin: 0;
+    padding: 0;
+}
+.model_select * {
+    margin: 0;
+}
+
 .SelectContainer {
     display: flex;
     justify-content: center;
@@ -45,14 +53,14 @@
 }
 
 .SelectContainer input {
-    background-color: #1b1b1b67;
+    background-color: #1b1b1be4;
     box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
     border-style: none;
     font-size: 20px;
     font-family: 'Montserrat', sans-serif;
     color: white;
-    padding: 0;
     margin: 0;
     border-radius: .2rem;
     text-align: center;
+    width: 90%;
 }

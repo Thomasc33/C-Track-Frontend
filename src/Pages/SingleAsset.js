@@ -198,12 +198,14 @@ function AssetsPage(props) {
 
     function renderHistoryRow(row) {
         let d = new Date(row.date)
-        let date = `${parseInt(d.getMonth()) + 1}-${d.getDate()}-${d.getFullYear()}`
+        let date = `${parseInt(d.getMonth()) + 1}-${parseInt(d.getDate()) + 1}-${d.getFullYear()}`
+        let time = ''
+        if (row.time) { let t = row.time.slice(11, 16); time = formatAMPM(t) }
         return (
             <tr key={row.id}>
                 <td><p>{row.name}</p></td>
                 <td><p>{jobCodes[row.job_code]}</p></td>
-                <td><p>{date}</p></td>
+                <td><p>{date} {time}</p></td>
                 <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
             </tr>
         )
@@ -294,7 +296,7 @@ function AssetsPage(props) {
                                 <h1>Status History</h1>
                                 <hr />
                                 <div style={{ display: 'flex' }}>
-                                    {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
+                                    {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
                                 </div>
                             </div>
                 }
@@ -312,4 +314,15 @@ function titleCase(str) {
         splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
     }
     return splitStr.join(' ');
+}
+
+function formatAMPM(time) {
+    time = time.split(':')
+    let hours = time[0]
+    let minutes = time[1]
+    let ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12
+    hours = hours ? hours : 12;
+    minutes = minutes = ('0' + minutes).slice(-2);
+    return hours + ':' + minutes + ' ' + ampm;
 }

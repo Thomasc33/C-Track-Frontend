@@ -201,20 +201,16 @@ function AssetPage(props) {
 
     const handleAssetAdding = async () => {
         // Get model
-        if (document.getElementById('model_input').classList.contains('invalid')) document.getElementById('model_input').classList.remove('invalid')
-        let model = document.getElementById('model_input').value
-        if (!model) return document.getElementById('model_input').classList.add('invalid')
+        if (!modelSelect) return
 
         // Get asset
         let asset = document.getElementById('missingAssetId').innerText
-        if (!asset) { console.log('Asset missing from asset adding function'); document.getElementById('model_input').classList.add('invalid'); return }
+        if (!asset) { console.log('Asset missing from asset adding function'); return }
 
-        let FormData = { model_id: model, asset_id: asset }
+        let FormData = { model_id: modelSelect, asset_id: asset }
         const t = await getTokenSilently()
         let res = await assetService.create(FormData, t)
         if (res.isErrored) {
-            document.getElementById('model_input').value = `Invalid Model Number`
-            document.getElementById('model_input').classList.add('invalid')
             console.log(res.error)
         } else document.getElementById('missingAssetBox').classList.remove('Show')
 
@@ -282,12 +278,14 @@ function AssetPage(props) {
                     id={`${row.id}-jobcode`}
                 />
             </td>
-            <td><input type='text'
+            <td><div style={{ padding: 0, margin: 0, display: 'flex', alignContent: 'center' }}><input type='text'
                 defaultValue={asset}
                 className='asset_id'
                 id={`${row.id}-assetid`}
                 onBlur={e => handleTextInputChange(row.id, e)}
-                onKeyDown={e => handleKeyDown(row.id, e)}></input></td>
+                onKeyDown={e => handleKeyDown(row.id, e)}></input>
+                {row.image ? <img src={row.image} alt={row.asset_id} style={{ maxWidth: '3rem', maxHeight: '3rem' }} /> : <></>}
+            </div></td>
             <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
