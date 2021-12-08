@@ -55,5 +55,15 @@ export default {
         let res = await axios.post(`${BaseApiUrl}/asset/unwatch`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    lock: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/lock`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    unlock: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/unlock`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }

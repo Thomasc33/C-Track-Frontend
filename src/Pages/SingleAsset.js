@@ -130,9 +130,15 @@ function AssetsPage(props) {
     const handleWatchUnWatch = async e => {
         const token = await getTokenSilently()
         const FormData = { id: asset.id }
-        console.log(e)
         if (e) await AssetService.watch(FormData, token)
         else await AssetService.unwatch(FormData, token)
+    }
+
+    const handleLocking = async e => {
+        const token = await getTokenSilently()
+        const FormData = { id: asset.id }
+        if (e) await AssetService.lock(FormData, token)
+        else await AssetService.unlock(FormData, token)
     }
 
     const handleAssetAdding = async () => {
@@ -172,7 +178,8 @@ function AssetsPage(props) {
                             readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
                             onBlur={e => handleTextInputChange(row, e)}
                             onKeyDown={e => handleKeyDown(row, e)} />
-                        : row.toLowerCase() === 'watching' ?
+                        :
+                        row.toLowerCase() === 'watching' ?
                             <Checkbox id={`${row}`}
                                 checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
                                 borderWidth='2px'
@@ -180,15 +187,23 @@ function AssetsPage(props) {
                                 style={{ backgroundColor: '#1b1b1b67' }}
                                 size='30px'
                                 icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
-                                onChange={(e) => handleWatchUnWatch(e)} />
-                            :
-                            <input type='text'
-                                defaultValue={val}
-                                id={`${row}`}
-                                style={{ margin: '.5rem', width: '79%' }}
-                                readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
-                                onBlur={e => handleTextInputChange(row, e)}
-                                onKeyDown={e => handleKeyDown(row, e)} />
+                                onChange={(e) => handleWatchUnWatch(e)} /> :
+                            row.toLowerCase() === 'locked' ?
+                                <Checkbox id={`${row}`}
+                                    checked={asset && asset.locked ? true : false}
+                                    borderWidth='2px'
+                                    borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                    style={{ backgroundColor: '#1b1b1b67' }}
+                                    size='30px'
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                    onChange={(e) => handleLocking(e)} />
+                                : <input type='text'
+                                    defaultValue={val}
+                                    id={`${row}`}
+                                    style={{ margin: '.5rem', width: '79%' }}
+                                    readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                    onBlur={e => handleTextInputChange(row, e)}
+                                    onKeyDown={e => handleKeyDown(row, e)} />
                     }
 
                 </td>
