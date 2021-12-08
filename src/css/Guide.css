@@ -3,14 +3,21 @@
     left: 14vw;
     top: 0;
     width: 85vw;
-    overflow: scroll;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    margin-top: 4rem;
+    height: 94vh;
     color: white;
     font-family: 'Montserrat', sans-serif;
+}
+
+.GuidePage * {
+    color: white;
+}
+
+.GuideContainer {
+    overflow: scroll;
+    text-align: center;
+    width: 100%;
+    max-height: 100%;
+    padding-top: 4rem;
 }
 
 .GuidePage h1 {
@@ -26,4 +33,18 @@
 
 .GuidePage hr {
     margin: 2rem;
+}
+
+.GuidePage img {
+    margin: 2rem 0 1rem 0;
+    max-height: 50vh;
+    border: white solid 2px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-radius: .5rem;
+}
+
+.GuidePage li {
+    display: list-item;
+    list-style: disc;
+    margin-left: 1em;
 }
