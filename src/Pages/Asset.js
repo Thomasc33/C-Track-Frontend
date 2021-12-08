@@ -116,9 +116,14 @@ function AssetPage(props) {
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
-                if (res.error && res.error.status === 406) {
+                console.log(res.error.message)
+                if (res.error.message === 'Job code doesnt apply to model type') {
                     document.getElementById(`${id}-assetid`).value = '';
                     alert(`Job code not compatable with asset's model type`)
+                }
+                else if (res.error.message === 'Asset is Locked') {
+                    console.log('locked')
+                    alert(`This asset is currently locked and cannot be modified. Contact a site admin for more information`)
                 }
                 else {
                     if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
@@ -178,10 +183,14 @@ function AssetPage(props) {
                 let token = await getTokenSilently()
                 let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
-                    if (res.error.status === 406) {
+                    if (res.error.message === 'Job code doesnt apply to model type') {
                         alert(`Job code not compatable with asset's model type`)
                         document.getElementById(`${id}-assetid`).value = ''
                         if (document.getElementById(`${id}-jobcode`)) document.getElementById(`${id}-jobcode`).classList.add('invalid')
+                    }
+                    if (res.error.message === 'Asset is Locked') {
+                        console.log('locked')
+                        alert(`This asset is currently locked and cannot be modified. Contact a site admin for more information`)
                     }
                     if (e.target) {
                         e.target.classList.add('invalid')
