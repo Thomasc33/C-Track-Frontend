@@ -89,10 +89,9 @@ function ReportsPage(props) {
         let csvData = []
         if (onUser) {
             if (!data['Daily Dollars']) return null
-            csvData.push(['userid'])
-            csvData.push([onUser])
+            csvData.push(['type', 'value'])
+            csvData.push(['userid', onUser])
             for (let i in data) {
-                csvData.push(['type', 'value'])
                 if (typeof (data[i]) == 'object') {
                     csvData.push([`${i}-${data[i].is_hourly ? 'hours' : 'count'}`, data[i].count])
                     csvData.push([`${i}-$`, data[i].dd])
