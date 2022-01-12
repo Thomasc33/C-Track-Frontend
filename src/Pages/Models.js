@@ -29,7 +29,7 @@ function ModelPage(props) {
         const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
             offset,
-            limit: 25,
+            limit: 50,
             orderBy: 'model_number'
         }, {
             headers: {
@@ -82,7 +82,7 @@ function ModelPage(props) {
                 document.getElementById('new-manufacturer').value = ''
                 document.getElementById('new-image').value = ''
                 alert(`Model ${z.model_number} has been added.`)
-                getCatalog((pageNumber - 1) * 25)
+                getCatalog((pageNumber - 1) * 50)
                 setNewInfo({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
             }
         } else for (let i of catalog) {
@@ -132,12 +132,12 @@ function ModelPage(props) {
         if (e.target.id === 'next') {
             setCatalog([])
             setPageNumber(pageNumber + 1)
-            getCatalog(pageNumber * 25)
+            getCatalog(pageNumber * 50)
         }
         else {
             setCatalog([])
             setPageNumber(pageNumber - 1)
-            getCatalog((pageNumber - 2) * 25)
+            getCatalog((pageNumber - 2) * 50)
         }
     }
 
@@ -204,9 +204,9 @@ function ModelPage(props) {
                     onClick={e => { if (pageNumber > 1) handlePageChange(e) }}
                 >navigate_before</i>
                 <i className='material-icons PageArrow'
-                    style={catalog.length >= 25 ? {} : { color: 'gray' }}
+                    style={catalog.length >= 50 ? {} : { color: 'gray' }}
                     id='next'
-                    onClick={e => catalog.length >= 25 ? handlePageChange(e) : console.log('Next page unavailable')}
+                    onClick={e => catalog.length >= 50 ? handlePageChange(e) : console.log('Next page unavailable')}
                 >navigate_next</i>
             </div>
             <div className='AssetArea'>
@@ -260,8 +260,8 @@ const selectStyles = {
     control: (styles, { selectProps: { width } }) => ({
         ...styles,
         backgroundColor: '#1b1b1b67',
-        boxShadow: ' 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)',
-        borderRadius: '.25rem',
+        boxShadow: ' 0 0 50px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)',
+        borderRadius: '.50rem',
         padding: '.5rem',
         border: 'none',
         width
