@@ -92,14 +92,12 @@ function ReportsPage(props) {
             csvData.push(['userid'])
             csvData.push([onUser])
             for (let i in data) {
+                csvData.push(['type', 'value'])
                 if (typeof (data[i]) == 'object') {
-                    csvData[0].push(`${i}-${data[i].is_hourly ? 'hours' : 'count'}`)
-                    csvData[1].push(data[i].count)
-                    csvData[0].push(`${i}-$`)
-                    csvData[1].push(data[i].dd)
+                    csvData.push([`${i}-${data[i].is_hourly ? 'hours' : 'count'}`, data[i].count])
+                    csvData.push([`${i}-$`, data[i].dd])
                 } else {
-                    csvData[0].push(i)
-                    csvData[1].push(data[i])
+                    csvData.push([i, data[i]])
                 }
             }
         } else {
@@ -115,11 +113,9 @@ function ReportsPage(props) {
     const getGraphCSVData = () => {
         if (!lineChartData || lineChartData == {}) return [['error'], ['error']]
         console.log(lineChartData)
-        const csvData = [[], []]
-        for (let i in lineChartData) {
-            csvData[0].push(i.substring(0, 15))
-            csvData[1].push(lineChartData[i])
-        }
+        const csvData = [['date', 'dailydollars']]
+        for (let i in lineChartData)
+            csvData.push([i.substring(0, 15), lineChartData[i]])
         return csvData
     }
 
