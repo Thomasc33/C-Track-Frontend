@@ -19,6 +19,7 @@
     "react-color": "^2.19.3",
     "react-confirm-alert": "^2.7.0",
     "react-cookie-consent-notification": "^1.1.1",
+    "react-csv": "^2.2.1",
     "react-csv-reader": "^3.3.1",
     "react-custom-checkbox": "^2.0.0",
     "react-dom": "^17.0.2",

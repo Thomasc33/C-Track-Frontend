@@ -9,6 +9,7 @@ import { Button } from '@material-ui/core';
 import { LineChart } from 'react-chartkick'
 import 'chartkick/chart.js'
 import axios from 'axios';
+import { CSVLink } from "react-csv";
 const settings = require('../settings.json')
 
 function ReportsPage(props) {
@@ -84,8 +85,46 @@ function ReportsPage(props) {
         setLoading(true)
     }
 
+    const getCSVData = () => {
+        let csvData = []
+        if (onUser) {
+            if (!data['Daily Dollars']) return null
+            csvData.push(['userid'])
+            csvData.push([onUser])
+            for (let i in data) {
+                if (typeof (data[i]) == 'object') {
+                    csvData[0].push(`${i}-${data[i].is_hourly ? 'hours' : 'count'}`)
+                    csvData[1].push(data[i].count)
+                    csvData[0].push(`${i}-$`)
+                    csvData[1].push(data[i].dd)
+                } else {
+                    csvData[0].push(i)
+                    csvData[1].push(data[i])
+                }
+            }
+        } else {
+            csvData.push(['name', 'dailydollars'])
+            for (let i of data) {
+                csvData.push([i.name, i.dailydollars || 0])
+            }
+        }
+        return csvData
+    }
+
+
+    const getGraphCSVData = () => {
+        if (!lineChartData || lineChartData == {}) return [['error'], ['error']]
+        console.log(lineChartData)
+        const csvData = [[], []]
+        for (let i in lineChartData) {
+            csvData[0].push(i.substring(0, 15))
+            csvData[1].push(lineChartData[i])
+        }
+        return csvData
+    }
+
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100)/2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#524e00'
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#524e00'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#524e00', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#524e00'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
@@ -95,7 +134,7 @@ function ReportsPage(props) {
     function renderSingleUserRow(k, v) {
         let accent = localStorage.getItem('accentColor') || '#524e00'
         return (
-            <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .95)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((parseInt(v) / 650 * 100) + 100)/2)}%, #1b1b1b 100%)` : accent : 'inherit' }}>
+            <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .95)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((parseInt(v) / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : accent : 'inherit' }}>
                 <h1>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
                 <h1>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
                 {k !== 'Daily Dollars' ? <h1>${v.dd}</h1> : <></>}
@@ -124,6 +163,7 @@ function ReportsPage(props) {
             </div>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
+            <CSVLink filename={`${Date.now()}-EXPORT.csv`} target='_blank' data={getCSVData()}><Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} >Download CSV</Button></CSVLink>
         </div >
         <div className='AssetArea'>
             {onUser ?
@@ -137,6 +177,7 @@ function ReportsPage(props) {
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
                         <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#e3de00']} />
+                        <CSVLink filename={`${Date.now()}-EXPORT.csv`} target='_blank' data={getGraphCSVData()}><Button variant='contained' color='primary' size='large' style={{ marginTop: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} >Download CSV</Button></CSVLink>
                     </div>
                 </> : <>
                     <div className='UserReports'>
