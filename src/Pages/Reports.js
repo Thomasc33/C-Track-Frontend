@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Redirect } from 'react-router'
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
@@ -10,6 +10,7 @@ import { LineChart } from 'react-chartkick'
 import 'chartkick/chart.js'
 import axios from 'axios';
 import { CSVLink } from "react-csv";
+import ReportService from '../Services/Report'
 const settings = require('../settings.json')
 
 function ReportsPage(props) {
@@ -20,6 +21,9 @@ function ReportsPage(props) {
     const [lineChartData, setLineChartData] = useState({})
     const [onUser, setOnUser] = useState(null)
     const { instance, accounts } = useMsal()
+    const [reportData, setReportData] = useState([])
+    const [fileName, setFileName] = useState(null)
+    const reportRef = useRef(null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -35,6 +39,17 @@ function ReportsPage(props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { sendReq() }, [onUser, graphDate, date])
+    useEffect(() => {
+        if (reportRef && reportRef && reportRef.current && reportRef.current.link) {
+            setTimeout(() => {
+                reportRef.current.link.click()
+                setReportData([])
+                setFileName(null)
+            });
+        }
+    }, [reportData]);
+
+
     if (!props.permissions.view_reports && !props.isAdmin) return <Redirect to='/' />
 
     async function sendReq(doSetLoading = true) {
@@ -88,7 +103,7 @@ function ReportsPage(props) {
     const getCSVData = () => {
         let csvData = []
         if (onUser) {
-            if (!data['Daily Dollars']) return null
+            if (!data['Daily Dollars']) return ['error']
             csvData.push(['type', 'value'])
             csvData.push(['userid', onUser])
             for (let i in data) {
@@ -108,10 +123,23 @@ function ReportsPage(props) {
         return csvData
     }
 
+    const getReport = async (e, timeframe, to) => {
+        if (timeframe == to) to = undefined
+        let t = await getTokenSilently()
+        setFileName(`${timeframe}-Report.csv`)
+        let d = await ReportService.generateReport(t, timeframe, to)
+        if (d.isErrored) {
+            setFileName(null)
+            alert(d.error)
+        } else {
+            if (d.data.length == 0) return alert('No data to pull, try custom range if you are looking for friday.')
+            setReportData(d.data)
+        }
+    }
+
 
     const getGraphCSVData = () => {
         if (!lineChartData || lineChartData == {}) return [['error'], ['error']]
-        console.log(lineChartData)
         const csvData = [['date', 'dailydollars']]
         for (let i in lineChartData)
             csvData.push([i.substring(0, 15), lineChartData[i]])
@@ -181,7 +209,20 @@ function ReportsPage(props) {
                             : <></>}
                     </div>
                     <div className='UserReports'>
-                        <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Placeholder for future functionality</h1>
+                        <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Reports Section</h1>
+                        {reportData.length > 0 ? <CSVLink filename={fileName} target='_blank' data={reportData} ref={reportRef}></CSVLink> : undefined}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => { setFileName(`${getDate(Date.now())}-Report.csv`); getReport(e, getDate(Date.now())) }}>Download Today's Report</Button>
+                        <br />
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => { setFileName(`${getDateSubtractDay(Date.now())}-Report.csv`); getReport(e, getDateSubtractDay(Date.now())) }}>Download Yesterday's Report</Button>
+                        <hr />
+                        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                            <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
+                            <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
+                        </div>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => { setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-Report.csv`); getReport(e, getDate(graphDate.from), getDate(graphDate.to)) }}>Download Custom Report</Button>
                     </div>
                 </>
             }
@@ -201,6 +242,12 @@ function getDate(date) {
 function getDateSubtractMonth(date) {
     date = new Date(date)
     date.setMonth(date.getMonth() - 1)
+    return date.toISOString().split('T')[0]
+}
+
+function getDateSubtractDay(date) {
+    date = new Date(date)
+    date.setDate(date.getDate() - 1)
     return date.toISOString().split('T')[0]
 }
 
