@@ -137,6 +137,20 @@ function ReportsPage(props) {
         }
     }
 
+    const getAssetSummary = async (e, timeframe, to) => {
+        if (timeframe == to) to = undefined
+        let t = await getTokenSilently()
+        setFileName(`${timeframe}-AS.csv`)
+        let d = await ReportService.generateAssetSummary(t, timeframe, to)
+        if (d.isErrored) {
+            setFileName(null)
+            alert(d.error)
+        } else {
+            if (d.data.length == 0) return alert('No data to pull, try custom range if you are looking for friday.')
+            setReportData(d.data)
+        }
+    }
+
 
     const getGraphCSVData = () => {
         if (!lineChartData || lineChartData == {}) return [['error'], ['error']]
@@ -211,18 +225,40 @@ function ReportsPage(props) {
                     <div className='UserReports'>
                         <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Reports Section</h1>
                         {reportData.length > 0 ? <CSVLink filename={fileName} target='_blank' data={reportData} ref={reportRef}></CSVLink> : undefined}
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => { setFileName(`${getDate(Date.now())}-Report.csv`); getReport(e, getDate(Date.now())) }}>Download Today's Report</Button>
+                        <h2>Today</h2>
                         <br />
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => { setFileName(`${getDateSubtractDay(Date.now())}-Report.csv`); getReport(e, getDateSubtractDay(Date.now())) }}>Download Yesterday's Report</Button>
+                            onClick={e => {
+                                setFileName(`${getDate(Date.now())}-Report.csv`); getReport(e, getDate(Date.now()))
+                            }}>Download Report</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDate(Date.now())}-AS.csv`); getAssetSummary(e, getDate(Date.now()))
+                            }}>Download Asset Summary</Button>
                         <hr />
+                        <h2>Yesterday</h2>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDateSubtractDay(Date.now())}-Report.csv`); getReport(e, getDateSubtractDay(Date.now()))
+                            }}>Download Report</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDateSubtractDay(Date.now())}-AS.csv`); getAssetSummary(e, getDateSubtractDay(Date.now()))
+                            }}>Download Asset Summary</Button>
+                        <hr />
+                        <h2>Custom Date Range</h2>
                         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => { setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-Report.csv`); getReport(e, getDate(graphDate.from), getDate(graphDate.to)) }}>Download Custom Report</Button>
+                            onClick={e => {
+                                setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-Report.csv`); getReport(e, getDate(graphDate.from), getDate(graphDate.to))
+                            }}>Download Report</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-AS.csv`); getAssetSummary(e, getDate(graphDate.from), getDate(graphDate.to))
+                            }}>Download Asset Summary</Button>
                     </div>
                 </>
             }
