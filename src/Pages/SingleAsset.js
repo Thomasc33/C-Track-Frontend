@@ -10,11 +10,12 @@ import { Button } from '@material-ui/core';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import axios from 'axios';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
-const editable = ['return_reason', 'notes', 'model_number']
+const editable = ['return_reason', 'notes', 'model_number', 'company']
 
 function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
@@ -113,11 +114,12 @@ function AssetsPage(props) {
 
     const handleTextInputChange = async (row, e) => {
         if (!editable.includes(row) || !(props.permissions.edit_assets || props.isAdmin)) return
-        if (e.target.value === asset[row]) return
+        if (e.target && e.target.value === asset[row]) return
+        if (!e.target && !e) return
         let formData = {
             id: search,
             change: row,
-            value: e.target.value
+            value: e.target ? e.target.value : e
         }
         if (!formData.value) formData.value = ''
 
@@ -166,6 +168,7 @@ function AssetsPage(props) {
             default:
                 val = asset[row]
         }
+        console.log(row.toLowerCase())
         return (
             <tr key={row} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <td style={{ width: '30%' }}>{titleCase(row.replace('_', ' '))}</td>
@@ -184,7 +187,7 @@ function AssetsPage(props) {
                                 checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
                                 borderWidth='2px'
                                 borderColor={localStorage.getItem('accentColor') || '#e3de00'}
-                                style={{ backgroundColor: '#1b1b1b67' }}
+                                style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67' }}
                                 size='30px'
                                 icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                                 onChange={(e) => handleWatchUnWatch(e)} /> :
@@ -193,17 +196,30 @@ function AssetsPage(props) {
                                     checked={asset && asset.locked ? true : false}
                                     borderWidth='2px'
                                     borderColor={localStorage.getItem('accentColor') || '#e3de00'}
-                                    style={{ backgroundColor: '#1b1b1b67' }}
+                                    style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67' }}
                                     size='30px'
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
-                                    onChange={(e) => handleLocking(e)} />
-                                : <input type='text'
-                                    defaultValue={val}
-                                    id={`${row}`}
-                                    style={{ margin: '.5rem', width: '79%' }}
-                                    readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
-                                    onBlur={e => handleTextInputChange(row, e)}
-                                    onKeyDown={e => handleKeyDown(row, e)} />
+                                    onChange={(e) => handleLocking(e)} /> :
+                                row.toLowerCase() === 'company' ?
+                                    <div style={{ padding: '1rem', margin: '.5rem', width: '95%' }}>
+                                        <SelectSearch
+                                            options={companies}
+                                            value={val}
+                                            search
+                                            placeholder="Company"
+                                            filterOptions={fuzzySearch}
+                                            className='model_select'
+                                            autoComplete='on'
+                                            id='company_select'
+                                            onChange={e => handleTextInputChange(row, e)}
+                                        /></div> :
+                                    <input type='text'
+                                        defaultValue={val}
+                                        id={`${row}`}
+                                        style={{ margin: '.5rem', width: '79%' }}
+                                        readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                        onBlur={e => handleTextInputChange(row, e)}
+                                        onKeyDown={e => handleKeyDown(row, e)} />
                     }
 
                 </td>
@@ -341,3 +357,9 @@ function formatAMPM(time) {
     minutes = minutes = ('0' + minutes).slice(-2);
     return hours + ':' + minutes + ' ' + ampm;
 }
+
+const companies = [
+    { name: 'CURO', value: 'CURO' },
+    { name: 'Palliative Care', value: 'Palliative Care' },
+    { name: 'Home Health', value: 'Home Health' }
+]

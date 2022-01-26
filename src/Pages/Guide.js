@@ -25,6 +25,7 @@ function GuidePage(props) {
             <PageTemplate disableSearch highLight='6' {...props} />
             <div className='GuidePage'><div className='GuideContainer'>
                 <h1>Changing Accent Color</h1>
+                <p>Just set it below and refresh</p>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                     <ChromePicker color={color} onChangeComplete={e => handleColorChange(e)} />
                 </div>
