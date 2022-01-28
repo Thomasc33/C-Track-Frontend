@@ -64,6 +64,7 @@ function AssetsPage(props) {
                 'Access-Control-Allow-Origin': '*'
             }
         })
+        setModelInfo(null)
         if (res.isErrored) return console.log(res)
         if (res.data.resu.notFound) return setAsset(res.data.resu) // Not found
         setUid(res.data.uid)
@@ -288,7 +289,7 @@ function AssetsPage(props) {
     function renderModelsAssetsRow(row) {
         return (
             <tr key={row.id}>
-                <td><p>{row.id}</p></td>
+                <td style={{ cursor: 'pointer' }} onClick={e => { props.history.push(`/search?q=${row.id}`); setSearch(row.id) }}><p>{row.id}</p></td>
                 <td><p>{jobCodes[row.status]}</p></td>
                 <td><p>{row.company}</p></td>
                 <td><p>{row.locked ? 'Yes' : 'No'}</p></td>
