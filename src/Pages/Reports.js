@@ -107,7 +107,7 @@ function ReportsPage(props) {
             csvData.push(['type', 'value'])
             csvData.push(['userid', onUser])
             for (let i in data) {
-                if (typeof (data[i]) == 'object') {
+                if (typeof (data[i]) === 'object') {
                     csvData.push([`${i}-${data[i].is_hourly ? 'hours' : 'count'}`, data[i].count])
                     csvData.push([`${i}-$`, data[i].dd])
                 } else {
@@ -124,7 +124,7 @@ function ReportsPage(props) {
     }
 
     const getReport = async (e, timeframe, to) => {
-        if (timeframe == to) to = undefined
+        if (timeframe === to) to = undefined
         let t = await getTokenSilently()
         setFileName(`${timeframe}-Report.csv`)
         let d = await ReportService.generateReport(t, timeframe, to)
@@ -132,13 +132,13 @@ function ReportsPage(props) {
             setFileName(null)
             alert(d.error)
         } else {
-            if (d.data.length == 0) return alert('No data to pull, try custom range if you are looking for friday.')
+            if (d.data.length === 0) return alert('No data to pull, try custom range if you are looking for friday.')
             setReportData(d.data)
         }
     }
 
     const getAssetSummary = async (e, timeframe, to) => {
-        if (timeframe == to) to = undefined
+        if (timeframe === to) to = undefined
         let t = await getTokenSilently()
         setFileName(`${timeframe}-AS.csv`)
         let d = await ReportService.generateAssetSummary(t, timeframe, to)
@@ -146,14 +146,14 @@ function ReportsPage(props) {
             setFileName(null)
             alert(d.error)
         } else {
-            if (d.data.length == 0) return alert('No data to pull, try custom range if you are looking for friday.')
+            if (d.data.length === 0) return alert('No data to pull, try custom range if you are looking for friday.')
             setReportData(d.data)
         }
     }
 
 
     const getGraphCSVData = () => {
-        if (!lineChartData || lineChartData == {}) return [['error'], ['error']]
+        if (!lineChartData || lineChartData === {}) return [['error'], ['error']]
         const csvData = [['date', 'dailydollars']]
         for (let i in lineChartData)
             csvData.push([i.substring(0, 15), lineChartData[i]])
@@ -259,6 +259,15 @@ function ReportsPage(props) {
                             onClick={e => {
                                 setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-AS.csv`); getAssetSummary(e, getDate(graphDate.from), getDate(graphDate.to))
                             }}>Download Asset Summary</Button>
+                        {props.tsheetsBearer ? undefined : <>
+                            <hr />
+                            <h2>Sign in to T-Sheets</h2>
+                            <Button variant='contained' color='primary' size='large' href={`https://rest.tsheets.com/api/v1/authorize?response_type=code&client_id=${settings.tsheets.clientId}&redirect_uri=${settings.tsheets.redirectURI}&state=login`}
+                                style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}>
+                                <img src='https://res.cloudinary.com/compter-pros-on-call/image/upload/v1643650072/qb_chypxi.svg' alt='tsheets icon' style={{ maxHeight: '4rem', margin: '-1rem' }} />
+                            </Button>
+                        </>
+                        }
                     </div>
                 </>
             }

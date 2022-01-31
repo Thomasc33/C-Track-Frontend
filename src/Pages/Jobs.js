@@ -23,6 +23,7 @@ function JobPage(props) {
     const [newIsHourly, setNewIsHourly] = useState(false)
     const [newIsAsset, setNewIsAsset] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
+    const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
     const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
 
@@ -106,6 +107,7 @@ function JobPage(props) {
             let isHourly = newIsHourly;
             let isAsset = newIsAsset
             let applies = newAppliesSelection;
+            let hourly_goal = newHourlyGoal
             if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
             else if (e.isAsset) { isAsset = e.selection; setNewIsAsset(e.selection) }
             else if (e.isSelect) { applies = e.selection.map(m => m.value).join(',') }
@@ -113,6 +115,10 @@ function JobPage(props) {
                 case 'new-price':
                     price = e.target.value
                     await setNewPrice(e.target.value)
+                    break;
+                case 'new-hourly_goal':
+                    hourly_goal = e.target.value
+                    await setNewHourlyGoal(e.target.value)
                     break;
                 case 'new-jobname':
                     job_name = e.target.value
@@ -144,7 +150,7 @@ function JobPage(props) {
             if (!cont) return
 
             //send to api
-            let formData = { job_code, job_name, price, isHourly, applies, isAsset }
+            let formData = { job_code, job_name, price, isHourly, applies, isAsset, hourly_goal }
             setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
@@ -198,6 +204,12 @@ function JobPage(props) {
                             formData.value = e.target.value.replace(/[^\d]/g, '')
                         }
                         break;
+                    case 'hourly_goal':
+                        if (e.target.value !== i.hourly_goal) if (e.target.value) {
+                            formData.change = 'hourly_goal'
+                            formData.value = e.target.value.replace(/[^.\d]/g, '')
+                        }
+                        break;
                     case 'job_name':
                         if (e.target.value !== i.job_name) if (e.target.value) formData.change = 'job_name'
                         break;
@@ -227,7 +239,7 @@ function JobPage(props) {
     }
 
     const numberValidatorEventListener = (e) => {
-        e.target.value = e.target.value.replace(/[^\d]/g, '')
+        e.target.value = e.target.value.replace(/[^.\d]/g, '')
     }
 
     const handleKeyDown = async (id, e) => {
@@ -290,6 +302,15 @@ function JobPage(props) {
                         onChange={e => handleTextInputChange(row.id, { isAsset: true, selection: e })} />
                 </td>
                     <td>
+                        <input type='number'
+                            defaultValue={row.hourly_goal}
+                            className='hourly_goal'
+                            id={`${row.id}-hourly_goal`}
+                            onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
+                            onKeyDown={e => { handleKeyDown(row.id, e) }}
+                            style={{ width: '5rem', padding: '1rem' }} />
+                    </td>
+                    <td>
                         <Select menuPlacement='auto' options={multiSelectOptions}
                             isMulti
                             closeMenuOnSelect={false}
@@ -298,7 +319,7 @@ function JobPage(props) {
                             isSearchable
                             onChange={e => selectionChange(row.id, e)} />
                     </td></> : <></>}
-        </tr >)
+        </tr>)
     }
 
 
@@ -310,11 +331,12 @@ function JobPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th style={{ width: '30%' }}>Job Code</th>
-                            <th style={{ width: '30%' }}>Job Name</th>
+                            <th style={{ width: '27.5%' }}>Job Code</th>
+                            <th style={{ width: '27.5%' }}>Job Name</th>
                             <th style={{ width: '5%' }}>Price</th>
                             <th style={{ width: '5%' }}>Hourly</th>
                             <th style={{ width: '5%' }}>Asset</th>
+                            <th style={{ width: '5%' }}>Hrly Target</th>
                             <th style={{ width: '25%' }}>Applies To</th>
                         </tr>
                     </thead>
@@ -327,6 +349,14 @@ function JobPage(props) {
                             <td className='isHourly'><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e3de00'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             {!newIsHourly ? <>
                                 <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e3de00'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                                <td>
+                                    <input type='number'
+                                        className='hourly_goal'
+                                        id={`new-hourly_goal`}
+                                        onBlur={e => { numberValidatorEventListener(e); handleTextInputChange('new', e) }}
+                                        onKeyDown={e => { handleKeyDown('new', e) }}
+                                        style={{ width: '5rem', padding: '1rem' }} />
+                                </td>
                                 <td><Select menuPlacement='auto' options={multiSelectOptions}
                                     isMulti
                                     closeMenuOnSelect={false}

@@ -139,7 +139,7 @@ function HourlyPage(props) {
             }
         } else for (let i of data.records) {
             // eslint-disable-next-line eqeqeq
-            if (id == i.id) {
+            if (id === i.id) {
                 let formData = {
                     id: i.id,
                     change: null,

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Switch,
   Route,
-  BrowserRouter
 } from "react-router-dom";
 
 // Import the Pages
@@ -25,6 +24,7 @@ import GuidePage from './Pages/Guide';
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
+import TSheetsService from './Services/TSheets'
 import './App.css';
 import Particles from './Components/Particles';
 const settings = require('./settings.json')
@@ -39,6 +39,7 @@ function App(props) {
     loading: true,
   })
   const setLoginStatus = (perm, admin) => setState({ permissions: perm, isAdmin: admin, loading: false })
+  const [tsheetsBearer, setTsheetsBearer] = useState(null)
 
 
   useEffect(() => {
@@ -64,7 +65,13 @@ function App(props) {
         }
       });
       const data = await response.json();
-      setLoginStatus(data.permissions, data.isAdmin ? true : false)
+      setLoginStatus(data.permissions, data.isAdmin ? true : false,)
+      
+      //Get TSheets token
+      let ts = await TSheetsService.getToken(t)
+      if (!ts.isErrored) {
+        setTsheetsBearer(ts.token)
+      }
     }
     if (isAuthenticated) loadPermissions()
   }, [isAuthenticated, accounts, instance])
@@ -95,25 +102,22 @@ function App(props) {
 
   if (isAuthenticated && !isAuthed) validateUser()
 
-
   if (isAuthenticated && !loading) return (
-    <BrowserRouter>
-      <Switch>
-        <Route exact path="/asset" render={props => <AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      </Switch>
-    </BrowserRouter>
+    <Switch>
+      <Route exact path="/asset" render={props => <AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />
+      <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />
+      <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+    </Switch>
   )
   if (!isAuthenticated) return (
     <LoginPage />

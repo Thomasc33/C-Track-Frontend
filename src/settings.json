@@ -1,4 +1,8 @@
 {
     "APIBase": "http://localhost:3005/a",
-    "graphUrl": "https://graph.microsoft.com/v1.0"
+    "graphUrl": "https://graph.microsoft.com/v1.0",
+    "tsheets": {
+        "clientId": "",
+        "redirectURI" : "https://localhost:3000/callback"
+    }
 }

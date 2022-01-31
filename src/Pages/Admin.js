@@ -31,12 +31,22 @@ function AdminPage(props) {
         return res.accessToken
     }
 
-    const handlePermissionChange = async (e, id) => {
-        let formData = { id, isAdmin: e ? 1 : 0 }
+    const handlePermissionChange = async (e, id, className) => {
         let token = await getTokenSilently()
-        let res = await UserService.setAdmin(formData, token)
+        let formData = { id, val: e ? 1 : 0 }
+        let res
+        switch (className) {
+            case 'isAdmin':
+                res = await UserService.setAdmin(formData, token)
+                break;
+            case 'isArchived':
+                res = await UserService.setArchived(formData, token)
+                break;
+            default:
+                return console.warn('hit default statement on admin page')
+        }
         if (res.isErrored) {
-            if (res.error.status === 401) alert('You cannot remove admin from yourself')
+            if (res.error.status === 401) alert('You cannot remove admin from or archive yourself')
         }
     }
 
@@ -49,16 +59,27 @@ function AdminPage(props) {
             <td>
                 <p>{row.name}</p>
             </td>
-            <td style={{ display: 'flex', justifyContent: "center" }}>
+            <td>
                 <Checkbox
                     id={`${row.id}-isAdmin`}
-                    className='isHourly'
+                    className='isAdmin'
                     checked={row.is_admin}
                     borderWidth='5px'
                     borderColor={localStorage.getItem('accentColor') || '#c9c622'}
                     size='30px'
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#c9c622'} size={36} />}
-                    onChange={e => handlePermissionChange(e, row.id)} />
+                    onChange={e => handlePermissionChange(e, row.id, 'isAdmin')} />
+            </td>
+            <td>
+                <Checkbox
+                    id={`${row.id}-isArchived`}
+                    className='isArchived'
+                    checked={row.is_archived}
+                    borderWidth='5px'
+                    borderColor={localStorage.getItem('accentColor') || '#c9c622'}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#c9c622'} size={36} />}
+                    onChange={e => handlePermissionChange(e, row.id, 'isArchived')} />
             </td>
         </tr >)
     }
@@ -74,6 +95,7 @@ function AdminPage(props) {
                         <tr>
                             <th>Name</th>
                             <th>Admin</th>
+                            <th>Archive</th>
                         </tr>
                     </thead>
                     <tbody>
