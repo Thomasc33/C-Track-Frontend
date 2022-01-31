@@ -246,6 +246,16 @@ function ReportsPage(props) {
                                 setFileName(`${getDateSubtractDay(date)}-AS.csv`); getAssetSummary(e, getDateSubtractDay(date))
                             }}>Download Asset Summary</Button>
                         <hr />
+                        <h2>Past Week - {getDateSubtractWeek(date).substring(5).replace('-', '/')} {'➝'} {getDate(Date.now()).substring(5).replace('-', '/')}</h2>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDateSubtractWeek(date)}-${getDate(Date.now())}-Report.csv`); getReport(e, getDateSubtractWeek(date), getDate(Date.now()))
+                            }}>Download Report</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                setFileName(`${getDateSubtractWeek(date)}-${getDate(Date.now())}-AS.csv`); getAssetSummary(e, getDateSubtractWeek(date), getDate(Date.now()))
+                            }}>Download Asset Summary</Button>
+                        <hr />
                         <h2>Custom Date Range</h2>
                         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
@@ -293,6 +303,12 @@ function getDateSubtractMonth(date) {
 function getDateSubtractDay(date) {
     date = new Date(date)
     date.setDate(date.getDate() - 1)
+    return date.toISOString().split('T')[0]
+}
+
+function getDateSubtractWeek(date) {
+    date = new Date(date)
+    date.setDate(date.getDate() - 7)
     return date.toISOString().split('T')[0]
 }
 
