@@ -15,7 +15,11 @@ import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
-const editable = ['return_reason', 'notes', 'model_number', 'company']
+const editable = ['return_reason', 'notes', 'model_number', 'company', 'icc_id']
+const nameOverrides = {
+    icc_id: 'ICCID'
+}
+
 
 function AssetsPage(props) {
     let APILink = `${settings.APIBase}/asset`
@@ -215,7 +219,7 @@ function AssetsPage(props) {
         }
         return (
             <tr key={row} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <td style={{ width: '30%' }}>{titleCase(row.replace('_', ' '))}</td>
+                <td style={{ width: '30%' }}>{nameOverrides[row] ? nameOverrides[row] : titleCase(row.replace('_', ' '))}</td>
                 <td style={{ width: '70%' }}>
                     {row.toLowerCase() === 'notes' ?
                         <textarea
@@ -245,7 +249,7 @@ function AssetsPage(props) {
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                                     onChange={(e) => handleLocking(e)} /> :
                                 row.toLowerCase() === 'company' ?
-                                    <div style={{ padding: '1rem', margin: '.5rem', width: '95%' }}>
+                                    <div style={{ paddingLeft: '1.4rem', margin: '.5rem', width: '94%' }}>
                                         <SelectSearch
                                             options={companies}
                                             value={val}
