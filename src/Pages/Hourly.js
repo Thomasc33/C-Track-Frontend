@@ -139,7 +139,7 @@ function HourlyPage(props) {
             }
         } else for (let i of data.records) {
             // eslint-disable-next-line eqeqeq
-            if (id === i.id) {
+            if (`${id}` === `${i.id}`) {
                 let formData = {
                     id: i.id,
                     change: null,
@@ -167,7 +167,6 @@ function HourlyPage(props) {
                         }
                     }
                 }
-
                 if (!formData.change) return console.log('exited on change because no formData.change')
                 let token = await getTokenSilently()
                 let res = await hourlyService.edit(formData, token)
