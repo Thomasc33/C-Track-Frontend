@@ -15,7 +15,7 @@ import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
-const editable = ['return_reason', 'notes', 'model_number', 'company', 'icc_id']
+const editable = ['return_reason', 'notes', 'model_number', 'company', 'icc_id', 'mobile_number']
 const nameOverrides = {
     icc_id: 'ICCID'
 }
