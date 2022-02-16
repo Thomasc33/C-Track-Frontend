@@ -65,5 +65,20 @@ export default {
         let res = await axios.post(`${BaseApiUrl}/asset/unlock`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    alter: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/alter`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    alterNew: async (FormData, token) => {
+        let res = await axios.put(`${BaseApiUrl}/asset/alter`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    alterDelete: async (column, token) => {
+        let res = await axios.delete(`${BaseApiUrl}/asset/alter/${column}`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }

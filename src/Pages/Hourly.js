@@ -20,6 +20,8 @@ function HourlyPage(props) {
     const [newComment, setNewComment] = useState('');
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [times, setTimes] = useState({})
+    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') || false)
+
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -316,6 +318,10 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
 
+            <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
+            </div>
+
             <div className='AssetArea' style={{ overflowX: 'scroll' }}>
                 <table className='rows'>
                     <thead>
@@ -327,7 +333,7 @@ function HourlyPage(props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.records ? data.records.map(m => RenderRow(m)) : <></>}
+                        {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
                         <tr style={{ verticalAlign: 'top' }}>
                             <td>
                                 <SelectSearch
@@ -367,6 +373,7 @@ function HourlyPage(props) {
                                 /></div></td>
                             <td><input type='text' className='notes' id={`new-notes`} placeholder='Notes / Comments' onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
+                        {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
                     </tbody>
                 </table>
             </div>

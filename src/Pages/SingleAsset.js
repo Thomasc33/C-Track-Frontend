@@ -15,7 +15,7 @@ import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
 
 const dontRender = ['id', 'image', 'status']
-const editable = ['return_reason', 'notes', 'model_number', 'company', 'icc_id', 'mobile_number']
+const notEditable = []
 const nameOverrides = {
     icc_id: 'ICCID'
 }
@@ -139,7 +139,7 @@ function AssetsPage(props) {
     }
 
     const handleTextInputChange = async (row, e) => {
-        if (!editable.includes(row) || !(props.permissions.edit_assets || props.isAdmin) || modelInfo) return
+        if (notEditable.includes(row) || !(props.permissions.edit_assets || props.isAdmin) || modelInfo) return
         if (e.target && e.target.value === asset[row]) return
         if (!e.target && !e) return
         let formData = {
@@ -226,7 +226,7 @@ function AssetsPage(props) {
                             defaultValue={val}
                             id={`${row}`}
                             style={{ padding: '1rem', margin: '.5rem', height: '10rem', width: '87.5%' }}
-                            readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                            readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
                             onBlur={e => handleTextInputChange(row, e)}
                             onKeyDown={e => handleKeyDown(row, e)} />
                         :
@@ -265,7 +265,7 @@ function AssetsPage(props) {
                                         defaultValue={val}
                                         id={`${row}`}
                                         style={{ margin: '.5rem', width: '79%' }}
-                                        readOnly={editable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                        readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
                                         onBlur={e => handleTextInputChange(row, e)}
                                         onKeyDown={e => handleKeyDown(row, e)} />
                     }

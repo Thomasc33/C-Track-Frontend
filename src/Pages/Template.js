@@ -72,6 +72,7 @@ function PageTemplate(props) {
                                 {isAdmin || (permissions && permissions.view_users) ?
                                     <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
                                 {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
+                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/adas')}>Asset Info</p> : <></>}
                             </div>
                         </div>
                     </li> : <></>}

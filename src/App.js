@@ -7,6 +7,7 @@ import {
 
 // Import the Pages
 import AdminPage from './Pages/Admin';
+import AssetManagement from './Pages/AssetManagement'
 import AssetPage from './Pages/Asset';
 import AssetsPage from './Pages/AssetPage';
 import HomePage from './Pages/Home';
@@ -109,6 +110,7 @@ function App(props) {
       <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />
       <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/adas" render={props => <AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />

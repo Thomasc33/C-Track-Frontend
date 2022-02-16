@@ -24,6 +24,7 @@ function AssetPage(props) {
     const noAssetJobCounts = {}
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [modelSelect, setModelSelect] = useState(null)
+    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') || false)
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -319,6 +320,9 @@ function AssetPage(props) {
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
+            <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
+            </div>
             <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
@@ -329,8 +333,8 @@ function AssetPage(props) {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.records ? data.records.map(m => RenderRow(m)) : <></>}
-                        <tr>
+                        {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
+                        <tr style={{ borderTop: '1px' }}>
                             <td>
                                 <SelectSearch
                                     options={getJobArray()}
@@ -346,6 +350,7 @@ function AssetPage(props) {
                             <td><input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
+                        {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
                     </tbody>
                 </table>
             </div>
