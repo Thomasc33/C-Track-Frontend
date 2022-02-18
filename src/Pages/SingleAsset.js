@@ -275,6 +275,27 @@ function AssetsPage(props) {
         )
     }
 
+    function renderAssetAdding(checkForMatch = false, addHr = false) {
+        if (checkForMatch) {
+            if (results.length > 0) for (let i of results) if (i.type === 'asset' && i.data && i.data.id && i.data.id.toLowerCase() === search.toLowerCase()) return undefined
+            else if (!asset || asset.id.toLowerCase() === search.toLowerCase()) return undefined
+        }
+        return <>
+            {addHr ? <hr /> : undefined}
+            <div><h1>{search} not found</h1>
+                {props.permissions.edit_models || props.isAdmin ? <div>
+                    <hr />
+                    <h2>Add it?</h2>
+                    <ModelSelect setModelSelect={setModelSelect} />
+                    <br />
+                    <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { handleAssetAdding() }}>Add</Button>
+                </div>
+                    : <></>
+                }
+            </div>
+        </>
+    }
+
     function renderHistoryRow(row) {
         let d = new Date(row.date)
         let date = `${parseInt(d.getMonth()) + 1}-${parseInt(d.getDate()) + 1}-${d.getFullYear()}`
@@ -381,27 +402,20 @@ function AssetsPage(props) {
                                     </table> :
                                     <h2>No Assets Found</h2>}
                             </div>
-
+                            <hr />
+                            {renderAssetAdding()}
                         </div>
                         :
                         !asset ? results.length > 0 ? <div>
                             <h1>Search Results:</h1>
                             <hr />
                             {results.map(m => renderResultsRow(m))}
+                            {renderAssetAdding(true, true)}
                         </div> : <CircularProgress size='6rem' /> :
                             asset.notFound ?
-                                <div>
-                                    <h1>{search} not found</h1>
-                                    {props.permissions.edit_models || props.isAdmin ? <div>
-                                        <hr />
-                                        <h2>Add it?</h2>
-                                        <ModelSelect setModelSelect={setModelSelect} />
-                                        <br />
-                                        <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { handleAssetAdding() }}>Add</Button>
-                                    </div>
-                                        : <></>}
-                                </div>
+                                renderAssetAdding()
                                 : <div style={{ overflow: 'scroll' }}>
+                                    {renderAssetAdding(true) ? <>{renderAssetAdding(true)}<hr /><h2>The following has a matching comment:</h2></> : undefined}
                                     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                                         {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
                                         <div style={{ display: 'inline-flex', alignItems: 'center' }}>
