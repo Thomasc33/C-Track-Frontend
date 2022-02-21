@@ -28,6 +28,7 @@ function AssetPage(props) {
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [modelSelect, setModelSelect] = useState(null)
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') || false)
+    const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') || false)
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -323,6 +324,7 @@ function AssetPage(props) {
                 }
         }
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
+            {showTimestamp ? <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
             <td>
                 <SelectSearch
                     options={getJobArray()}
@@ -373,12 +375,14 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
             <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
-                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
+                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('showTimestamp', !newestOnTop); setShowTimestamp(!showTimestamp) }}>schedule</i>
+                <i className='material-icons DateArrows' style={{ paddingLeft: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
             <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>
+                            {showTimestamp ? <th>Time</th> : undefined}
                             <th>Job Code</th>
                             <th>Asset Tag / IMEI</th>
                             <th>Comments</th>
@@ -387,6 +391,7 @@ function AssetPage(props) {
                     <tbody>
                         {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
                         <tr style={{ borderTop: '1px' }}>
+                            {showTimestamp ? <td /> : undefined}
                             <td>
                                 <SelectSearch
                                     options={getJobArray()}
@@ -448,4 +453,14 @@ function removeDay(date) {
     date = new Date(date)
     date.setTime(date.getTime() - 86400000)
     return date.toISOString().split('T')[0]
+}
+
+function formatAMPM(date) {
+    let hours = date.substring(11, 13)
+    let minutes = date.substring(14, 16)
+    let ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    return hours + ':' + minutes + ' ' + ampm;
 }
