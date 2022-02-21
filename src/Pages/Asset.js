@@ -4,6 +4,7 @@ import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import assetService from '../Services/Asset'
+import User from '../Services/User';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import { Button } from '@material-ui/core';
@@ -17,6 +18,8 @@ function AssetPage(props) {
 
     const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
+    const [favorites, setFavorites] = useState([])
+    const [indexedJobCodes, setIndexJobCodes] = useState({})
     const [newJobCode, setNewJobCode] = useState(0);
     const [newAssetTag, setNewAssetTag] = useState('');
     const [newComment, setNewComment] = useState('');
@@ -40,21 +43,55 @@ function AssetPage(props) {
     }
 
     useEffect(() => {
-        async function getJobCodes() {
-            let t = await getTokenSilently()
-            const response = await fetch(`${settings.APIBase}/job/all`, {
-                mode: 'cors',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': `Bearer ${t}`
-                }
-            });
-            const data = await response.json();
-            setJobCodes(data.job_codes)
+        async function sort() {
+            let jc = getJobCodes(true)
+            let fav = getFavorites()
+
+            let val = await Promise.all([jc, fav])
+            let j = val[0], f = val[1].map(m => parseInt(m))
+
+            // Sorry to anyone that ever has to read this :)
+            // Basically, returns -1 if a is exclusively favorite, 0 if both a and b are favorites, and 1 if b is exclusively favorite
+            j.sort((a, b) => { return f.includes(a.id) ? f.includes(b.id) ? 0 : -1 : f.includes(b.id) ? 1 : 0 })
+
+            setJobCodes(j)
         }
-        getJobCodes()
+        sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    async function getFavorites() {
+        let t = await getTokenSilently()
+        const response = await fetch(`${settings.APIBase}/job/favorites/asset`, {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
+            }
+        });
+        const data = await response.json();
+        setFavorites(data.favorites)
+        return data.favorites
+    }
+
+    async function getJobCodes(ignoreState = false) {
+        let t = await getTokenSilently()
+        const response = await fetch(`${settings.APIBase}/job/all/asset`, {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
+            }
+        });
+        const data = await response.json();
+        if (!ignoreState) setJobCodes(data.job_codes)
+        let te = {}
+        for (let i of data.job_codes) {
+            te[i.id] = i.job_code
+        }
+        setIndexJobCodes(te)
+        return data.job_codes
+    }
 
     if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Redirect to='/' />
 
@@ -252,6 +289,17 @@ function AssetPage(props) {
         }
     }
 
+    const handleFavorite = async (job_code) => {
+        let data = { type: 'asset', isRemove: 0, job_id: `${job_code}` }
+        if (favorites.includes(`${job_code}`)) data.isRemove = 1
+
+        let token = await getTokenSilently()
+        let q = await User.updateFavorites(data, token)
+        if (q.isErrored) return alert('Failed to update favorites')
+
+        getFavorites()
+    }
+
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
@@ -285,8 +333,12 @@ function AssetPage(props) {
                     className='job_list'
                     autoComplete='on'
                     onChange={e => handleTextInputChange(row.id, e)}
+                    menuPlacement='auto'
                     id={`${row.id}-jobcode`}
-                />
+                    renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="material-icons favorite-icon" onMouseDown={e => { e.stopPropagation(); e.preventDefault() }} onClick={e => handleFavorite(optionProps.value)}>{favorites.includes(`${optionProps.value}`) ? 'star' : 'star_border'}</i>
+                        {indexedJobCodes[optionProps.value]}
+                    </button>} />
             </td>
             <td><div style={{ padding: 0, margin: 0, display: 'flex', alignContent: 'center' }}><input type='text'
                 defaultValue={asset}
@@ -344,8 +396,12 @@ function AssetPage(props) {
                                     className='job_list'
                                     autoComplete='on'
                                     onChange={e => handleTextInputChange('new', e)}
-                                    id='new-jobcode'
-                                />
+                                    menuPlacement='auto'
+                                    id={`new-jobcode`}
+                                    renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <i className="material-icons favorite-icon" onMouseDown={e => { e.stopPropagation(); e.preventDefault() }} onClick={e => handleFavorite(optionProps.value)}>{favorites.includes(`${optionProps.value}`) ? 'star' : 'star_border'}</i>
+                                        {indexedJobCodes[optionProps.value]}
+                                    </button>} />
                             </td>
                             <td><input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>

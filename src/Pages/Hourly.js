@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import hourlyService from '../Services/Hourly'
+import User from '../Services/User';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import TimeKeeper from 'react-timekeeper';
@@ -16,6 +17,8 @@ function HourlyPage(props) {
     let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user/${props.location.state.uid}/` : `${settings.APIBase}/hourly/user/`
     const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
+    const [favorites, setFavorites] = useState([])
+    const [indexedJobCodes, setIndexJobCodes] = useState({})
     const [newJobCode, setNewJobCode] = useState(0);
     const [newComment, setNewComment] = useState('');
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
@@ -36,21 +39,55 @@ function HourlyPage(props) {
     }
 
     useEffect(() => {
-        async function getJobCodes() {
-            let t = await getTokenSilently()
-            const response = await fetch(`${settings.APIBase}/job/all`, {
-                mode: 'cors',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': `Bearer ${t}`
-                }
-            });
-            const data = await response.json();
-            setJobCodes(data.job_codes)
+        async function sort() {
+            let jc = getJobCodes(true)
+            let fav = getFavorites()
+
+            let val = await Promise.all([jc, fav])
+            let j = val[0], f = val[1].map(m => parseInt(m))
+
+            // Sorry to anyone that ever has to read this :)
+            // Basically, returns -1 if a is exclusively favorite, 0 if both a and b are favorites, and 1 if b is exclusively favorite
+            j.sort((a, b) => { return f.includes(a.id) ? f.includes(b.id) ? 0 : -1 : f.includes(b.id) ? 1 : 0 })
+
+            setJobCodes(j)
         }
-        getJobCodes()
+        sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    async function getFavorites() {
+        let t = await getTokenSilently()
+        const response = await fetch(`${settings.APIBase}/job/favorites/hrly`, {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
+            }
+        });
+        const data = await response.json();
+        setFavorites(data.favorites)
+        return data.favorites
+    }
+
+    async function getJobCodes(ignoreState = false) {
+        let t = await getTokenSilently()
+        const response = await fetch(`${settings.APIBase}/job/all/hrly`, {
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${t}`
+            }
+        });
+        const data = await response.json();
+        if (!ignoreState) setJobCodes(data.job_codes)
+        let te = {}
+        for (let i of data.job_codes) {
+            te[i.id] = i.job_code
+        }
+        setIndexJobCodes(te)
+        return data.job_codes
+    }
 
     if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Redirect to='/' />
 
@@ -206,6 +243,17 @@ function HourlyPage(props) {
         }
     }
 
+    const handleFavorite = async (job_code) => {
+        let data = { type: 'hrly', isRemove: 0, job_id: `${job_code}` }
+        if (favorites.includes(`${job_code}`)) data.isRemove = 1
+
+        let token = await getTokenSilently()
+        let q = await User.updateFavorites(data, token)
+        if (q.isErrored) return alert('Failed to update favorites')
+
+        getFavorites()
+    }
+
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
@@ -276,7 +324,10 @@ function HourlyPage(props) {
                     onChange={e => handleTextInputChange(row.id, e)}
                     menuPlacement='auto'
                     id={`${row.id}-jobcode`}
-                />
+                    renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="material-icons favorite-icon" onMouseDown={e => { e.stopPropagation(); e.preventDefault() }} onClick={e => handleFavorite(optionProps.value)}>{favorites.includes(`${optionProps.value}`) ? 'star' : 'star_border'}</i>
+                        {indexedJobCodes[optionProps.value]}
+                    </button>} />
             </td>
             <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-Start`} >.
                 <TimeKeeper
@@ -344,8 +395,12 @@ function HourlyPage(props) {
                                     className='job_list'
                                     autoComplete='on'
                                     onChange={e => handleTextInputChange('new', e)}
-                                    id='new-jobcode'
-                                />
+                                    menuPlacement='auto'
+                                    id={`new-jobcode`}
+                                    renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <i className="material-icons favorite-icon" onMouseDown={e => { e.stopPropagation(); e.preventDefault() }} onClick={e => handleFavorite(optionProps.value)}>{favorites.includes(`${optionProps.value}`) ? 'star' : 'star_border'}</i>
+                                        {indexedJobCodes[optionProps.value]}
+                                    </button>} />
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'>.
                                 <TimeKeeper

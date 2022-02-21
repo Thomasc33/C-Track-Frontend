@@ -72,7 +72,17 @@ td {
 }
 
 .delete-icon {
-    font-size: 32px;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    align-items: center;
+}
+
+.favorite-icon {
+    font-size: 1.5rem;
+    margin-right: .5rem;
     cursor: pointer;
     user-select: none;
     -moz-user-select: none;
@@ -89,8 +99,8 @@ td {
 }
 
 .job_list li button {
-    padding-left: 4rem;
-    padding-right: 4rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
     font-family: 'Montserrat', sans-serif;
     color: white;
     background: #1b1b1b67;

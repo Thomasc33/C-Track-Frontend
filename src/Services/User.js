@@ -27,5 +27,10 @@ export default {
         let res = await axios.post(`${BaseApiUrl}/user/management/edit/title`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
-    }
+    },
+    updateFavorites: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/user/pref/jobs/favorites`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
 }

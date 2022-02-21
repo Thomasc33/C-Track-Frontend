@@ -46,7 +46,7 @@ function AssetManagement(props) {
 
         let t
         if (updatedRows[column || 'new']) t = updatedRows[column || 'new']
-        else if (column == 'new') t = { DATA_TYPE: undefined, IS_NULLABLE: true, COLUMN_NAME: undefined }
+        else if (column === 'new') t = { DATA_TYPE: undefined, IS_NULLABLE: true, COLUMN_NAME: undefined }
         else for (let i of data.data) if (i.COLUMN_NAME === column) t = { ...i }
 
         switch (type) {
