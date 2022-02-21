@@ -99,6 +99,14 @@ function UserPage(props) {
         if (res.isErrored) document.getElementById(`${id}-permselect`).classList.add('invalid')
     }
 
+    const handleTitleChange = async (e, id) => {
+        if (!e.target || !e.target.value || e.target.value.length >= 50) return
+        if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
+        let token = await getTokenSilently()
+        let res = await UserService.setTitle({ id, title: e.target.value }, token)
+        if (res.isErrored) e.target.classList.add('invalid')
+    }
+
     /**
      * Function to control rendering of data
      * 
@@ -116,7 +124,11 @@ function UserPage(props) {
                 <p>{row.email}</p>
             </td>
             <td>
-                <p>{row.title}</p>
+                {(props.isAdmin || props.permissions.edit_users) ? <input
+                    defaultValue={row.title}
+                    style={{ width: '11vw' }}
+                    onBlur={e => { if (e.target.value !== row.title) handleTitleChange(e, row.id) }}
+                /> : <p>{row.title}</p>}
             </td>
             {(props.isAdmin || props.permissions.edit_users) ?
                 <td>
