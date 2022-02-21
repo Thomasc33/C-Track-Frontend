@@ -22,10 +22,11 @@ function JobPage(props) {
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
     const [newIsAsset, setNewIsAsset] = useState(false)
+    const [newstatusOnly, setNewstatusOnly] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
     const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
-    const { loading, data = [], setData } = useFetch(`${APILink}/all`, null)
+    const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
 
@@ -96,7 +97,7 @@ function JobPage(props) {
     }
 
     const handleTextInputChange = async (id, e) => {
-        if (!e.isHourly && !e.isSelect && !e.isAsset) {
+        if (!e.isHourly && !e.isSelect && !e.isAsset && !e.statusOnly) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
@@ -107,10 +108,12 @@ function JobPage(props) {
             let isHourly = newIsHourly;
             let isAsset = newIsAsset
             let applies = newAppliesSelection;
-            let hourly_goal = newHourlyGoal
+            let hourly_goal = newHourlyGoal;
+            let statusOnly = newstatusOnly
             if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
             else if (e.isAsset) { isAsset = e.selection; setNewIsAsset(e.selection) }
             else if (e.isSelect) { applies = e.selection.map(m => m.value).join(',') }
+            else if (e.statusOnly) { statusOnly = e.selection; setNewstatusOnly(e.selection) }
             else switch (e.target.id) {
                 case 'new-price':
                     price = e.target.value
@@ -150,7 +153,7 @@ function JobPage(props) {
             if (!cont) return
 
             //send to api
-            let formData = { job_code, job_name, price, isHourly, applies, isAsset, hourly_goal }
+            let formData = { job_code, job_name, price, isHourly, applies, isAsset, hourly_goal, statusOnly }
             setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
@@ -197,6 +200,9 @@ function JobPage(props) {
                     formData.change = 'applies'
                     formData.value = e.selection.map(m => m.value).join(',')
                     // eslint-disable-next-line default-case
+                } else if (e.statusOnly) {
+                    formData.change = 'statusOnly'
+                    formData.value = e.selection.toString()
                 } else switch (e.target.className) {
                     case 'price':
                         if (e.target.value !== i.price) if (e.target.value) {
@@ -287,7 +293,7 @@ function JobPage(props) {
                     style={{ backgroundColor: '#1b1b1b67' }}
                     size='30px'
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
-                    onChange={e => { row.is_hourly = e; setUpdated(updated + 1); handleTextInputChange(row.id, { isHourly: true, selection: e }) }} />
+                    onChange={e => { row.is_hourly = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
             </td>
 
             {!row.is_hourly ?
@@ -318,7 +324,18 @@ function JobPage(props) {
                             defaultValue={defaultOptions}
                             isSearchable
                             onChange={e => selectionChange(row.id, e)} />
-                    </td></> : <></>}
+                    </td></> : <><td /><td /><td /></>}
+
+            <td className='statusOnly'>
+                <Checkbox id={`${row.id}-statusOnly`}
+                    checked={row.status_only}
+                    borderWidth='2px'
+                    borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                    style={{ backgroundColor: '#1b1b1b67' }}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                    onChange={e => { row.status_only = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
+            </td>
         </tr>)
     }
 
@@ -331,13 +348,14 @@ function JobPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th style={{ width: '27.5%' }}>Job Code</th>
-                            <th style={{ width: '27.5%' }}>Job Name</th>
+                            <th style={{ width: '25%' }}>Job Code</th>
+                            <th style={{ width: '25%' }}>Job Name</th>
                             <th style={{ width: '5%' }}>Price</th>
                             <th style={{ width: '5%' }}>Hourly</th>
                             <th style={{ width: '5%' }}>Asset</th>
                             <th style={{ width: '5%' }}>Hrly Target</th>
                             <th style={{ width: '25%' }}>Applies To</th>
+                            <th style={{ width: '5%' }}>S.O.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -363,7 +381,16 @@ function JobPage(props) {
                                     styles={selectStyles}
                                     isSearchable
                                     onChange={e => selectionChange('new', e)} /></td>
-                            </> : <></>}
+                            </> : <><td /><td /><td /></>}
+                            <td className='statusOnly'>
+                                <Checkbox id={`new-statusOnly`}
+                                    borderWidth='2px'
+                                    borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                    style={{ backgroundColor: '#1b1b1b67' }}
+                                    size='30px'
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                    onChange={e => { handleTextInputChange('new', { statusOnly: true, selection: e }) }} />
+                            </td>
                         </tr>
                     </tbody>
                 </table>
