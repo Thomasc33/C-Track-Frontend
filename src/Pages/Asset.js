@@ -27,8 +27,8 @@ function AssetPage(props) {
     const noAssetJobCounts = {}
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [modelSelect, setModelSelect] = useState(null)
-    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') || false)
-    const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') || false)
+    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
+    const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') === 'true' || false)
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
