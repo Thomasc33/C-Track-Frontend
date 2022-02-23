@@ -23,7 +23,7 @@ function HourlyPage(props) {
     const [newComment, setNewComment] = useState('');
     const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [times, setTimes] = useState({})
-    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') || false)
+    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
