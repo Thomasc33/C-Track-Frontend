@@ -375,7 +375,7 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
             <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
-                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('showTimestamp', !newestOnTop); setShowTimestamp(!showTimestamp) }}>schedule</i>
+                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
                 <i className='material-icons DateArrows' style={{ paddingLeft: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
             <div className='AssetArea'>
