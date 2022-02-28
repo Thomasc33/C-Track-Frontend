@@ -74,7 +74,6 @@ function AssetsPage(props) {
         setUid(res.data.uid)
         if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
             if (res.data.resu[0].type === 'model') { // if the only result is a model
-                console.log(res.data.resu[0])
                 setModelInfo({
                     ...res.data.resu[0]
                 })
@@ -97,7 +96,6 @@ function AssetsPage(props) {
             for (let i of res.data.resu) {
                 if (assets.has(i.info.id)) continue
                 if (i.type === 'model') {
-                    console.log(i)
                     let info = {
                         type: i.type,
                         data: i.info,
@@ -118,9 +116,7 @@ function AssetsPage(props) {
                     else info.data = { ...i.info, ...res.data.resu }
                     results.push(info)
                 }
-
             }
-            console.log(results)
             setResults(results)
         }
     }
@@ -169,6 +165,12 @@ function AssetsPage(props) {
         else await AssetService.unlock(FormData, token)
     }
 
+    const handleUnhold = async e => {
+        const token = await getTokenSilently()
+        const FormData = { id: asset.id }
+        await AssetService.unHold(FormData, token)
+    }
+
     const handleAssetAdding = async () => {
         if (!modelSelect) return
 
@@ -186,7 +188,6 @@ function AssetsPage(props) {
     }
 
     function renderResultsRow(row) {
-        console.log('row', row)
         return <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
             onClick={() => { if (row.type === 'model') { setModelInfo({ type: 'model', info: row.data, assets: row.assets }) } else { setAsset(row.data); setHistory(row.history) } }}>
             {row.type === 'asset' || row.type === 'tracker' ?
@@ -235,7 +236,7 @@ function AssetsPage(props) {
                                 checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
                                 borderWidth='2px'
                                 borderColor={localStorage.getItem('accentColor') || '#e3de00'}
-                                style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67' }}
+                                style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                 size='30px'
                                 icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                                 onChange={(e) => handleWatchUnWatch(e)} /> :
@@ -244,30 +245,40 @@ function AssetsPage(props) {
                                     checked={asset && asset.locked ? true : false}
                                     borderWidth='2px'
                                     borderColor={localStorage.getItem('accentColor') || '#e3de00'}
-                                    style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67' }}
+                                    style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                     size='30px'
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                                     onChange={(e) => handleLocking(e)} /> :
-                                row.toLowerCase() === 'company' ?
-                                    <div style={{ paddingLeft: '1.4rem', margin: '.5rem', width: '94%' }}>
-                                        <SelectSearch
-                                            options={companies}
-                                            value={val}
-                                            search
-                                            placeholder="Company"
-                                            filterOptions={fuzzySearch}
-                                            className='model_select'
-                                            autoComplete='on'
-                                            id='company_select'
-                                            onChange={e => handleTextInputChange(row, e)}
-                                        /></div> :
-                                    <input type='text'
-                                        defaultValue={val}
-                                        id={`${row}`}
-                                        style={{ margin: '.5rem', width: '79%' }}
-                                        readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
-                                        onBlur={e => handleTextInputChange(row, e)}
-                                        onKeyDown={e => handleKeyDown(row, e)} />
+                                row.toLowerCase() === 'hold_type' ?
+                                    <Checkbox id={`${row}-hold`}
+                                        checked={asset && asset.hold_type}
+                                        disabled={!asset || !asset.hold_type}
+                                        borderWidth='2px'
+                                        borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                        style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
+                                        size='30px'
+                                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                        onChange={(e) => handleUnhold(e)} /> :
+                                    row.toLowerCase() === 'company' ?
+                                        <div style={{ paddingLeft: '1.4rem', margin: '.5rem', width: '94%' }}>
+                                            <SelectSearch
+                                                options={companies}
+                                                value={val}
+                                                search
+                                                placeholder="Company"
+                                                filterOptions={fuzzySearch}
+                                                className='model_select'
+                                                autoComplete='on'
+                                                id='company_select'
+                                                onChange={e => handleTextInputChange(row, e)}
+                                            /></div> :
+                                        <input type='text'
+                                            defaultValue={val}
+                                            id={`${row}`}
+                                            style={{ margin: '.5rem', width: '79%' }}
+                                            readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                            onBlur={e => handleTextInputChange(row, e)}
+                                            onKeyDown={e => handleKeyDown(row, e)} />
                     }
 
                 </td>
@@ -442,7 +453,7 @@ function AssetsPage(props) {
                                     <h1>Status History</h1>
                                     <hr />
                                     <div style={{ display: 'flex' }}>
-                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th>{assetHistory.map(m => renderHistoryRow(m))}</table> : <h2>No Changes Found</h2>}
+                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead><tbody>{assetHistory.map(m => renderHistoryRow(m))}</tbody></table> : <h2>No Changes Found</h2>}
                                     </div>
                                 </div>
                 }

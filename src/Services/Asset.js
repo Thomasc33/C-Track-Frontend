@@ -66,6 +66,11 @@ export default {
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
+    unHold: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/asset/unhold`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
     alter: async (FormData, token) => {
         let res = await axios.post(`${BaseApiUrl}/asset/alter`, FormData, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })

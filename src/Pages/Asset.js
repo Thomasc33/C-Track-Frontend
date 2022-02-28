@@ -348,7 +348,7 @@ function AssetPage(props) {
                 checked={selected.includes(row.id)}
                 borderWidth='2px'
                 borderColor={localStorage.getItem('accentColor') || '#e3de00'}
-                style={{ backgroundColor: '#1b1b1b67' }}
+                style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                 size='30px'
                 icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                 onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>

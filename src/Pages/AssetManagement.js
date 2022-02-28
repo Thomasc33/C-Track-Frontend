@@ -157,6 +157,7 @@ function AssetManagement(props) {
                     checked={row === 'new' ? true : row.IS_NULLABLE}
                     borderWidth='5px'
                     borderColor={localStorage.getItem('accentColor') || '#c9c622'}
+                    style={{ cursor: 'pointer' }}
                     size='30px'
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#c9c622'} size={36} />}
                     onChange={e => handleChange(row.COLUMN_NAME || 'new', e, 'nullable')} />

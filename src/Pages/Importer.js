@@ -13,7 +13,9 @@ const settings = require('../settings.json')
 
 function ImporterPage(props) {
     const { instance, accounts } = useMsal()
+    const [importerType, setImporterType] = useState(0)
     const [isAsset, setIsAsset] = useState(true)
+    //0 = asset, 1 = model, 2 = legal hold
     if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -33,14 +35,17 @@ function ImporterPage(props) {
         let csv = []
         for (let i of text.split('\n')) {
             let t = i.split(',')
-            csv.push({ id: t[0], model_number: t[1] })
+            if (importerType === 0) csv.push({ id: t[0], model_number: t[1] })
+            else if (importerType === 1) csv.push({ id: t[0], name: t[1], device_type: t[2], manufacturer: t[3] })
+            else if (importerType === 2) csv.push({ id: t[0] })
         }
         confirm(csv)
     }
     const handleData = (data, fileInfo) => {
         let csv = []
-        if (isAsset) for (let i of data) csv.push({ id: i[0], model_number: i[1] })
-        else for (let i of data) csv.push({ id: i[0], name: i[1], device_type: i[2], manufacturer: i[3] })
+        if (importerType === 0) for (let i of data) csv.push({ id: i[0], model_number: i[1] })
+        else if (importerType === 1) for (let i of data) csv.push({ id: i[0], name: i[1], device_type: i[2], manufacturer: i[3] })
+        else if (importerType === 2) for (let i of data) csv.push({ id: i[0] })
         confirm(csv)
     }
 
@@ -54,7 +59,9 @@ function ImporterPage(props) {
                         <br />
                         <DataGrid
                             className='grid'
-                            columns={isAsset ? asset_columns : model_columns}
+                            columns={importerType === 0 ? asset_columns :
+                                importerType === 1 ? model_columns :
+                                    importerType === 2 ? legal_hold_columns : undefined}
                             rows={data}
                             disableSelectionOnClick
                             hideFooterSelectedRowCount
@@ -94,7 +101,7 @@ function ImporterPage(props) {
             }
         }
         async function req(section) {
-            let res = await axios.post(`${settings.APIBase}/importer/${isAsset ? `asset` : `model`}`, section, {
+            let res = await axios.post(`${settings.APIBase}/importer/${importerType === 0 ? 'asset' : importerType === 1 ? 'model' : importerType === 2 ? 'legal' : undefined}`, section, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Authorization': `Bearer ${token}`
@@ -112,12 +119,21 @@ function ImporterPage(props) {
     return (
         <>
             <div className='ImporterArea'>
-                <h1>CSV Format - {isAsset ? `Assets` : `Models`}</h1>
+                <h1>CSV Format - {importerType === 0 ? 'Assets' :
+                    importerType === 1 ? 'Models' :
+                        importerType === 2 ? 'Legal Hold' : undefined}
+                    {() => {
+                        switch (importerType) {
+                            case 1: return 'Models';
+                            case 2: return 'Legal Hold';
+                            default: return 'Assets';
+                        }
+                    }}</h1>
                 <div style={{ display: 'inline-block', padding: '1rem' }}><h3 style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', fontFamily: 'Consolas, monaco, monospace' }}>
-                    {isAsset ?
-                        asset_columns.map(m => m.field).join(',') :
-                        model_columns.map(m => m.field).join(',')
-                    }</h3></div>
+                    {importerType === 0 ? asset_columns.map(m => m.field).join(',') :
+                        importerType === 1 ? model_columns.map(m => m.field).join(',') :
+                            importerType === 2 ? legal_hold_columns.map(m => m.field).join(',') : undefined}
+                </h3></div>
                 <br />
                 <h3>Do not include header row</h3>
                 <hr style={{ marginTop: '2rem' }} />
@@ -129,7 +145,31 @@ function ImporterPage(props) {
                 <br />
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={e => handleButtonClick(e)}>Parse</Button>
                 <hr style={{ marginTop: '2rem', marginBottom: '2rem' }} />
-                <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={e => setIsAsset(!isAsset)}>Switch to Model Importer</Button>
+                {importerType === 0 ? undefined : <Button
+                    variant='contained'
+                    color='primary'
+                    size='large'
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    onClick={e => setImporterType(0)}>
+                    Switch to Asset Importer
+                </Button>}
+                {importerType === 1 ? undefined : <Button
+                    variant='contained'
+                    color='primary'
+                    size='large'
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    onClick={e => setImporterType(1)}>
+                    Switch to Model Importer
+                </Button>}
+                {importerType === 2 ? undefined : <Button
+                    variant='contained'
+                    color='primary'
+                    size='large'
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    onClick={e => setImporterType(2)}>
+                    Switch to Legal Hold Importer
+                </Button>}
+
                 <br />
                 <br />
                 <br />
@@ -151,4 +191,8 @@ const model_columns = [
     { field: 'name', headerName: 'Name', width: 300, editable: true },
     { field: 'device_type', headerName: 'Device Type', width: 300, editable: true },
     { field: 'manufacturer', headerName: 'Manufacturer', width: 300, editable: true }
+]
+
+const legal_hold_columns = [
+    { field: 'id', headerName: "Asset ID", 'width': 400, editable: true }
 ]
