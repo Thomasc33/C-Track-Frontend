@@ -9,6 +9,8 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import { Button } from '@material-ui/core';
 import ModelSelect from '../Components/ModelSelect';
+import Checkbox from 'react-custom-checkbox';
+import * as Icon from 'react-icons/fi';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
@@ -29,6 +31,7 @@ function AssetPage(props) {
     const [modelSelect, setModelSelect] = useState(null)
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
     const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') === 'true' || false)
+    const [selected, setSelected] = useState([])
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -310,6 +313,23 @@ function AssetPage(props) {
         return ar
     }
 
+    const copySelected = () => {
+        let s = ''
+        if (selected.length == data.records.length) s = data.records.map(m => m.asset_id).join('\n')
+        else s = [...data.records].filter(v => selected.includes(v.id)).map(m => m.asset_id).join('\n')
+        navigator.clipboard.writeText(s).then(() => {
+            let ele = document.getElementById('copy_content')
+            ele.classList.add('success')
+            ele.innerText = 'done'
+            setTimeout(() => {
+                try {
+                    ele.classList.remove('success')
+                    ele.innerText = 'content_copy'
+                } catch (er) { }
+            }, 1500)
+        })
+    }
+
     /**
      * Function to control rendering of data
      * 
@@ -324,6 +344,14 @@ function AssetPage(props) {
                 }
         }
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
+            <td><Checkbox id={`${row.id}-isHourly`}
+                checked={selected.includes(row.id)}
+                borderWidth='2px'
+                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                style={{ backgroundColor: '#1b1b1b67' }}
+                size='30px'
+                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>
             {showTimestamp ? <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
             <td>
                 <SelectSearch
@@ -374,14 +402,24 @@ function AssetPage(props) {
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
-            <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
-                <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
-                <i className='material-icons DateArrows' style={{ paddingLeft: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
+            <div style={{ position: 'absolute', top: '2%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
+                {selected.length > 0 ? <>
+                    <i id='copy_content' className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { copySelected() }}>content_copy</i>
+                </> : undefined}
+                <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
+                <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
             <div className='AssetArea'>
                 <table className='rows'>
                     <thead>
                         <tr>
+                            <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length == data.records.length}
+                                borderWidth='2px'
+                                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                style={{ backgroundColor: '#1b1b1b67' }}
+                                size='30px'
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                onChange={e => { e ? setSelected(data.records.map(m => m.id)) : setSelected([]) }} /></th>
                             {showTimestamp ? <th>Time</th> : undefined}
                             <th>Job Code</th>
                             <th>Asset Tag / IMEI</th>
@@ -391,6 +429,7 @@ function AssetPage(props) {
                     <tbody>
                         {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
                         <tr style={{ borderTop: '1px' }}>
+                            <td></td>
                             {showTimestamp ? <td /> : undefined}
                             <td>
                                 <SelectSearch
