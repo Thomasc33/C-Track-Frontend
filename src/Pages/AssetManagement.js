@@ -14,7 +14,7 @@ import '../css/Asset.css'
 
 const settings = require('../settings.json')
 
-const dontRender = ['id', 'status', 'model_number', 'notes', 'watching']
+const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type']
 const dataTypes = [{ name: 'varchar(50)', value: 'varchar(50)' }, { name: 'varchar(255)', value: 'varchar(255)' }, { name: 'varchar(15)', value: 'varchar(15)' },
 { name: 'text', value: 'text' }, { name: 'tinyint', value: 'tinyint' }, { name: 'int(11)', value: 'int(11)' },
 { name: 'int', value: 'int' }, { name: 'decimal(13,4)', value: 'decimal(13,4)' }, { name: 'date', value: 'date' },
