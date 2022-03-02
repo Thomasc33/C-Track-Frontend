@@ -289,7 +289,7 @@ function AssetsPage(props) {
     function renderAssetAdding(checkForMatch = false, addHr = false) {
         if (checkForMatch) {
             if (results.length > 0) for (let i of results) if (i.type === 'asset' && i.data && i.data.id && i.data.id.toLowerCase() === search.toLowerCase()) return undefined
-            else if (!asset || asset.id.toLowerCase() === search.toLowerCase()) return undefined
+            if (!asset || asset.id.toLowerCase() === search.toLowerCase()) return undefined
         }
         return <>
             {addHr ? <hr /> : undefined}
