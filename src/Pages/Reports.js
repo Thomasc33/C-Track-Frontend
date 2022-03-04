@@ -103,7 +103,7 @@ function ReportsPage(props) {
     const getCSVData = () => {
         let csvData = []
         if (onUser) {
-            if (!data['Daily Dollars']) return ['error']
+            if (!data['Daily Dollars']) return [['No Counts for this day']]
             csvData.push(['type', 'value'])
             csvData.push(['userid', onUser])
             for (let i in data) {
