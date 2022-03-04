@@ -217,6 +217,11 @@ function AssetPage(props) {
                         break;
                 }
 
+                if (formData.change === 'asset')
+                    for (let j of jobCodes)
+                        if (j.id == i.job_code && !j.requires_asset)
+                            return console.log('Cancelled an edit because it was an asset change on a non-asset job')
+
                 if (!formData.change) return
 
                 if (!formData.value) formData.value = e.target.value
@@ -436,6 +441,7 @@ function AssetPage(props) {
                                     options={getJobArray()}
                                     search
                                     placeholder="Job Code"
+                                    value={newJobCode ? newJobCode : null}
                                     filterOptions={fuzzySearch}
                                     className='job_list'
                                     autoComplete='on'
