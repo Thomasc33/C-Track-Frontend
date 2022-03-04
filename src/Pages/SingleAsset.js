@@ -17,7 +17,8 @@ import '../css/SingleAsset.css'
 const dontRender = ['id', 'image', 'status']
 const notEditable = []
 const nameOverrides = {
-    icc_id: 'ICCID'
+    icc_id: 'ICCID',
+    hold_type: 'On Hold'
 }
 
 
