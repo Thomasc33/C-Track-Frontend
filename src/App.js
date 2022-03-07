@@ -20,6 +20,10 @@ import ReportsPage from './Pages/Reports';
 import SingleAssetPage from './Pages/SingleAsset';
 import UserPage from './Pages/User';
 import GuidePage from './Pages/Guide';
+import PartCategoriesPage from './Pages/Part Types'
+import PartInventoryPage from './Pages/Part Inventory'
+import PartManagementPage from './Pages/Part Management'
+import RepairLogPage from './Pages/Repair Log'
 
 // Import Libraries
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
@@ -67,7 +71,7 @@ function App(props) {
       });
       const data = await response.json();
       setLoginStatus(data.permissions, data.isAdmin ? true : false,)
-      
+
       //Get TSheets token
       let ts = await TSheetsService.getToken(t)
       if (!ts.isErrored) {
@@ -118,6 +122,10 @@ function App(props) {
       <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/repair" render={props => <RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/inventory" render={props => <PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/parts" render={props => <PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/parttypes" render={props => <PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
     </Switch>
   )

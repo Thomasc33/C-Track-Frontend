@@ -1,0 +1,98 @@
+import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router';
+import PageTemplate from './Template'
+import { useMsal } from '@azure/msal-react';
+import { InteractionRequiredAuthError } from '@azure/msal-common';
+import ModelSelect from '../Components/ModelSelect'
+import { Button } from '@material-ui/core';
+import axios from 'axios';
+import PartService from '../Services/Parts'
+import '../css/PartManagement.css'
+const APIBase = require('../settings.json').APIBase
+
+function PartManagementPage(props) {
+    // MSAL stuff
+    const { instance, accounts } = useMsal()
+    async function getTokenSilently() {
+        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
+        let res = await instance.acquireTokenSilent(SilentRequest)
+            .catch(async er => {
+                if (er instanceof InteractionRequiredAuthError) {
+                    return await instance.acquireTokenPopup(SilentRequest)
+                } else {
+                    console.log('Unable to get token')
+                }
+            })
+        return res.accessToken
+    }
+
+    // Misc Functions
+    const getModelList = async () => {
+        const token = await getTokenSilently()
+        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Access-Control-Allow-Origin': '*'
+            }
+        })
+        if (res.isErrored) return console.log(res)
+        setModelList(res.data || [])
+    }
+
+    // States
+    const [modelList, setModelList] = useState([])
+    const [modelAddSelect, setModelAddSelect] = useState(null)
+    const [selectedModel, setSelectedModel] = useState(null)
+
+    // useEffect(s)
+    useEffect(getModelList, [])
+
+
+    // Permission Check
+    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+
+    // Event Handlers
+    const handleModelAddButton = async () => {
+        const token = await getTokenSilently()
+        PartService.addModelList({ model: modelAddSelect }, token)
+        setModelAddSelect(null)
+        getModelList()
+    }
+
+    // Renderers
+    const renderModelList = row => {
+        console.log(row)
+        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
+            <h2 style={{ width: '33.4%', textAlign: 'left' }}>{row.model_number}</h2>
+            <h2 style={{ width: '33.3%' }}>{row.manufacturer}</h2>
+            <h2 style={{ width: '33.3%', textAlign: 'right' }}>0</h2>
+        </div>
+    }
+
+    // Base JSX
+    return (
+        <><div className='PartManagementArea'>
+            {selectedModel ?
+                <h1>Section under construction</h1>
+                :
+                <>
+                    <h1>Part Management</h1>
+                    <hr />
+                    <br />
+                    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', width: '90%', padding: '1rem', borderRadius: '.3rem' }}>
+                        <h2 style={{ width: '33.4%', textAlign: 'left' }}>Model Number</h2>
+                        <h2 style={{ width: '33.3%' }}>Manufacturer</h2>
+                        <h2 style={{ width: '33.3%', textAlign: 'right' }}>Unique Parts</h2>
+                    </div>
+                    {modelList.map(renderModelList)}
+                    <hr />
+                    <h2>Add Model</h2>
+                    <ModelSelect setModelSelect={setModelAddSelect} />
+                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
+                </>
+            }
+        </div><PageTemplate highLight='7' disableSearch {...props} /></>
+    )
+}
+
+export default PartManagementPage
