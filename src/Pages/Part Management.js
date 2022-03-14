@@ -5,6 +5,7 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import ModelSelect from '../Components/ModelSelect'
 import { Button } from '@material-ui/core';
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import PartService from '../Services/Parts'
 import '../css/PartManagement.css'
@@ -30,22 +31,32 @@ function PartManagementPage(props) {
     const getModelList = async () => {
         const token = await getTokenSilently()
         let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
-            }
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*' }
         })
         if (res.isErrored) return console.log(res)
         setModelList(res.data || [])
+    }
+
+    const getPartList = async () => {
+        if (!selectedModel) return
+        const token = await getTokenSilently()
+        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model/${selectedModel}`, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*' }
+        })
+        if (res.isErrored) return console.log(res)
+        console.log(res.data)
+        setPartsList(res.data || [])
     }
 
     // States
     const [modelList, setModelList] = useState([])
     const [modelAddSelect, setModelAddSelect] = useState(null)
     const [selectedModel, setSelectedModel] = useState(null)
+    const [partsList, setPartsList] = useState(null)
 
     // useEffect(s)
     useEffect(getModelList, [])
+    useEffect(getPartList, [selectedModel])
 
 
     // Permission Check
@@ -61,7 +72,6 @@ function PartManagementPage(props) {
 
     // Renderers
     const renderModelList = row => {
-        console.log(row)
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
             <h2 style={{ width: '33.4%', textAlign: 'left' }}>{row.model_number}</h2>
             <h2 style={{ width: '33.3%' }}>{row.manufacturer}</h2>
@@ -69,13 +79,40 @@ function PartManagementPage(props) {
         </div>
     }
 
+    const renderPartList = row => {
+        return <tr>
+            <td>part</td>
+            <td>type</td>
+            <td>image</td>
+        </tr>
+    }
+
     // Base JSX
     return (
         <><div className='PartManagementArea'>
             {selectedModel ?
-                <h1>Section under construction</h1>
+                <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
+                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
+                        <h1>Parts for {selectedModel}</h1>
+                        <div></div>
+                    </div>
+                    <hr />
+                    {partsList ? <>
+                        <table className='rows' style={{ position: 'relative' }}>
+                            <thead>
+                                <tr><th>Part Number</th><th>Common Type</th><th>Image</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>new</td></tr>
+                                {partsList.map(renderPartList)}
+                            </tbody>
+                        </table>
+                    </> : <CircularProgress size='48px' />}
+                </>
                 :
                 <>
+
                     <h1>Part Management</h1>
                     <hr />
                     <br />
