@@ -106,7 +106,7 @@ function ImporterPage(props) {
                     'Access-Control-Allow-Origin': '*',
                     'Authorization': `Bearer ${token}`
                 }
-            }).catch(er => { return { isErrored: true, error: er, failed: er.response && er.response.data && er.response.data.failed ? er.response.data.failed : [] } })
+            }).catch(er => { return { isErrored: true, error: er.response || er, failed: er.response && er.response.data && er.response.data.failed ? er.response.data.failed : [] } })
             if (res.isErrored) console.error(res.error)
             else res.failed = res.data && res.data.field ? res.data.failed : []
             return res

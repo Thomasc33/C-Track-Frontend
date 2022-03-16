@@ -151,6 +151,18 @@ function ReportsPage(props) {
         }
     }
 
+    const getJobSummary = async (type) => {
+        let t = await getTokenSilently()
+        let d = await ReportService.getJobCodeSummary(t, type)
+        if (d.isErrored) {
+            setFileName(null)
+            alert(d.error)
+        } else {
+            if (d.data.length === 0) return alert('No data to pull')
+            setReportData(d.data)
+        }
+    }
+
 
     const getGraphCSVData = () => {
         if (!lineChartData || lineChartData === {}) return [['error'], ['error']]
@@ -166,6 +178,12 @@ function ReportsPage(props) {
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
         </div>
+    }
+
+    function getTotal() {
+        let tot = 0
+        for (let i of data) if (i.dailydollars) tot += i.dailydollars
+        return tot
     }
 
     function renderSingleUserRow(k, v) {
@@ -219,7 +237,14 @@ function ReportsPage(props) {
                 </> : <>
                     <div className='UserReports'>
                         {data ?
-                            data.map(m => renderUserRow(m))
+                            <>
+                                {data.map(m => renderUserRow(m))}
+                                {data.length > 0 ? <hr style={{ width: '95%' }} /> : <></>}
+                                <div key='total' className='UserReport' style={{ cursor: 'default' }}>
+                                    <h1>Total</h1>
+                                    <h1>${getTotal()}</h1>
+                                </div>
+                            </>
                             : <></>}
                     </div>
                     <div className='UserReports'>
@@ -235,7 +260,7 @@ function ReportsPage(props) {
                             onClick={e => {
                                 setFileName(`${getDate(date)}-AS.csv`); getAssetSummary(e, getDate(date))
                             }}>Download Asset Summary</Button>
-                        <hr />
+                        <hr style={{ width: '95%' }} />
                         <h2>Yesterday - {getDateSubtractDay(date).substring(5).replace('-', '/')}</h2>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
@@ -245,7 +270,7 @@ function ReportsPage(props) {
                             onClick={e => {
                                 setFileName(`${getDateSubtractDay(date)}-AS.csv`); getAssetSummary(e, getDateSubtractDay(date))
                             }}>Download Asset Summary</Button>
-                        <hr />
+                        <hr style={{ width: '95%' }} />
                         <h2>Past Week - {getDateSubtractWeek(date).substring(5).replace('-', '/')} {'➝'} {getDate(Date.now()).substring(5).replace('-', '/')}</h2>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
@@ -255,7 +280,7 @@ function ReportsPage(props) {
                             onClick={e => {
                                 setFileName(`${getDateSubtractWeek(date)}-${getDate(Date.now())}-AS.csv`); getAssetSummary(e, getDateSubtractWeek(date), getDate(Date.now()))
                             }}>Download Asset Summary</Button>
-                        <hr />
+                        <hr style={{ width: '95%' }} />
                         <h2>Custom Date Range</h2>
                         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
@@ -269,8 +294,16 @@ function ReportsPage(props) {
                             onClick={e => {
                                 setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-AS.csv`); getAssetSummary(e, getDate(graphDate.from), getDate(graphDate.to))
                             }}>Download Asset Summary</Button>
+                        <hr style={{ width: '95%' }} />
+                        <h2>Job Code Usage</h2>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => { setFileName(`All Time Job Reports.csv`); getJobSummary('at') }}
+                        >All Time</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => { setFileName(`All Time Job Reports.csv`); getJobSummary('ytd') }}
+                        >YTD</Button>
                         {props.tsheetsBearer ? undefined : <>
-                            <hr />
+                            <hr style={{ width: '95%' }} />
                             <h2>Sign in to T-Sheets</h2>
                             <Button variant='contained' color='primary' size='large' href={`https://rest.tsheets.com/api/v1/authorize?response_type=code&client_id=${settings.tsheets.clientId}&redirect_uri=${settings.tsheets.redirectURI}&state=login`}
                                 style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}>

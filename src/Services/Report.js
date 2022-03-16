@@ -14,5 +14,11 @@ export default {
             .then(d => d.data)
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    getJobCodeSummary: async (token, type) => {
+        let res = await axios.get(`${BaseApiUrl}/reports/jobusage/${type}`, { headers: { 'Authorization': `Bearer ${token}` } })
+            .then(d => d.data)
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }
