@@ -153,6 +153,7 @@ function HourlyPage(props) {
                 endTime: dateInfo.endTime,
                 total_hours,
                 notes: comment,
+                uid: props.location.state && props.location.state.uid || null
             }
             let token = await getTokenSilently()
             let res = await hourlyService.add(formData, token)
@@ -183,7 +184,8 @@ function HourlyPage(props) {
                     id: i.id,
                     change: null,
                     value: null,
-                    total_hours: null
+                    total_hours: null,
+                    uid: props.location.state && props.location.state.uid || null
                 }
 
                 //find change
@@ -224,7 +226,7 @@ function HourlyPage(props) {
 
     const handleDelete = async (id, e) => {
         let token = await getTokenSilently()
-        let res = await hourlyService.delete(id, getDate(date), token)
+        let res = await hourlyService.delete(id, getDate(date), token, props.location.state && props.location.state.uid || null)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
