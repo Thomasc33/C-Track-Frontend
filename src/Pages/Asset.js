@@ -154,7 +154,7 @@ function AssetPage(props) {
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
-                uid: props.location.state.uid
+                uid: props.location.state && props.location.state.uid
             }
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
@@ -202,7 +202,7 @@ function AssetPage(props) {
                 let formData = {
                     id: i.id,
                     change: null,
-                    uid: props.location.state.uid
+                    uid: props.location.state && props.location.state.uid
                 }
                 if (!isNaN(parseInt(e))) {
                     formData.change = 'job'
@@ -281,7 +281,7 @@ function AssetPage(props) {
 
     const handleDelete = async (id, e) => {
         let token = await getTokenSilently()
-        let res = await assetService.delete(id, getDate(date), token, props.location.state.uid)
+        let res = await assetService.delete(id, getDate(date), token, props.location.state && props.location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
