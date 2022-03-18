@@ -13,8 +13,8 @@ export default {
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
-    delete: async (id, date, token) => {
-        let res = await axios.delete(`${BaseApiUrl}/asset/user/del/${id}/${date}`, { headers: { 'Authorization': `Bearer ${token}` } })
+    delete: async (id, date, token, uid = null) => {
+        let res = await axios.delete(`${BaseApiUrl}/asset/user/del?id=${id}&date=${date}${uid ? `&uid=${uid}` : ''}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },

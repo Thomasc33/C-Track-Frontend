@@ -14,7 +14,7 @@ export default {
         return res
     },
     delete: async (id, date, token, uid = null) => {
-        let res = await axios.delete(`${BaseApiUrl}/hourly/user/del/${id}/${date}/${uid || 'none'}`, { headers: { 'Authorization': `Bearer ${token}` } })
+        let res = await axios.delete(`${BaseApiUrl}/hourly/user/del?id=${id}&date=${date}${uid ? `&uid=${uid}` : ''}`, { headers: { 'Authorization': `Bearer ${token}` } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     }

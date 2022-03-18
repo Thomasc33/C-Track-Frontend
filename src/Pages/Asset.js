@@ -281,7 +281,7 @@ function AssetPage(props) {
 
     const handleDelete = async (id, e) => {
         let token = await getTokenSilently()
-        let res = await assetService.delete(id, getDate(date), token)
+        let res = await assetService.delete(id, getDate(date), token, props.location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
