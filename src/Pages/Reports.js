@@ -11,6 +11,7 @@ import 'chartkick/chart.js'
 import axios from 'axios';
 import { CSVLink } from "react-csv";
 import ReportService from '../Services/Report'
+import writeXlsxFile from 'write-excel-file'
 const settings = require('../settings.json')
 
 function ReportsPage(props) {
@@ -163,6 +164,18 @@ function ReportsPage(props) {
         }
     }
 
+    const getExcelReport = async (e, to = new Date().toISOString().split('T')[0], from = null) => {
+        let t = await getTokenSilently()
+        let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${t}` } })
+            .then(d => d.data)
+            .catch(e => { console.warn(e.response); return { isErrored: true, error: e.response.data } })
+        if (!res.isErrored)
+            await writeXlsxFile(res.data, {
+                columns: res.columns,
+                fileName: 'report.xlsx'
+            })
+
+    }
 
     const getGraphCSVData = () => {
         if (!lineChartData || lineChartData === {}) return [['error'], ['error']]
@@ -249,6 +262,12 @@ function ReportsPage(props) {
                     </div>
                     <div className='UserReports'>
                         <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Reports Section</h1>
+                        <h2>Excel Report - Today</h2>
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                            onClick={e => {
+                                getExcelReport(e)
+                            }}>Download Report</Button>
+                        <hr style={{ width: '95%' }} />
                         {reportData.length > 0 ? <CSVLink filename={fileName} target='_blank' data={reportData} ref={reportRef}></CSVLink> : undefined}
                         <h2>Today - {getDate(date).substring(5).replace('-', '/')}</h2>
                         <br />
