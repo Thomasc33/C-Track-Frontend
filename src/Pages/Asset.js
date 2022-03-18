@@ -154,6 +154,7 @@ function AssetPage(props) {
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
+                uid: props.location.state.uid
             }
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
@@ -200,7 +201,8 @@ function AssetPage(props) {
                 //data validation
                 let formData = {
                     id: i.id,
-                    change: null
+                    change: null,
+                    uid: props.location.state.uid
                 }
                 if (!isNaN(parseInt(e))) {
                     formData.change = 'job'
@@ -434,9 +436,9 @@ function AssetPage(props) {
                     <tbody>
                         {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
                         <tr style={{ borderTop: '1px' }}>
-                            <td></td>
-                            {showTimestamp ? <td /> : undefined}
-                            <td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}></td>
+                            {showTimestamp ? <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }} /> : undefined}
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
                                 <SelectSearch
                                     options={getJobArray()}
                                     search
@@ -453,8 +455,12 @@ function AssetPage(props) {
                                         {indexedJobCodes[optionProps.value]}
                                     </button>} />
                             </td>
-                            <td><input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
+                                <input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                            </td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
+                                <input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                            </td>
                         </tr>
                         {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
                     </tbody>
