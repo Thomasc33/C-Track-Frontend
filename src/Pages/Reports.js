@@ -174,7 +174,7 @@ function ReportsPage(props) {
         if (!res.isErrored)
             await writeXlsxFile(res.data, {
                 columns: res.columns,
-                fileName: fileName || 'report.xlsx'
+                fileName: fileName || `${to}-${from ? `>${from} - ` : ''}Report.xlsx`
             })
         setGeneratingReport(false)
 
@@ -352,7 +352,13 @@ function getDateSubtractMonth(date) {
 function getDateSubtractDay(date) {
     date = new Date(date)
     date.setDate(date.getDate() - 1)
+    while (!isBusinessDay(date)) { date.setDate(date.getDate() - 1) }
     return date.toISOString().split('T')[0]
+}
+
+function isBusinessDay(date) {
+    if ([0, 6].includes(date.getDay())) return false
+    return true
 }
 
 function getDateSubtractWeek(date) {
