@@ -24,6 +24,7 @@ function ReportsPage(props) {
     const { instance, accounts } = useMsal()
     const [reportData, setReportData] = useState([])
     const [fileName, setFileName] = useState(null)
+    const [generatingReport, setGeneratingReport] = useState(false)
     const reportRef = useRef(null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -165,6 +166,7 @@ function ReportsPage(props) {
     }
 
     const getExcelReport = async (e, to = new Date().toISOString().split('T')[0], from = null) => {
+        setGeneratingReport(true)
         let t = await getTokenSilently()
         let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${t}` } })
             .then(d => d.data)
@@ -172,8 +174,9 @@ function ReportsPage(props) {
         if (!res.isErrored)
             await writeXlsxFile(res.data, {
                 columns: res.columns,
-                fileName: 'report.xlsx'
+                fileName: fileName || 'report.xlsx'
             })
+        setGeneratingReport(false)
 
     }
 
@@ -262,18 +265,12 @@ function ReportsPage(props) {
                     </div>
                     <div className='UserReports'>
                         <h1 style={{ padding: '1rem', paddingTop: '2rem' }}>Reports Section</h1>
-                        <h2>Excel Report - Today</h2>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => {
-                                getExcelReport(e)
-                            }}>Download Report</Button>
-                        <hr style={{ width: '95%' }} />
                         {reportData.length > 0 ? <CSVLink filename={fileName} target='_blank' data={reportData} ref={reportRef}></CSVLink> : undefined}
                         <h2>Today - {getDate(date).substring(5).replace('-', '/')}</h2>
                         <br />
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
-                                setFileName(`${getDate(date)}-Report.csv`); getReport(e, getDate(date))
+                                setFileName(`${getDate(date)}-Report.xlsx`); getExcelReport(e, getDate(date))
                             }}>Download Report</Button>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
@@ -281,9 +278,9 @@ function ReportsPage(props) {
                             }}>Download Asset Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Yesterday - {getDateSubtractDay(date).substring(5).replace('-', '/')}</h2>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
-                                setFileName(`${getDateSubtractDay(date)}-Report.csv`); getReport(e, getDateSubtractDay(date))
+                                setFileName(`${getDateSubtractDay(date)}-Report.xlsx`); getExcelReport(e, getDateSubtractDay(date))
                             }}>Download Report</Button>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
