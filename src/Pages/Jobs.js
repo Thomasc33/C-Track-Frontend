@@ -222,6 +222,8 @@ function JobPage(props) {
                     case 'job_code':
                         if (e.target.value !== i.job_code) if (e.target.value) formData.change = 'job_code'
                         break;
+                    default:
+                        return alert('Default case hit, please contact Thomas C')
                 }
 
                 if (!formData.change) return

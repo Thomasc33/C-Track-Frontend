@@ -105,9 +105,9 @@ function AssetPage(props) {
 
     const handleTextInputChange = async (id, e, fromEnter = false) => {
         // Prevent non asset codes from adding an extra at the end
-        if (id == 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
+        if (id === 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
             if (!newJobCode) return
-            for (let i of jobCodes) if (newJobCode == i.id) { console.log(i); if (!i.requires_asset) return; break }
+            for (let i of jobCodes) if (newJobCode === i.id) { if (!i.requires_asset) return; break }
         }
         if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
@@ -226,7 +226,7 @@ function AssetPage(props) {
                 console.log(formData)
                 if (formData.change === 'asset')
                     for (let j of jobCodes)
-                        if (j.id == i.job_code && !j.requires_asset)
+                        if (j.id === i.job_code && !j.requires_asset)
                             return console.log('Cancelled an edit because it was an asset change on a non-asset job')
 
                 if (!formData.change) return
@@ -327,7 +327,7 @@ function AssetPage(props) {
 
     const copySelected = () => {
         let s = ''
-        if (selected.length == data.records.length) s = data.records.map(m => m.asset_id).join('\n')
+        if (selected.length === data.records.length) s = data.records.map(m => m.asset_id).join('\n')
         else s = [...data.records].filter(v => selected.includes(v.id)).map(m => m.asset_id).join('\n')
         navigator.clipboard.writeText(s).then(() => {
             let ele = document.getElementById('copy_content')
@@ -425,7 +425,7 @@ function AssetPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length == data.records.length}
+                            <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length === data.records.length}
                                 borderWidth='2px'
                                 borderColor={localStorage.getItem('accentColor') || '#e3de00'}
                                 style={{ backgroundColor: '#1b1b1b67' }}

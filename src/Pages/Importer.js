@@ -14,7 +14,6 @@ const settings = require('../settings.json')
 function ImporterPage(props) {
     const { instance, accounts } = useMsal()
     const [importerType, setImporterType] = useState(0)
-    const [isAsset, setIsAsset] = useState(true)
     //0 = asset, 1 = model, 2 = legal hold
     if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
     async function getTokenSilently() {
@@ -137,7 +136,7 @@ function ImporterPage(props) {
                 <br />
                 <h3>Do not include header row</h3>
                 <hr style={{ marginTop: '2rem' }} />
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Select CSV File with {isAsset ? `Assets` : `Models`} Information</h3>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Select CSV File with Information</h3>
                 <CSVReader cssClass="react-csv-input" onFileLoaded={handleData} />
                 <hr />
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Or Paste It</h3>
