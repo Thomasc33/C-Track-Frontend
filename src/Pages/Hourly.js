@@ -55,6 +55,7 @@ function HourlyPage(props) {
         sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    console.log(data)
 
     async function getFavorites() {
         let t = await getTokenSilently()
@@ -406,7 +407,7 @@ function HourlyPage(props) {
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'>.
                                 <TimeKeeper
-                                    time={times.new && times.new.startTime ? times.new.startTime : Date.now()}
+                                    time={times.new && times.new.startTime ? times.new.startTime : data.records.length && data.records[data.records.length - 1].end_time ? data.records[data.records.length - 1].end_time.substr(11, 5) : '8:30pm'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
@@ -418,7 +419,7 @@ function HourlyPage(props) {
                                 /></div></td>
                             <td><div className="TimeKeeper" id='new-End'>.
                                 <TimeKeeper
-                                    time={times.new && times.new.endTime ? times.new.endTime : Date.now()}
+                                    time={times.new && times.new.endTime ? times.new.endTime : '5:00pm'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', false, e)}
