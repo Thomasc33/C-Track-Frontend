@@ -55,7 +55,6 @@ function HourlyPage(props) {
         sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-    console.log(data)
 
     async function getFavorites() {
         let t = await getTokenSilently()
@@ -173,7 +172,8 @@ function HourlyPage(props) {
                 setData(d);
                 setNewComment('')
                 let temp = { ...times }
-                delete temp.new
+                temp.new.startTime = temp.new.endTime
+                temp.new.endTime = '5:00pm'
                 setTimes(temp)
                 document.getElementById('new-Start').classList.remove('invalid')
                 document.getElementById('new-End').classList.remove('invalid')
@@ -306,7 +306,10 @@ function HourlyPage(props) {
             let time = { startTime: row.start_time.substr(11, 5), endTime: row.end_time.substr(11, 5) }
             temp[row.id] = time
         }
+        if (!temp.new) temp.new = {}
+        if (!temp.new.startTime) temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '8:30am'
         setTimes(temp)
+        return < ></>
     }
     /**
      * Function to control rendering of data
@@ -366,6 +369,7 @@ function HourlyPage(props) {
     if (loading || !data || !jobCodes) return <PageTemplate highLight='2' {...props} />
     else return (
         <>
+            {data.records.length > Object.keys(times).length ? parseTime() : <></>}
             <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
@@ -407,7 +411,7 @@ function HourlyPage(props) {
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'>.
                                 <TimeKeeper
-                                    time={times.new && times.new.startTime ? times.new.startTime : data.records.length && data.records[data.records.length - 1].end_time ? data.records[data.records.length - 1].end_time.substr(11, 5) : '8:30pm'}
+                                    time={times.new && times.new.startTime ? times.new.startTime : '8:30pm'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
