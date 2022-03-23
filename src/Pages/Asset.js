@@ -103,7 +103,12 @@ function AssetPage(props) {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleTextInputChange = async (id, e) => {
+    const handleTextInputChange = async (id, e, fromEnter = false) => {
+        // Prevent non asset codes from adding an extra at the end
+        if (id == 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
+            if (!newJobCode) return
+            for (let i of jobCodes) if (newJobCode == i.id) { console.log(i); if (!i.requires_asset) return; break }
+        }
         if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else {
@@ -218,7 +223,7 @@ function AssetPage(props) {
                     default:
                         break;
                 }
-
+                console.log(formData)
                 if (formData.change === 'asset')
                     for (let j of jobCodes)
                         if (j.id == i.job_code && !j.requires_asset)
@@ -276,7 +281,7 @@ function AssetPage(props) {
     }
 
     const handleKeyDown = async (id, e) => {
-        if (e.key === 'Enter') handleTextInputChange(id, e)
+        if (e.key === 'Enter') handleTextInputChange(id, e, true)
     }
 
     const handleDelete = async (id, e) => {
