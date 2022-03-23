@@ -161,7 +161,12 @@ function ReportsPage(props) {
             alert(d.error)
         } else {
             if (d.data.length === 0) return alert('No data to pull')
-            setReportData(d.data)
+            await writeXlsxFile(d.data, {
+                columns: d.columns,
+                fileName: fileName || `Asset Summary.xlsx`,
+                stickyColumnsCount: 1,
+                stickyRowsCount: 1
+            })
         }
     }
 
@@ -275,7 +280,7 @@ function ReportsPage(props) {
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
                                 setFileName(`${getDate(date)}-AS.csv`); getAssetSummary(e, getDate(date))
-                            }}>Download Asset Summary</Button>
+                            }}>Asset Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Yesterday - {getDateSubtractDay(date).substring(5).replace('-', '/')}</h2>
                         <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
@@ -285,7 +290,7 @@ function ReportsPage(props) {
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
                                 setFileName(`${getDateSubtractDay(date)}-AS.csv`); getAssetSummary(e, getDateSubtractDay(date))
-                            }}>Download Asset Summary</Button>
+                            }}>Asset Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Past Week - {getDateSubtractWeek(date).substring(5).replace('-', '/')} {'➝'} {getDate(Date.now()).substring(5).replace('-', '/')}</h2>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
@@ -295,7 +300,7 @@ function ReportsPage(props) {
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
                                 setFileName(`${getDateSubtractWeek(date)}-${getDate(Date.now())}-AS.csv`); getAssetSummary(e, getDateSubtractWeek(date), getDate(Date.now()))
-                            }}>Download Asset Summary</Button>
+                            }}>Asset Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Custom Date Range</h2>
                         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
@@ -309,14 +314,14 @@ function ReportsPage(props) {
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => {
                                 setFileName(`${getDate(graphDate.from)}-${getDate(graphDate.to)}-AS.csv`); getAssetSummary(e, getDate(graphDate.from), getDate(graphDate.to))
-                            }}>Download Asset Summary</Button>
+                            }}>Asset Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Job Code Usage</h2>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => { setFileName(`All Time Job Reports.csv`); getJobSummary('at') }}
+                            onClick={e => { setFileName(`All Time Job Reports.xlsx`); getJobSummary('at') }}
                         >All Time</Button>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
-                            onClick={e => { setFileName(`All Time Job Reports.csv`); getJobSummary('ytd') }}
+                            onClick={e => { setFileName(`YTD Job Reports.xlsx`); getJobSummary('ytd') }}
                         >YTD</Button>
                         {props.tsheetsBearer ? undefined : <>
                             <hr style={{ width: '95%' }} />
