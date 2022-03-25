@@ -11,6 +11,7 @@ import { Button } from '@material-ui/core';
 import ModelSelect from '../Components/ModelSelect';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
+import { confirmAlert } from 'react-confirm-alert';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
@@ -284,7 +285,35 @@ function AssetPage(props) {
         if (e.key === 'Enter') handleTextInputChange(id, e, true)
     }
 
-    const handleDelete = async (id, e) => {
+    const handleDelete = (id, e, row) => {
+        let jc = 'unknown'
+        for (let i of jobCodes) if (i.id == row.job_code) jc = i.job_name
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>Confirm the deletion</h1>
+                        <br />
+                        <h2>Asset: {row.asset_id}</h2>
+                        <h3>Job: {jc}</h3>
+                        {row.notes ? <p>{row.notes}</p> : undefined}
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067', margin: '1rem' }} onClick={() => {
+                                sendDelete(id, e)
+                                onClose()
+                            }}
+                            >Confirm</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                onClose()
+                            }}>Nevermind</Button>
+                        </span>
+                    </div>
+                )
+            }
+        })
+    }
+
+    async function sendDelete(id, e) {
         let token = await getTokenSilently()
         let res = await assetService.delete(id, getDate(date), token, props.location.state && props.location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
@@ -298,8 +327,10 @@ function AssetPage(props) {
         setData(d);
 
         if (res.isErrored) {
-            e.target.classList.add('invalid')
-        } else {
+            alert('Failed to delete. Try again or see Thomas if it continues to fail')
+            console.log(res.error)
+        }
+        else {
             let row = document.getElementById(`${id}-row`)
             if (row) row.remove()
         }
@@ -399,7 +430,7 @@ function AssetPage(props) {
                     style={{ width: '79%', marginRight: '1rem' }}
                     onBlur={e => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e)}>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
         </tr >)
