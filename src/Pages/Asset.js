@@ -12,6 +12,7 @@ import ModelSelect from '../Components/ModelSelect';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import { confirmAlert } from 'react-confirm-alert';
+import Select from 'react-select';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
@@ -104,13 +105,13 @@ function AssetPage(props) {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleTextInputChange = async (id, e, fromEnter = false) => {
+    const handleTextInputChange = async (id, e, fromEnter = false, fromSelect = false) => {
         // Prevent non asset codes from adding an extra at the end
         if (id === 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
             if (!newJobCode) return
             for (let i of jobCodes) if (newJobCode === i.id) { if (!i.requires_asset) return; break }
         }
-        if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
+        if (isNaN(parseInt(e)) && !fromSelect) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else {
             let ele = document.getElementById(`${id}-jobcode`)
@@ -122,6 +123,7 @@ function AssetPage(props) {
             let asset = newAssetTag;
             let comment = newComment;
             if (!isNaN(parseInt(e))) { setNewJobCode(parseInt(e)); job_code = parseInt(e) }
+            else if (fromSelect) { comment = e.map(m => m.value).join(','); setNewComment(comment) }
             else switch (e.target.id) {
                 case 'new-notes':
                     comment = e.target.value
@@ -214,6 +216,10 @@ function AssetPage(props) {
                     formData.change = 'job'
                     formData.value = parseInt(e)
                 }
+                else if (fromSelect) {
+                    formData.change = 'notes'
+                    formData.value = e.map(m => m.value).join(',')
+                }
                 else switch (e.target.className) {
                     case 'asset_id':
                         if (e.target.value !== i.asset_id) if (e.target.value) formData.change = 'asset'
@@ -224,7 +230,6 @@ function AssetPage(props) {
                     default:
                         break;
                 }
-                console.log(formData)
                 if (formData.change === 'asset')
                     for (let j of jobCodes)
                         if (j.id === i.job_code && !j.requires_asset)
@@ -232,7 +237,7 @@ function AssetPage(props) {
 
                 if (!formData.change) return
 
-                if (!formData.value) formData.value = e.target.value
+                if (!formData.value && !fromSelect) formData.value = e.target.value
 
                 //send to api
                 let token = await getTokenSilently()
@@ -373,19 +378,57 @@ function AssetPage(props) {
         })
     }
 
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#524e00', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#524e00' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#524e00', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
+    }
+
+    const getRestrictedComments = jobId => {
+        let job
+        for (let i of jobCodes) if (i.id === jobId) job = i
+        if (!job) { console.log('no job found for', jobId); return null }
+        if (!job.restricted_comments) return null
+        return job.restricted_comments.split(',').map(m => { return { value: m, label: m } })
+    }
+
+    let newJobRestrictedComments
+    if (newJobCode) newJobRestrictedComments = getRestrictedComments(newJobCode)
+
     /**
      * Function to control rendering of data
      * 
      */
     function RenderRow(row) {
+        // Get asset id
         let asset = row.asset_id
+
+        // Get the job code information
+        let job
         for (let i of jobCodes) {
-            if (i.id === row.job_code)
+            if (i.id === row.job_code) {
+                job = i
                 if (!i.requires_asset) {
                     if (noAssetJobCounts[i.id]) { noAssetJobCounts[i.id]++; asset = noAssetJobCounts[i.id] }
                     else { noAssetJobCounts[i.id] = 1; asset = 1 }
                 }
+            }
         }
+
+        // Get the default restricted comments if applicable
+        let defaultRestrictedComment = []
+        let restrictedComments = getRestrictedComments(row.job_code)
+        if (restrictedComments) {
+            let flatrs = restrictedComments.map(m => m.value)
+            if (row.notes) for (let i of row.notes.split(',')) if (flatrs.includes(i)) defaultRestrictedComment.push({ value: i, label: i })
+        }
+
+        // Return the JSX
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td><Checkbox id={`${row.id}-isHourly`}
                 checked={selected.includes(row.id)}
@@ -421,15 +464,27 @@ function AssetPage(props) {
                 onKeyDown={e => handleKeyDown(row.id, e)}></input>
                 {row.image ? <img src={row.image} alt={row.asset_id} style={{ maxWidth: '2.5rem', maxHeight: '2.5rem', paddingTop: '.5rem', marginLeft: '1rem' }} /> : <></>}
             </div></td>
-            <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <input type='text'
-                    defaultValue={row.notes ? row.notes : ''}
-                    className='notes'
-                    placeholder='Notes / Comments'
-                    id={`${row.id}-notes`}
-                    style={{ width: '79%', marginRight: '1rem' }}
-                    onBlur={e => handleTextInputChange(row.id, e)}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
+            <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {job.restricted_comments ?
+                    <Select
+                        options={restrictedComments}
+                        isMulti
+                        closeMenuOnSelect={false}
+                        styles={selectStyles}
+                        defaultValue={defaultRestrictedComment}
+                        isSearchable
+                        onChange={e => handleTextInputChange(row.id, e, false, true)}
+                        menuPlacement='auto'
+                    />
+                    :
+                    <input type='text'
+                        defaultValue={row.notes ? row.notes : ''}
+                        className='notes'
+                        placeholder='Notes / Comments'
+                        id={`${row.id}-notes`}
+                        style={{ width: '79%', marginRight: '1rem' }}
+                        onBlur={e => handleTextInputChange(row.id, e)}
+                        onKeyDown={e => handleKeyDown(row.id, e)} />}
                 <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
@@ -495,7 +550,21 @@ function AssetPage(props) {
                                 <input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
                             </td>
                             <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
-                                <input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                                {newJobRestrictedComments ?
+                                    <Select
+                                        options={newJobRestrictedComments}
+                                        isMulti
+                                        closeMenuOnSelect={false}
+                                        styles={selectStyles}
+                                        defaultValue={[]}
+                                        isSearchable
+                                        onChange={e => handleTextInputChange('new', e, false, true)}
+                                        menuPlacement='auto'
+                                    />
+                                    :
+
+                                    <input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                                }
                             </td>
                         </tr>
                         {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
