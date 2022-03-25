@@ -287,7 +287,7 @@ function AssetPage(props) {
 
     const handleDelete = (id, e, row) => {
         let jc = 'unknown'
-        for (let i of jobCodes) if (i.id == row.job_code) jc = i.job_name
+        for (let i of jobCodes) if (i.id === row.job_code) jc = i.job_name
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (

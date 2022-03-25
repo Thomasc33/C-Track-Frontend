@@ -9,6 +9,8 @@ import User from '../Services/User';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import TimeKeeper from 'react-timekeeper';
+import { Button } from '@material-ui/core';
+import { confirmAlert } from 'react-confirm-alert';
 import '../css/Hourly.css';
 const settings = require('../settings.json')
 
@@ -55,6 +57,10 @@ function HourlyPage(props) {
         sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    useEffect(() => {
+        if (data && data.records) parseTime()
+    }, [data])
 
     async function getFavorites() {
         let t = await getTokenSilently()
@@ -158,7 +164,7 @@ function HourlyPage(props) {
             let token = await getTokenSilently()
             let res = await hourlyService.add(formData, token)
             if (res.isErrored) {
-                document.getElementById('new-assetid').classList.add('invalid')
+                alert('Failed to add hourly row')
             } else {
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
@@ -173,7 +179,7 @@ function HourlyPage(props) {
                 setNewComment('')
                 let temp = { ...times }
                 temp.new.startTime = temp.new.endTime
-                temp.new.endTime = '5:00pm'
+                temp.new.endTime = '5:00'
                 setTimes(temp)
                 document.getElementById('new-Start').classList.remove('invalid')
                 document.getElementById('new-End').classList.remove('invalid')
@@ -225,7 +231,35 @@ function HourlyPage(props) {
         if (e.key === 'Enter') handleTextInputChange(id, e)
     }
 
-    const handleDelete = async (id, e) => {
+    const handleDelete = (id, e, row) => {
+        let jc = 'unknown'
+        for (let i of jobCodes) if (i.id === row.job_code) jc = i.job_name
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>Confirm the deletion</h1>
+                        <br />
+                        <h2>{row.start_time.substr(11, 5)} → {row.end_time.substr(11, 5)}</h2>
+                        <h3>Job: {jc}</h3>
+                        {row.notes ? <p>{row.notes}</p> : undefined}
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067', margin: '1rem' }} onClick={() => {
+                                sendDelete(id, e)
+                                onClose()
+                            }}
+                            >Confirm</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                onClose()
+                            }}>Nevermind</Button>
+                        </span>
+                    </div>
+                )
+            }
+        })
+    }
+
+    async function sendDelete(id, e) {
         let token = await getTokenSilently()
         let res = await hourlyService.delete(id, getDate(date), token, props.location.state && props.location.state.uid || null)
         const response = await fetch(APILink.concat(getDate(date)), {
@@ -239,8 +273,10 @@ function HourlyPage(props) {
         setData(d);
 
         if (res.isErrored) {
-            e.target.classList.add('invalid')
-        } else {
+            alert('Failed to delete. Try again or see Thomas if it continues to fail')
+            console.log(res.error)
+        }
+        else {
             let row = document.getElementById(`${id}-row`)
             if (row) row.remove()
         }
@@ -307,7 +343,11 @@ function HourlyPage(props) {
             temp[row.id] = time
         }
         if (!temp.new) temp.new = {}
-        if (!temp.new.startTime) temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '8:30am'
+        if (!temp.new.startTime) {
+            if (data.records.length > Object.keys(times).length)
+                temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '8:30'
+            else temp.new.startTime = '8:30'
+        }
         setTimes(temp)
         return < ></>
     }
@@ -316,7 +356,6 @@ function HourlyPage(props) {
      * 
      */
     function RenderRow(row) {
-        if (data.records.length > Object.keys(times).length) parseTime()
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{ verticalAlign: 'top' }}>
             <td>
                 <SelectSearch
@@ -359,7 +398,7 @@ function HourlyPage(props) {
                     style={{ width: '79%', marginRight: '1rem' }}
                     onBlur={e => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e)}>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
         </tr >)
@@ -411,7 +450,7 @@ function HourlyPage(props) {
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'>.
                                 <TimeKeeper
-                                    time={times.new && times.new.startTime ? times.new.startTime : '8:30pm'}
+                                    time={times.new && times.new.startTime ? times.new.startTime : '8:30'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
