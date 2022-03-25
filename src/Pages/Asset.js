@@ -127,11 +127,11 @@ function AssetPage(props) {
             else switch (e.target.id) {
                 case 'new-notes':
                     comment = e.target.value
-                    await setNewComment(e.target.value)
+                    setNewComment(e.target.value)
                     break;
                 case 'new-assetid':
                     asset = e.target.value
-                    await setNewAssetTag(e.target.value)
+                    setNewAssetTag(e.target.value)
                     break;
                 default:
                     console.log('Default Case hit for new in new asset')

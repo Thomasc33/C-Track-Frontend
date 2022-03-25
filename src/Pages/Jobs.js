@@ -26,6 +26,7 @@ function JobPage(props) {
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
     const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
+    const [newRestrictedComments, setNewRestrictedComments] = useState(null)
     const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
@@ -109,7 +110,8 @@ function JobPage(props) {
             let isAsset = newIsAsset
             let applies = newAppliesSelection;
             let hourly_goal = newHourlyGoal;
-            let statusOnly = newstatusOnly
+            let statusOnly = newstatusOnly;
+            let restricted_comments = newRestrictedComments;
             if (e.isHourly) { isHourly = e.selection; setNewIsHourly(e.selection) }
             else if (e.isAsset) { isAsset = e.selection; setNewIsAsset(e.selection) }
             else if (e.isSelect) { applies = e.selection.map(m => m.value).join(',') }
@@ -117,20 +119,24 @@ function JobPage(props) {
             else switch (e.target.id) {
                 case 'new-price':
                     price = e.target.value
-                    await setNewPrice(e.target.value)
+                    setNewPrice(e.target.value)
                     break;
                 case 'new-hourly_goal':
                     hourly_goal = e.target.value
-                    await setNewHourlyGoal(e.target.value)
+                    setNewHourlyGoal(e.target.value)
                     break;
                 case 'new-jobname':
                     job_name = e.target.value
-                    await setNewJobName(e.target.value)
+                    setNewJobName(e.target.value)
                     break;
                 case 'new-jobcode':
                     job_code = e.target.value
-                    await setNewJobCode(e.target.value)
+                    setNewJobCode(e.target.value)
                     break;
+                case 'new-comments':
+                    restricted_comments = e.target.value
+                    setNewRestrictedComments(e.target.value)
+                    break
                 default:
                     console.log('Default Case hit for new')
                     return
@@ -153,7 +159,7 @@ function JobPage(props) {
             if (!cont) return
 
             //send to api
-            let formData = { job_code, job_name, price, isHourly, applies, isAsset, hourly_goal, statusOnly }
+            let formData = { job_code, job_name, price, isHourly, applies, isAsset, hourly_goal, statusOnly, restricted_comments }
             setLoading(true)
             let token = await getTokenSilently()
             let res = await jobService.add(formData, token)
@@ -222,6 +228,9 @@ function JobPage(props) {
                     case 'job_code':
                         if (e.target.value !== i.job_code) if (e.target.value) formData.change = 'job_code'
                         break;
+                    case 'comments':
+                        if (e.target.value !== i.restricted_comments) if (e.target.value) formData.change = 'restricted_comments'
+                        break
                     default:
                         return alert('Default case hit, please contact Thomas C')
                 }
@@ -338,6 +347,15 @@ function JobPage(props) {
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                     onChange={e => { row.status_only = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
             </td>
+            <td>
+                <input type='text'
+                    defaultValue={row.restricted_comments}
+                    placeholder='Restricted Comments'
+                    className='comments'
+                    id={`${row.id}-comments`}
+                    onBlur={(e) => handleTextInputChange(row.id, e)}
+                    onKeyDown={e => handleKeyDown(row.id, e)} />
+            </td>
         </tr>)
     }
 
@@ -347,17 +365,18 @@ function JobPage(props) {
     else return (
         <>
             <div className='AssetArea' style={{ top: '3vh', height: '97vh' }}>
-                <table className='rows'>
+                <table className='rows' style={{ overflowX: 'auto', width: '100vw', left: 0, top: 0 }}>
                     <thead>
                         <tr>
-                            <th style={{ width: '25%' }}>Job Code</th>
-                            <th style={{ width: '25%' }}>Job Name</th>
-                            <th style={{ width: '5%' }}>Price</th>
-                            <th style={{ width: '5%' }}>Hourly</th>
-                            <th style={{ width: '5%' }}>Asset</th>
-                            <th style={{ width: '5%' }}>Hrly Target</th>
-                            <th style={{ width: '25%' }}>Applies To</th>
-                            <th style={{ width: '5%' }}>S.O.</th>
+                            <th style={{ width: '25vw' }}>Job Code</th>
+                            <th style={{ width: '25vw' }}>Job Name</th>
+                            <th style={{ width: '5vw' }}>Price</th>
+                            <th style={{ width: '7vw' }}>Hourly</th>
+                            <th style={{ width: '7vw' }}>Asset</th>
+                            <th style={{ width: '5vw' }}>Hrly Target</th>
+                            <th style={{ width: '25vw' }}>Applies To</th>
+                            <th style={{ width: '7vw' }}>Usable</th>
+                            <th style={{ width: '25vw' }}>Comments</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -392,6 +411,9 @@ function JobPage(props) {
                                     size='30px'
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
                                     onChange={e => { handleTextInputChange('new', { statusOnly: true, selection: e }) }} />
+                            </td>
+                            <td className='comments'>
+                                <input type='text' placeholder='Comma Seperated Comments' className='comments' id={`new-comments`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)} />
                             </td>
                         </tr>
                     </tbody>
