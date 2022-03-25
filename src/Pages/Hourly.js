@@ -179,7 +179,7 @@ function HourlyPage(props) {
                 setNewComment('')
                 let temp = { ...times }
                 temp.new.startTime = temp.new.endTime
-                temp.new.endTime = '5:00'
+                temp.new.endTime = '17:00'
                 setTimes(temp)
                 document.getElementById('new-Start').classList.remove('invalid')
                 document.getElementById('new-End').classList.remove('invalid')
@@ -462,7 +462,7 @@ function HourlyPage(props) {
                                 /></div></td>
                             <td><div className="TimeKeeper" id='new-End'>.
                                 <TimeKeeper
-                                    time={times.new && times.new.endTime ? times.new.endTime : '5:00pm'}
+                                    time={times.new && times.new.endTime ? times.new.endTime : '17:00'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', false, e)}
