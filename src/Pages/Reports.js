@@ -175,7 +175,7 @@ function ReportsPage(props) {
                 columns: d.columns,
                 fileName: `Job Summary.xlsx`,
                 stickyColumnsCount: 1,
-                stickyRowsCount: 1
+                stickyRowsCount: 4
             })
         }
     }
@@ -323,15 +323,6 @@ function ReportsPage(props) {
                             onClick={e => getJobSummary('at')}>All Time</Button>
                         <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}
                             onClick={e => getJobSummary('ytd')}>YTD</Button>
-                        {props.tsheetsBearer ? undefined : <>
-                            <hr style={{ width: '95%' }} />
-                            <h2>Sign in to T-Sheets</h2>
-                            <Button variant='contained' color='primary' size='large' href={`https://rest.tsheets.com/api/v1/authorize?response_type=code&client_id=${settings.tsheets.clientId}&redirect_uri=${settings.tsheets.redirectURI}&state=login`}
-                                style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}>
-                                <img src='https://res.cloudinary.com/compter-pros-on-call/image/upload/v1643650072/qb_chypxi.svg' alt='tsheets icon' style={{ maxHeight: '4rem', margin: '-1rem' }} />
-                            </Button>
-                        </>
-                        }
                     </div>
                 </>
             }

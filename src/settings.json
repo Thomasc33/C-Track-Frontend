@@ -2,7 +2,7 @@
     "APIBase": "http://localhost:3005/a",
     "graphUrl": "https://graph.microsoft.com/v1.0",
     "tsheets": {
-        "clientId": "",
-        "redirectURI" : "https://localhost:3000/callback"
+        "clientId": "24485ea4b5fc699934d244a4558ac841",
+        "redirectURI": "https%3A%2F%2Flocalhost%3A3000%2Fcallback"
     }
 }
