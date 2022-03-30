@@ -179,7 +179,8 @@ function JobPage(props) {
                     mode: 'cors',
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Version': require('../backendVersion.json').version
                     }
                 });
                 const d = await response.json();

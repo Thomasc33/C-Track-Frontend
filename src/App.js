@@ -62,12 +62,14 @@ function App(props) {
         mode: 'cors',
         headers: {
           'Authorization': `Bearer ${t}`,
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'X-Version': require('./backendVersion.json').version
         }
       });
       const data = await response.json();
+      if (data.message === 'An upgrade is available. Please refresh the page.') alert(data.message)
       setLoginStatus(data.permissions, data.isAdmin ? true : false,)
-      
+
       //Get TSheets token
       let ts = await TSheetsService.getToken(t)
       if (!ts.isErrored) {

@@ -51,7 +51,8 @@ function AssetsPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -66,7 +67,8 @@ function AssetsPage(props) {
         let res = await axios.get(`${APILink}/get/${search}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         })
         setModelInfo(null)
@@ -84,7 +86,8 @@ function AssetsPage(props) {
                 res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Version': require('../backendVersion.json').version
                     }
                 })
                 if (res.isErrored) console.log(res)
@@ -110,7 +113,8 @@ function AssetsPage(props) {
                     res = await axios.get(`${settings.APIBase}/model/get/${i.info.model_number}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
-                            'Access-Control-Allow-Origin': '*'
+                            'Access-Control-Allow-Origin': '*',
+                            'X-Version': require('../backendVersion.json').version
                         }
                     })
                     if (res.isErrored) console.log(res)

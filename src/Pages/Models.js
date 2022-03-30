@@ -34,7 +34,8 @@ function ModelPage(props) {
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*', 
+                'X-Version': require('../backendVersion.json').version
             }
         })
         if (res.isErrored) return console.log(res)

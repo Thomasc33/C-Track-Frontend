@@ -61,14 +61,15 @@ function ReportsPage(props) {
             mode: 'cors',
             headers: {
                 'Authorization': `Bearer ${t}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         }).catch(er => { return { isErrored: true, error: er.response } })
         if (response.isErrored) return console.log(response.error)
         const data = await response.json();
         let lineReq
         if (onUser) {
-            lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}` } })
+            lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
                 .catch(er => { return { isErrored: true, error: er.response } })
             if (lineReq.isErrored) return console.log(response.error)
             lineReq = lineReq.data
@@ -183,7 +184,7 @@ function ReportsPage(props) {
     const getExcelReport = async (e, to = new Date().toISOString().split('T')[0], from = null) => {
         setGeneratingReport(true)
         let t = await getTokenSilently()
-        let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${t}` } })
+        let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
             .then(d => d.data)
             .catch(e => { console.warn(e.response); return { isErrored: true, error: e.response.data } })
         if (!res.isErrored)

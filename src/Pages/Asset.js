@@ -72,7 +72,8 @@ function AssetPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -86,7 +87,8 @@ function AssetPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -192,7 +194,8 @@ function AssetPage(props) {
                     mode: 'cors',
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Version': require('../backendVersion.json').version
                     }
                 });
                 const d = await response.json();
@@ -325,7 +328,8 @@ function AssetPage(props) {
             mode: 'cors',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const d = await response.json();

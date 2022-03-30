@@ -103,7 +103,8 @@ function ImporterPage(props) {
             let res = await axios.post(`${settings.APIBase}/importer/${importerType === 0 ? 'asset' : importerType === 1 ? 'model' : importerType === 2 ? 'legal' : undefined}`, section, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'X-Version': 'ignore'
                 }
             }).catch(er => { return { isErrored: true, error: er.response || er, failed: er.response && er.response.data && er.response.data.failed ? er.response.data.failed : [] } })
             if (res.isErrored) console.error(res.error)
