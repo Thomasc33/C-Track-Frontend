@@ -8,7 +8,7 @@ function PageTemplate(props) {
     const { instance, accounts } = useMsal()
     const permissions = props.permissions
     const isAdmin = props.isAdmin
-    const accent = localStorage.getItem('accentColor') || '#e3de00'
+    const accent = localStorage.getItem('accentColor') || '#00c6fc'
 
     const clickHandler = async () => {
         let search = document.getElementById('search').value
@@ -66,21 +66,21 @@ function PageTemplate(props) {
                             <p style={{ color: props.highLight === "7" ? accent : 'white' }} onClickCapture={(e) => { }}>Tools</p>
                             <div className='dropdown-content'>
                                 {isAdmin || (permissions && permissions.use_importer) ?
-                                    <p style={{ '&:hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
+                                    <p style={{ '&:hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/importer')}>Importer</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ?
-                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_users) ?
-                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
-                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
-                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#524e00' } }} onClickCapture={(e) => props.history.push('/adas')}>Asset Info</p> : <></>}
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
+                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
+                                {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/adas')}>Asset Info</p> : <></>}
                             </div>
                         </div>
                     </li> : <></>}
                 </ul>
                 <div className='AccountButton'>
-                    <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#524e00' }}>{accounts[0] ? accounts[0].name : ''}</button>
+                    <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#003994' }}>{accounts[0] ? accounts[0].name : ''}</button>
                     <div className='AccountDropDown'>
-                        <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={() => LogoutHandler()}>Logout</button>
+                        <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => LogoutHandler()}>Logout</button>
                     </div>
                 </div>
             </div>

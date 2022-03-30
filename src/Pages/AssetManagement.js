@@ -110,7 +110,7 @@ function AssetManagement(props) {
                         <p>Modifying the database can result in data loss. Please only continue if you know what you are doing and have a recent backup in case things go south.</p>
                         <br />
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
                                 if (type === 0) handleDelete(column, e)
                                 else if (type === 1) handleSave(column, e)
                                 else if (type === 2) handleNew(e)

@@ -306,7 +306,7 @@ function AssetPage(props) {
                         <h3>Job: {jc}</h3>
                         {row.notes ? <p>{row.notes}</p> : undefined}
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
                                 sendDelete(id, e)
                                 onClose()
                             }}
@@ -387,8 +387,8 @@ function AssetPage(props) {
         menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
         noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
         menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#524e00', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#524e00' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#524e00', }; },
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
         multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
@@ -437,10 +437,10 @@ function AssetPage(props) {
             <td><Checkbox id={`${row.id}-isHourly`}
                 checked={selected.includes(row.id)}
                 borderWidth='2px'
-                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                 style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                 size='30px'
-                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                 onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>
             {showTimestamp ? <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
             <td>
@@ -517,10 +517,10 @@ function AssetPage(props) {
                         <tr>
                             <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length === data.records.length}
                                 borderWidth='2px'
-                                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                 style={{ backgroundColor: '#1b1b1b67' }}
                                 size='30px'
-                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                 onChange={e => { e ? setSelected(data.records.map(m => m.id)) : setSelected([]) }} /></th>
                             {showTimestamp ? <th>Time</th> : undefined}
                             <th>Job Code</th>
@@ -581,8 +581,8 @@ function AssetPage(props) {
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
                 {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
-                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
-                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => {
+                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
+                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => {
                         document.getElementById('missingAssetBox').classList.remove('Show')
                     }}>Back</Button>
                 </div>

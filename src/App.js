@@ -127,7 +127,7 @@ function App(props) {
     <LoginPage />
   )
   else return (
-    <Particles color={localStorage.getItem('accentColor') || '#e3de00'} />
+    <Particles color={localStorage.getItem('accentColor') || '#00c6fc'} />
   )
 }
 

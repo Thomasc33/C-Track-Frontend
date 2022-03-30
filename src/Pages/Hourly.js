@@ -247,7 +247,7 @@ function HourlyPage(props) {
                         <h3>Job: {jc}</h3>
                         {row.notes ? <p>{row.notes}</p> : undefined}
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
                                 sendDelete(id, e)
                                 onClose()
                             }}
@@ -382,7 +382,7 @@ function HourlyPage(props) {
                 <TimeKeeper
                     coarseMinutes='15'
                     time={row.start_time.substr(11, 5)}
-                    css={{ color: localStorage.getItem('accentColor') || '#E3DE00' }}
+                    css={{ color: localStorage.getItem('accentColor') || '#00c6fc' }}
                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                     onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
                 /></div></td>

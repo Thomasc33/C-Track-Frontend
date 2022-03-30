@@ -286,11 +286,11 @@ const selectStyles = {
             color: 'white',
             ':active': {
                 ...styles[':active'],
-                backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+                backgroundColor: localStorage.getItem('accentColor') || '#003994',
             },
             ':hover': {
                 ...styles[':hover'],
-                backgroundColor: localStorage.getItem('accentColor') || '#524e00'
+                backgroundColor: localStorage.getItem('accentColor') || '#003994'
             }
         };
     },

@@ -68,7 +68,7 @@ function ImporterPage(props) {
                             onCellEditCommit={(e) => { for (let i in data) if (data[i].id === e.id) data[i][e.field] = e.value }}
                         />
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e3de0067' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
                                 sendData(data)
                                 onClose()
                             }}
@@ -143,13 +143,13 @@ function ImporterPage(props) {
                 <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Or Paste It</h3>
                 <textarea id='csv-text' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', width: '90%', height: '10rem', padding: '1rem', margin: '1rem', backgroundColor: '#1b1b1b', borderColor: 'white', borderWidth: '3px', color: 'white', fontSize: '16px', verticalAlign: 'top' }} />
                 <br />
-                <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00' }} onClick={e => handleButtonClick(e)}>Parse</Button>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={e => handleButtonClick(e)}>Parse</Button>
                 <hr style={{ marginTop: '2rem', marginBottom: '2rem' }} />
                 {importerType === 0 ? undefined : <Button
                     variant='contained'
                     color='primary'
                     size='large'
-                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(0)}>
                     Switch to Asset Importer
                 </Button>}
@@ -157,7 +157,7 @@ function ImporterPage(props) {
                     variant='contained'
                     color='primary'
                     size='large'
-                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(1)}>
                     Switch to Model Importer
                 </Button>}
@@ -165,7 +165,7 @@ function ImporterPage(props) {
                     variant='contained'
                     color='primary'
                     size='large'
-                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#524e00', marginLeft: '1rem', marginRight: '1rem' }}
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(2)}>
                     Switch to Legal Hold Importer
                 </Button>}

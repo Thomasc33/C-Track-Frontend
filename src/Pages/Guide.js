@@ -5,7 +5,7 @@ import { ChromePicker } from 'react-color'
 import '../css/Guide.css';
 
 function GuidePage(props) {
-    const [color, setColor] = useState(localStorage.getItem('accentColor') || '#e3de00')
+    const [color, setColor] = useState(localStorage.getItem('accentColor') || '#00c6fc')
     const handleColorChange = c => {
         setColor(c.hex)
         localStorage.setItem('accentColor', c.hex)
