@@ -34,7 +34,8 @@ function ModelPage(props) {
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*', 
+                'X-Version': require('../backendVersion.json').version
             }
         })
         if (res.isErrored) return console.log(res)
@@ -285,11 +286,11 @@ const selectStyles = {
             color: 'white',
             ':active': {
                 ...styles[':active'],
-                backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+                backgroundColor: localStorage.getItem('accentColor') || '#003994',
             },
             ':hover': {
                 ...styles[':hover'],
-                backgroundColor: localStorage.getItem('accentColor') || '#524e00'
+                backgroundColor: localStorage.getItem('accentColor') || '#003994'
             }
         };
     },

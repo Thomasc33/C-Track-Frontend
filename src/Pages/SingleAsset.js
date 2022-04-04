@@ -51,7 +51,8 @@ function AssetsPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -66,7 +67,8 @@ function AssetsPage(props) {
         let res = await axios.get(`${APILink}/get/${search}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         })
         setModelInfo(null)
@@ -84,7 +86,8 @@ function AssetsPage(props) {
                 res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Version': require('../backendVersion.json').version
                     }
                 })
                 if (res.isErrored) console.log(res)
@@ -110,7 +113,8 @@ function AssetsPage(props) {
                     res = await axios.get(`${settings.APIBase}/model/get/${i.info.model_number}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
-                            'Access-Control-Allow-Origin': '*'
+                            'Access-Control-Allow-Origin': '*',
+                            'X-Version': require('../backendVersion.json').version
                         }
                     })
                     if (res.isErrored) console.log(res)
@@ -236,29 +240,29 @@ function AssetsPage(props) {
                             <Checkbox id={`${row}`}
                                 checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
                                 borderWidth='2px'
-                                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                 style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                 size='30px'
-                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                 onChange={(e) => handleWatchUnWatch(e)} /> :
                             row.toLowerCase() === 'locked' ?
                                 <Checkbox id={`${row}`}
                                     checked={asset && asset.locked ? true : false}
                                     borderWidth='2px'
-                                    borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                     style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                     size='30px'
-                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                     onChange={(e) => handleLocking(e)} /> :
                                 row.toLowerCase() === 'hold_type' ?
                                     <Checkbox id={`${row}-hold`}
                                         checked={asset && asset.hold_type}
                                         disabled={!asset || !asset.hold_type}
                                         borderWidth='2px'
-                                        borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                        borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                         style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                         size='30px'
-                                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                         onChange={(e) => handleUnhold(e)} /> :
                                     row.toLowerCase() === 'company' ?
                                         <div style={{ paddingLeft: '1.4rem', margin: '.5rem', width: '94%' }}>
@@ -300,7 +304,7 @@ function AssetsPage(props) {
                     <h2>Add it?</h2>
                     <ModelSelect setModelSelect={setModelSelect} />
                     <br />
-                    <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { handleAssetAdding() }}>Add</Button>
+                    <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { handleAssetAdding() }}>Add</Button>
                 </div>
                     : <></>
                 }
@@ -383,9 +387,9 @@ function AssetsPage(props) {
                     modelInfo ?
                         <div>
                             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                                {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setModelInfo(null) }}>Back</Button> : <></>}
+                                {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setModelInfo(null) }}>Back</Button> : <></>}
                                 <h1>Model Information: {modelInfo.info.model_number}</h1>
-                                {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
+                                {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
                             </div>
                             <hr />
                             <div style={{ display: 'flex' }}>
@@ -429,7 +433,7 @@ function AssetsPage(props) {
                                 : <div style={{ overflow: 'scroll' }}>
                                     {renderAssetAdding(true) ? <>{renderAssetAdding(true)}<hr /><h2>The following has a matching comment:</h2></> : undefined}
                                     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
+                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
                                         <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                                             <h1>Asset Information For: </h1>
                                             {editName ?
@@ -441,7 +445,7 @@ function AssetsPage(props) {
                                                     {props.permissions.edit_models || props.isAdmin ?
                                                         <i className="material-icons" style={{ padding: '.2em', cursor: 'pointer' }} onClick={(e) => { setEditName(true) }}>edit</i> : <></>} </>}
                                         </div>
-                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#524E00' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
+                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { nextAsset() }}>Next</Button> : <></>}
                                     </div>
                                     <hr />
                                     <div style={{ display: 'flex' }}>

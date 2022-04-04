@@ -11,6 +11,8 @@ import { Button } from '@material-ui/core';
 import ModelSelect from '../Components/ModelSelect';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
+import { confirmAlert } from 'react-confirm-alert';
+import Select from 'react-select';
 import '../css/Asset.css'
 const settings = require('../settings.json')
 
@@ -70,7 +72,8 @@ function AssetPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -84,7 +87,8 @@ function AssetPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -103,8 +107,13 @@ function AssetPage(props) {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleTextInputChange = async (id, e) => {
-        if (isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
+    const handleTextInputChange = async (id, e, fromEnter = false, fromSelect = false) => {
+        // Prevent non asset codes from adding an extra at the end
+        if (id === 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
+            if (!newJobCode) return
+            for (let i of jobCodes) if (newJobCode === i.id) { if (!i.requires_asset) return; break }
+        }
+        if (isNaN(parseInt(e)) && !fromSelect) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else {
             let ele = document.getElementById(`${id}-jobcode`)
@@ -116,14 +125,15 @@ function AssetPage(props) {
             let asset = newAssetTag;
             let comment = newComment;
             if (!isNaN(parseInt(e))) { setNewJobCode(parseInt(e)); job_code = parseInt(e) }
+            else if (fromSelect) { comment = e.map(m => m.value).join(','); setNewComment(comment) }
             else switch (e.target.id) {
                 case 'new-notes':
                     comment = e.target.value
-                    await setNewComment(e.target.value)
+                    setNewComment(e.target.value)
                     break;
                 case 'new-assetid':
                     asset = e.target.value
-                    await setNewAssetTag(e.target.value)
+                    setNewAssetTag(e.target.value)
                     break;
                 default:
                     console.log('Default Case hit for new in new asset')
@@ -154,6 +164,7 @@ function AssetPage(props) {
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
+                uid: props.location.state && props.location.state.uid
             }
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
@@ -183,7 +194,8 @@ function AssetPage(props) {
                     mode: 'cors',
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*'
+                        'Access-Control-Allow-Origin': '*',
+                        'X-Version': require('../backendVersion.json').version
                     }
                 });
                 const d = await response.json();
@@ -200,11 +212,16 @@ function AssetPage(props) {
                 //data validation
                 let formData = {
                     id: i.id,
-                    change: null
+                    change: null,
+                    uid: props.location.state && props.location.state.uid
                 }
                 if (!isNaN(parseInt(e))) {
                     formData.change = 'job'
                     formData.value = parseInt(e)
+                }
+                else if (fromSelect) {
+                    formData.change = 'notes'
+                    formData.value = e.map(m => m.value).join(',')
                 }
                 else switch (e.target.className) {
                     case 'asset_id':
@@ -216,15 +233,14 @@ function AssetPage(props) {
                     default:
                         break;
                 }
-
                 if (formData.change === 'asset')
                     for (let j of jobCodes)
-                        if (j.id == i.job_code && !j.requires_asset)
+                        if (j.id === i.job_code && !j.requires_asset)
                             return console.log('Cancelled an edit because it was an asset change on a non-asset job')
 
                 if (!formData.change) return
 
-                if (!formData.value) formData.value = e.target.value
+                if (!formData.value && !fromSelect) formData.value = e.target.value
 
                 //send to api
                 let token = await getTokenSilently()
@@ -274,25 +290,56 @@ function AssetPage(props) {
     }
 
     const handleKeyDown = async (id, e) => {
-        if (e.key === 'Enter') handleTextInputChange(id, e)
+        if (e.key === 'Enter') handleTextInputChange(id, e, true)
     }
 
-    const handleDelete = async (id, e) => {
+    const handleDelete = (id, e, row) => {
+        let jc = 'unknown'
+        for (let i of jobCodes) if (i.id === row.job_code) jc = i.job_name
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>Confirm the deletion</h1>
+                        <br />
+                        <h2>Asset: {row.asset_id}</h2>
+                        <h3>Job: {jc}</h3>
+                        {row.notes ? <p>{row.notes}</p> : undefined}
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                                sendDelete(id, e)
+                                onClose()
+                            }}
+                            >Confirm</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                onClose()
+                            }}>Nevermind</Button>
+                        </span>
+                    </div>
+                )
+            }
+        })
+    }
+
+    async function sendDelete(id, e) {
         let token = await getTokenSilently()
-        let res = await assetService.delete(id, getDate(date), token)
+        let res = await assetService.delete(id, getDate(date), token, props.location.state && props.location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const d = await response.json();
         setData(d);
 
         if (res.isErrored) {
-            e.target.classList.add('invalid')
-        } else {
+            alert('Failed to delete. Try again or see Thomas if it continues to fail')
+            console.log(res.error)
+        }
+        else {
             let row = document.getElementById(`${id}-row`)
             if (row) row.remove()
         }
@@ -320,7 +367,7 @@ function AssetPage(props) {
 
     const copySelected = () => {
         let s = ''
-        if (selected.length == data.records.length) s = data.records.map(m => m.asset_id).join('\n')
+        if (selected.length === data.records.length) s = data.records.map(m => m.asset_id).join('\n')
         else s = [...data.records].filter(v => selected.includes(v.id)).map(m => m.asset_id).join('\n')
         navigator.clipboard.writeText(s).then(() => {
             let ele = document.getElementById('copy_content')
@@ -335,27 +382,65 @@ function AssetPage(props) {
         })
     }
 
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
+    }
+
+    const getRestrictedComments = jobId => {
+        let job
+        for (let i of jobCodes) if (i.id === jobId) job = i
+        if (!job) { console.log('no job found for', jobId); return null }
+        if (!job.restricted_comments) return null
+        return job.restricted_comments.split(',').map(m => { return { value: m, label: m } })
+    }
+
+    let newJobRestrictedComments
+    if (newJobCode) newJobRestrictedComments = getRestrictedComments(newJobCode)
+
     /**
      * Function to control rendering of data
      * 
      */
     function RenderRow(row) {
+        // Get asset id
         let asset = row.asset_id
+
+        // Get the job code information
+        let job
         for (let i of jobCodes) {
-            if (i.id === row.job_code)
+            if (i.id === row.job_code) {
+                job = i
                 if (!i.requires_asset) {
                     if (noAssetJobCounts[i.id]) { noAssetJobCounts[i.id]++; asset = noAssetJobCounts[i.id] }
                     else { noAssetJobCounts[i.id] = 1; asset = 1 }
                 }
+            }
         }
+
+        // Get the default restricted comments if applicable
+        let defaultRestrictedComment = []
+        let restrictedComments = getRestrictedComments(row.job_code)
+        if (restrictedComments) {
+            let flatrs = restrictedComments.map(m => m.value)
+            if (row.notes) for (let i of row.notes.split(',')) if (flatrs.includes(i)) defaultRestrictedComment.push({ value: i, label: i })
+        }
+
+        // Return the JSX
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td><Checkbox id={`${row.id}-isHourly`}
                 checked={selected.includes(row.id)}
                 borderWidth='2px'
-                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                 style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                 size='30px'
-                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                 onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>
             {showTimestamp ? <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
             <td>
@@ -383,16 +468,28 @@ function AssetPage(props) {
                 onKeyDown={e => handleKeyDown(row.id, e)}></input>
                 {row.image ? <img src={row.image} alt={row.asset_id} style={{ maxWidth: '2.5rem', maxHeight: '2.5rem', paddingTop: '.5rem', marginLeft: '1rem' }} /> : <></>}
             </div></td>
-            <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <input type='text'
-                    defaultValue={row.notes ? row.notes : ''}
-                    className='notes'
-                    placeholder='Notes / Comments'
-                    id={`${row.id}-notes`}
-                    style={{ width: '79%', marginRight: '1rem' }}
-                    onBlur={e => handleTextInputChange(row.id, e)}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e)}>
+            <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {job.restricted_comments ?
+                    <Select
+                        options={restrictedComments}
+                        isMulti
+                        closeMenuOnSelect={false}
+                        styles={selectStyles}
+                        defaultValue={defaultRestrictedComment}
+                        isSearchable
+                        onChange={e => handleTextInputChange(row.id, e, false, true)}
+                        menuPlacement='auto'
+                    />
+                    :
+                    <input type='text'
+                        defaultValue={row.notes ? row.notes : ''}
+                        className='notes'
+                        placeholder='Notes / Comments'
+                        id={`${row.id}-notes`}
+                        style={{ width: '79%', marginRight: '1rem' }}
+                        onBlur={e => handleTextInputChange(row.id, e)}
+                        onKeyDown={e => handleKeyDown(row.id, e)} />}
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
         </tr >)
@@ -418,12 +515,12 @@ function AssetPage(props) {
                 <table className='rows'>
                     <thead>
                         <tr>
-                            <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length == data.records.length}
+                            <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length === data.records.length}
                                 borderWidth='2px'
-                                borderColor={localStorage.getItem('accentColor') || '#e3de00'}
+                                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                 style={{ backgroundColor: '#1b1b1b67' }}
                                 size='30px'
-                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e3de00'} size={30} />}
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                 onChange={e => { e ? setSelected(data.records.map(m => m.id)) : setSelected([]) }} /></th>
                             {showTimestamp ? <th>Time</th> : undefined}
                             <th>Job Code</th>
@@ -434,9 +531,9 @@ function AssetPage(props) {
                     <tbody>
                         {newestOnTop ? undefined : data.records ? data.records.map(m => RenderRow(m)) : undefined}
                         <tr style={{ borderTop: '1px' }}>
-                            <td></td>
-                            {showTimestamp ? <td /> : undefined}
-                            <td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}></td>
+                            {showTimestamp ? <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }} /> : undefined}
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
                                 <SelectSearch
                                     options={getJobArray()}
                                     search
@@ -453,8 +550,26 @@ function AssetPage(props) {
                                         {indexedJobCodes[optionProps.value]}
                                     </button>} />
                             </td>
-                            <td><input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
+                                <input type='text' placeholder='Asset Tag / IMEI' className='asset_id' id={`new-assetid`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                            </td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
+                                {newJobRestrictedComments ?
+                                    <Select
+                                        options={newJobRestrictedComments}
+                                        isMulti
+                                        closeMenuOnSelect={false}
+                                        styles={selectStyles}
+                                        defaultValue={[]}
+                                        isSearchable
+                                        onChange={e => handleTextInputChange('new', e, false, true)}
+                                        menuPlacement='auto'
+                                    />
+                                    :
+
+                                    <input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
+                                }
+                            </td>
                         </tr>
                         {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
                     </tbody>
@@ -466,8 +581,8 @@ function AssetPage(props) {
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
                 {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
-                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
-                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => {
+                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
+                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => {
                         document.getElementById('missingAssetBox').classList.remove('Show')
                     }}>Back</Button>
                 </div>

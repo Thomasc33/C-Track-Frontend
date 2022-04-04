@@ -1,6 +1,6 @@
 {
   "name": "asset-tracking-frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^2.17.0",
@@ -33,7 +33,8 @@
     "react-tsparticles": "^1.34.0",
     "string-similarity": "^4.0.4",
     "web-vitals": "^1.1.2",
-    "webpack": "^4.42.0"
+    "webpack": "^4.42.0",
+    "write-excel-file": "^1.3.16"
   },
   "scripts": {
     "start": "set HTTPS=true&&set SSL_CRT_FILE=cert.pem&&set SSL_KEY_FILE=key.pem&&react-scripts start",

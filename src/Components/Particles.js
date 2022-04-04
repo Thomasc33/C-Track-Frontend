@@ -6,8 +6,8 @@ export default (props) => {
     if (props.permissions && props.permissions.view_particles) return (
         <Particles
             width='100vw'
-            height='100vh'
-            style={{ overflow: 'hidden' }}
+            height='99.6vh'
+            style={{ overflow: 'hidden', padding: '0', margin: '0' }}
             options={{
                 background: {
                     color: {

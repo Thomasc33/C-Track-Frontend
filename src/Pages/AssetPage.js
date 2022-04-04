@@ -28,7 +28,8 @@ function AssetsPage(props) {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`
+                'Authorization': `Bearer ${t}`,
+                'X-Version': require('../backendVersion.json').version
             }
         });
         const data = await response.json();
@@ -45,7 +46,8 @@ function AssetsPage(props) {
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
             }
         })
         if (res.isErrored) return console.log(res)

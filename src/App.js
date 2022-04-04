@@ -66,10 +66,12 @@ function App(props) {
         mode: 'cors',
         headers: {
           'Authorization': `Bearer ${t}`,
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'X-Version': require('./backendVersion.json').version
         }
       });
       const data = await response.json();
+      if (data.message === 'An upgrade is available. Please refresh the page.') alert(data.message)
       setLoginStatus(data.permissions, data.isAdmin ? true : false,)
 
       //Get TSheets token
@@ -133,7 +135,7 @@ function App(props) {
     <LoginPage />
   )
   else return (
-    <Particles color={localStorage.getItem('accentColor') || '#e3de00'} />
+    <Particles color={localStorage.getItem('accentColor') || '#00c6fc'} />
   )
 }
 

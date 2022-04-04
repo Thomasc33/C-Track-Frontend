@@ -26,7 +26,8 @@ const useFetch = (url, timeout = 5000) => {
                 mode: 'cors',
                 headers: {
                     'Authorization': `Bearer ${t}`,
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Version': require('../backendVersion.json').version
                 }
             }).catch(er => {
                 return { isErrored: true, error: er.response }

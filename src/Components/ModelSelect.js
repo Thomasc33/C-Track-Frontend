@@ -28,7 +28,8 @@ const ModelSelect = props => {
                 mode: 'cors',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Authorization': `Bearer ${t}`
+                    'Authorization': `Bearer ${t}`,
+                    'X-Version': require('../backendVersion.json').version
                 }
             });
             const data = await response.json();
