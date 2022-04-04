@@ -156,10 +156,10 @@ function AssetManagement(props) {
                     className='isAdmin'
                     checked={row === 'new' ? true : row.IS_NULLABLE}
                     borderWidth='5px'
-                    borderColor={localStorage.getItem('accentColor') || '#c9c622'}
+                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                     style={{ cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#c9c622'} size={36} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
                     onChange={e => handleChange(row.COLUMN_NAME || 'new', e, 'nullable')} />
             </td>
             <td>{row === 'new' ? undefined : <i className="material-icons delete-icon" onClickCapture={e => confirm(row.COLUMN_NAME || 'new', e, 0)}>delete_outline</i>}</td>

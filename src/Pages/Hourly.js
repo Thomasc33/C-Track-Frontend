@@ -12,7 +12,10 @@ import TimeKeeper from 'react-timekeeper';
 import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
 import '../css/Hourly.css';
+import Checkbox from 'react-custom-checkbox';
+import * as Icon from 'react-icons/fi';
 const settings = require('../settings.json')
+const normalTimeRange = [6, 19]
 
 function HourlyPage(props) {
     const { instance, accounts } = useMsal()
@@ -48,7 +51,6 @@ function HourlyPage(props) {
             let val = await Promise.all([jc, fav])
             let j = val[0], f = val[1].map(m => parseInt(m))
 
-            // Sorry to anyone that ever has to read this :)
             // Basically, returns -1 if a is exclusively favorite, 0 if both a and b are favorites, and 1 if b is exclusively favorite
             j.sort((a, b) => { return f.includes(a.id) ? f.includes(b.id) ? 0 : -1 : f.includes(b.id) ? 1 : 0 })
 
@@ -61,6 +63,20 @@ function HourlyPage(props) {
     useEffect(() => {
         if (data && data.records) parseTime()
     }, [data])
+
+    async function updateData() {
+        let token = await getTokenSilently()
+        const response = await fetch(APILink.concat(getDate(date)), {
+            mode: 'cors',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Access-Control-Allow-Origin': '*',
+                'X-Version': require('../backendVersion.json').version
+            }
+        });
+        const d = await response.json();
+        setData(d);
+    }
 
     async function getFavorites() {
         let t = await getTokenSilently()
@@ -103,10 +119,8 @@ function HourlyPage(props) {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleTextInputChange = async (id, e, target = false) => {
-        if (target) {
-            document.getElementById(`${id}-${target.split('-')[1] === 'start' ? 'Start' : 'End'}`)
-        } else if (e && isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
+    const handleChange = async (id, e, target = false, value = undefined) => {
+        if (e && isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else { //remove invalid from new job code input
             if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').classList.remove('invalid')
@@ -131,6 +145,8 @@ function HourlyPage(props) {
             // Data validation
             // ----------------
 
+            if (dateInfo.in_progress || value) dateInfo.endTime = getClosestTime()
+
             // Check to see if date is added
             if (!dateInfo) {
                 document.getElementById('new-Start').classList.add('invalid')
@@ -142,8 +158,7 @@ function HourlyPage(props) {
 
             // Make sure the end date is after start date
             // Parses the date as a number for simple conversion for time savings. More in depth methods used below for getting actual times
-            if (parseInt(dateInfo.startTime.replace(':', '')) > parseInt(dateInfo.endTime.replace(':', ''))) return document.getElementById('new-End').classList.add('invalid')
-
+            if (parseInt(dateInfo.startTime.replace(':', '')) >= parseInt(dateInfo.endTime.replace(':', ''))) return alert('End Time Must be Later Than Start Time')
 
             let total_hours = getTotalHours(dateInfo.startTime, dateInfo.endTime)
             if (total_hours < 0) return document.getElementById('new-End').classList.add('invalid')
@@ -151,7 +166,6 @@ function HourlyPage(props) {
             // Return if no job code provided
             // This will be reached if date is done before job code
             if (!job_code) return document.getElementById('new-jobcode').getElementsByTagName('input')[0].classList.add('invalid')
-
 
             //send to api
             let formData = {
@@ -161,24 +175,16 @@ function HourlyPage(props) {
                 endTime: dateInfo.endTime,
                 total_hours,
                 notes: comment,
-                uid: props.location.state && props.location.state.uid || null
+                uid: props.location.state && props.location.state.uid || null,
+                in_progress: dateInfo.in_progress || value
             }
             let token = await getTokenSilently()
             let res = await hourlyService.add(formData, token)
             if (res.isErrored) {
                 alert('Failed to add hourly row')
             } else {
-                const response = await fetch(APILink.concat(getDate(date)), {
-                    mode: 'cors',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Access-Control-Allow-Origin': '*',
-                        'X-Version': require('../backendVersion.json').version
-                    }
-                });
-                const d = await response.json();
+                updateData()
                 document.getElementById('new-notes').value = ''
-                setData(d);
                 setNewComment('')
                 let temp = { ...times }
                 temp.new.startTime = temp.new.endTime
@@ -200,13 +206,18 @@ function HourlyPage(props) {
 
                 //find change
                 if (target) {
-                    formData.change = target.split('-')[1]
-                    let dateInfo = times[id]
-                    if (formData.change === 'start') formData.value = dateInfo.startTime
-                    else formData.value = dateInfo.endTime
-                    let total_hours = getTotalHours(dateInfo.startTime, dateInfo.endTime)
-                    if (total_hours < 0) if (document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`)) return document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid'); else return
-                    formData.total_hours = total_hours
+                    if (target == 'inProgress') {
+                        formData.change = 'in_progress'
+                        formData.value = times[id].in_progress ? '1' : '0'
+                    } else {
+                        formData.change = target.split('-')[1]
+                        let dateInfo = times[id]
+                        if (formData.change === 'start') formData.value = dateInfo.startTime
+                        else formData.value = dateInfo.endTime
+                        let total_hours = getTotalHours(dateInfo.startTime, dateInfo.endTime)
+                        if (total_hours < 0) if (document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`)) return document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid'); else return
+                        formData.total_hours = total_hours
+                    }
                 } else {
                     if (!isNaN(parseInt(e))) {
                         formData.change = 'job'
@@ -226,12 +237,13 @@ function HourlyPage(props) {
                         if (document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`)) document.getElementById(`${id}-${formData.change === 'start' ? 'Start' : 'End'}`).classList.add('invalid')
                     } else e.target.classList.add('invalid')
                 }
+                updateData()
             }
         }
     }
 
     const handleKeyDown = async (id, e) => {
-        if (e.key === 'Enter') handleTextInputChange(id, e)
+        if (e.key === 'Enter') handleChange(id, e)
     }
 
     const handleDelete = (id, e, row) => {
@@ -336,7 +348,7 @@ function HourlyPage(props) {
         }
 
         if (sendToAPI) {
-            handleTextInputChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
+            handleChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
         }
     }
 
@@ -355,9 +367,24 @@ function HourlyPage(props) {
         setTimes(temp)
         return < ></>
     }
+
+    const handleCurrentChange = async (id, e) => {
+        if (id === 'new') {
+            let temp = { ...times }
+            if (!temp.new) temp.new = {}
+            temp.new.in_progress = e
+            setTimes(temp)
+            handleChange('new', null)
+        } else {
+            let temp = { ...times }
+            temp[`${id}`].in_progress = e
+            setTimes(temp)
+            handleChange(id, null, 'inProgress', e)
+        }
+    }
+
     /**
      * Function to control rendering of data
-     * 
      */
     function RenderRow(row) {
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{ verticalAlign: 'top' }}>
@@ -370,7 +397,7 @@ function HourlyPage(props) {
                     filterOptions={fuzzySearch}
                     className='job_list'
                     autoComplete='on'
-                    onChange={e => handleTextInputChange(row.id, e)}
+                    onChange={e => handleChange(row.id, e)}
                     menuPlacement='auto'
                     id={`${row.id}-jobcode`}
                     renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -378,7 +405,8 @@ function HourlyPage(props) {
                         {indexedJobCodes[optionProps.value]}
                     </button>} />
             </td>
-            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-Start`} >.
+            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-Start`}
+                style={{ border: (parseInt(row.start_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.start_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
                 <TimeKeeper
                     coarseMinutes='15'
                     time={row.start_time.substr(11, 5)}
@@ -386,24 +414,37 @@ function HourlyPage(props) {
                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                     onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
                 /></div></td>
-            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-End`} >.
-                <TimeKeeper
-                    coarseMinutes='15'
-                    time={row.end_time.substr(11, 5)}
-                    forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
-                    onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
-                /></div></td>
-            <td style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-End`}
+                style={{ border: (parseInt(row.end_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.end_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
+                {row.in_progress ? undefined :
+                    <TimeKeeper
+                        coarseMinutes='15'
+                        time={row.end_time.substr(11, 5)}
+                        forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
+                        onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
+                    />}</div></td>
+            <td>
+                <Checkbox
+                    id={`${row.id}-inProgress`}
+                    className='inProgress'
+                    checked={row.in_progress}
+                    borderWidth='5px'
+                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    style={{ cursor: 'pointer' }}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                    onChange={e => handleCurrentChange(row.id, e)} />
+            </td>
+            <td style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center', width: '100%' }}>
                 <input type='text'
                     defaultValue={row.notes ? row.notes : ''}
                     className='notes'
                     placeholder='Notes / Comments'
                     id={`${row.id}-notes`}
                     style={{ width: '79%', marginRight: '1rem' }}
-                    onBlur={e => handleTextInputChange(row.id, e)}
+                    onBlur={e => handleChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
-                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
-                    delete_outline</i>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>delete_outline</i>
             </td>
         </tr >)
     }
@@ -430,6 +471,7 @@ function HourlyPage(props) {
                             <th>Job Code</th>
                             <th className='TimeColumn'>Start Time</th>
                             <th className='TimeColumn'>End Time</th>
+                            <th style={{ width: '7%' }}>Current</th>
                             <th>Comments</th>
                         </tr>
                     </thead>
@@ -444,7 +486,7 @@ function HourlyPage(props) {
                                     filterOptions={fuzzySearch}
                                     className='job_list'
                                     autoComplete='on'
-                                    onChange={e => handleTextInputChange('new', e)}
+                                    onChange={e => handleChange('new', e)}
                                     menuPlacement='auto'
                                     id={`new-jobcode`}
                                     renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -452,31 +494,45 @@ function HourlyPage(props) {
                                         {indexedJobCodes[optionProps.value]}
                                     </button>} />
                             </td>
-                            <td><div className="TimeKeeper" id='new-Start'>.
+                            <td><div className="TimeKeeper" id='new-Start'
+                                style={{ border: times.new && times.new.startTime && (parseInt(times.new.startTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.startTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new.endTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
                                 <TimeKeeper
                                     time={times.new && times.new.startTime ? times.new.startTime : '8:30'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
                                     doneButton={(newTime) => (
-                                        <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
+                                        <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleChange('new', null, 'new-start')}>
                                             <i className="material-icons">done</i>
                                         </div>
                                     )}
                                 /></div></td>
-                            <td><div className="TimeKeeper" id='new-End'>.
-                                <TimeKeeper
-                                    time={times.new && times.new.endTime ? times.new.endTime : '17:00'}
-                                    coarseMinutes='15'
-                                    forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
-                                    onChange={e => handleTimeSelectChange('new', false, e)}
-                                    doneButton={(newTime) => (
-                                        <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleTextInputChange('new', null, 'new-start')}>
-                                            <i className="material-icons">done</i>
-                                        </div>
-                                    )}
-                                /></div></td>
-                            <td><input type='text' className='notes' id={`new-notes`} placeholder='Notes / Comments' onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
+                            <td><div className="TimeKeeper" id='new-End'
+                                style={{ border: times.new && times.new.endTime && (parseInt(times.new.endTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.endTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new.startTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
+                                {times.new && times.new && times.new.in_progress ? undefined :
+                                    <TimeKeeper
+                                        time={times.new && times.new.endTime ? times.new.endTime : '17:00'}
+                                        coarseMinutes='15'
+                                        forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
+                                        onChange={e => handleTimeSelectChange('new', false, e)}
+                                        doneButton={(newTime) => (
+                                            <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleChange('new', null, 'new-start')}>
+                                                <i className="material-icons">done</i>
+                                            </div>
+                                        )}
+                                    />}</div></td>
+                            <td>
+                                <Checkbox
+                                    id={`new-inProgress`}
+                                    className='inProgress'
+                                    borderWidth='5px'
+                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    style={{ cursor: 'pointer' }}
+                                    size='30px'
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                                    onChange={e => handleCurrentChange('new', e)} />
+                            </td>
+                            <td><input type='text' className='notes' id={`new-notes`} placeholder='Notes / Comments' onBlur={(e) => handleChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                         </tr>
                         {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
                     </tbody>
@@ -548,4 +604,12 @@ function removeDay(date) {
     date = new Date(date)
     date.setTime(date.getTime() - 86400000)
     return date.toISOString().split('T')[0]
+}
+
+function getClosestTime() {
+    let now = new Date()
+    let mod = now.getMinutes() % 15
+    if (mod === 0) return `${now.getHours()}:${now.getMinutes()}`
+    if (mod >= 7) if (now.getMinutes() > 45) return `${now.getHours() + 1}:00`
+    if (mod < 7) return `${now.getHours() + 1}:${now.getMinutes() - mod}`
 }
