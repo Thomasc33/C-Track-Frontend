@@ -31,7 +31,7 @@ function PartManagementPage(props) {
     const getModelList = async () => {
         const token = await getTokenSilently()
         let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*' }
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         })
         if (res.isErrored) return console.log(res)
         setModelList(res.data || [])
@@ -41,7 +41,7 @@ function PartManagementPage(props) {
         if (!selectedModel) return
         const token = await getTokenSilently()
         let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model/${selectedModel}`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*' }
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         })
         if (res.isErrored) return console.log(res)
         console.log(res.data)
@@ -93,7 +93,7 @@ function PartManagementPage(props) {
             {selectedModel ?
                 <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
-                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
                         <h1>Parts for {selectedModel}</h1>
                         <div></div>
                     </div>
@@ -104,7 +104,9 @@ function PartManagementPage(props) {
                                 <tr><th>Part Number</th><th>Common Type</th><th>Image</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td>new</td></tr>
+                                <tr><td><input type='text' placeholder='New...' /></td>
+                                    <td><input type='text' placeholder='New...' /></td>
+                                    <td><input type='text' placeholder='New...' /></td></tr>
                                 {partsList.map(renderPartList)}
                             </tbody>
                         </table>
@@ -112,7 +114,6 @@ function PartManagementPage(props) {
                 </>
                 :
                 <>
-
                     <h1>Part Management</h1>
                     <hr />
                     <br />
@@ -125,7 +126,7 @@ function PartManagementPage(props) {
                     <hr />
                     <h2>Add Model</h2>
                     <ModelSelect setModelSelect={setModelAddSelect} />
-                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e3de00' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
+                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
                 </>
             }
         </div><PageTemplate highLight='7' disableSearch {...props} /></>
