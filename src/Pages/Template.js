@@ -46,9 +46,17 @@ function PageTemplate(props) {
                         <li>
                             <p style={{ color: props.highLight === "2" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/hourly')}>Hourly Tracking</p>
                         </li> : <></>}
+                    {isAdmin || (permissions && permissions.use_repair_log) ?
+                        <li>
+                            <p style={{ color: props.highLight === "8" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/repair')}>Repair Tracking</p>
+                        </li> : <></>}
                     {isAdmin || (permissions && permissions.view_reports) ?
                         <li>
                             <p style={{ color: props.highLight === "3" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/reports')}>Reports</p>
+                        </li> : <></>}
+                    {isAdmin || (permissions && permissions.view_part_inventory) ?
+                        <li>
+                            <p style={{ color: props.highLight === "9" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/inventory')}>Parts Inventory</p>
                         </li> : <></>}
                     {isAdmin || (permissions && permissions.view_assets) ?
                         <li>
@@ -71,6 +79,10 @@ function PageTemplate(props) {
                                     <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/jobs')}>Job Codes</p> : <></>}
                                 {isAdmin || (permissions && permissions.view_users) ?
                                     <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/users')}>Users</p> : <></>}
+                                {isAdmin || (permissions && permissions.view_jobcodes) ?
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/parts')}>Part Management</p> : <></>}
+                                {isAdmin || (permissions && permissions.view_jobcodes) ?
+                                    <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/parttypes')}>Part Types</p> : <></>}
                                 {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/admin')}>Admin</p> : <></>}
                                 {isAdmin ? <p style={{ ':hover': { background: localStorage.getItem('accentColor') || '#003994' } }} onClickCapture={(e) => props.history.push('/adas')}>Asset Info</p> : <></>}
                             </div>

@@ -435,4 +435,58 @@ const multiSelectOptions = [
     { value: 'MiFi', label: 'MiFi' },
 ]
 
-const multiSelectIndexer = { 'IGEL': 0, 'Thick': 1, 'Phone': 2, 'Tablet': 3, 'MiFi': 4 }
+const multiSelectIndexer = {}
+for (let i in multiSelectOptions) multiSelectIndexer[multiSelectOptions[i].value] = i
+
+const selectStyles = {
+    control: (styles, { selectProps: { width } }) => ({
+        ...styles,
+        backgroundColor: 'transparent',
+        width
+    }),
+    menu: (provided, state) => ({
+        ...provided,
+        width: state.selectProps.width,
+    }),
+    noOptionsMessage: (styles) => ({
+        ...styles,
+        backgroundColor: '#1b1b1b'
+    }),
+    menuList: (styles) => ({
+        ...styles,
+        backgroundColor: '#1b1b1b'
+    }),
+    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+        return {
+            ...styles,
+            backgroundColor: '#1b1b1b',
+            color: 'white',
+            ':active': {
+                ...styles[':active'],
+                backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+            },
+            ':hover': {
+                ...styles[':hover'],
+                backgroundColor: localStorage.getItem('accentColor') || '#524e00'
+            }
+        };
+    },
+    multiValue: (styles, { data }) => {
+        return {
+            ...styles,
+            backgroundColor: localStorage.getItem('accentColor') || '#524e00',
+        };
+    },
+    multiValueLabel: (styles, { data }) => ({
+        ...styles,
+        color: data.color,
+    }),
+    multiValueRemove: (styles, { data }) => ({
+        ...styles,
+        color: 'white',
+        ':hover': {
+            color: 'red',
+        },
+    }),
+
+}
