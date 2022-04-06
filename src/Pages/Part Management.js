@@ -8,6 +8,7 @@ import { Button } from '@material-ui/core';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import PartService from '../Services/Parts'
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import '../css/PartManagement.css'
 const APIBase = require('../settings.json').APIBase
 
@@ -48,11 +49,22 @@ function PartManagementPage(props) {
         setPartsList(res.data || [])
     }
 
+    const getCommonParts = () => {
+        let ar = []
+        for (let i of partsList) {
+            if (i.is_hourly) continue
+            ar.push({ name: i.job_code, value: i.id })
+        }
+        return ar
+    }
+
     // States
     const [modelList, setModelList] = useState([])
     const [modelAddSelect, setModelAddSelect] = useState(null)
     const [selectedModel, setSelectedModel] = useState(null)
     const [partsList, setPartsList] = useState(null)
+    const [newPart, setNewPart] = useState({})
+    const [commonParts, setCommonParts] = useState({}) //{manufacturer:[common types]}
 
     // useEffect(s)
     useEffect(getModelList, [])
@@ -68,6 +80,32 @@ function PartManagementPage(props) {
         PartService.addModelList({ model: modelAddSelect }, token)
         setModelAddSelect(null)
         getModelList()
+    }
+
+    const handleTextInputChange = async (e, id) => {
+        if (id === 'new') {
+            let field = e.target.id
+            if (!field) return
+            let newP = { ...newPart }
+            newP[field] = e.target.value
+            setNewPart(newP)
+            handleChange(id, newP)
+        } else {
+            let formData = {}
+            switch (e.target.id) {
+                case 'part': break
+                default: return
+            }
+
+        }
+    }
+
+    const handleSelectChange = async (id, e) => {
+
+    }
+
+    const handleChange = async (id, formData) => {
+
     }
 
     // Renderers
@@ -104,9 +142,20 @@ function PartManagementPage(props) {
                                 <tr><th>Part Number</th><th>Common Type</th><th>Image</th></tr>
                             </thead>
                             <tbody>
-                                <tr><td><input type='text' placeholder='New...' /></td>
-                                    <td><input type='text' placeholder='New...' /></td>
-                                    <td><input type='text' placeholder='New...' /></td></tr>
+                                <tr>
+                                    <td><input type='text' id='part' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
+                                    <td><SelectSearch
+                                        options={getJobArray()}
+                                        search
+                                        placeholder="Job Code"
+                                        filterOptions={fuzzySearch}
+                                        className='job_list'
+                                        autoComplete='on'
+                                        onChange={e => handleSelectChange('new', e)}
+                                        menuPlacement='auto'
+                                        id={`type`} /></td>
+                                    <td><input type='text' id='image' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
+                                </tr>
                                 {partsList.map(renderPartList)}
                             </tbody>
                         </table>
