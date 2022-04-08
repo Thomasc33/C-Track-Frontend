@@ -288,15 +288,17 @@ function JobPage(props) {
                     onBlur={e => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
             </td>
-            <td>
-                <input type='number'
-                    defaultValue={row.price}
-                    className='price'
-                    id={`${row.id}-price`}
-                    onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
-                    onKeyDown={e => { handleKeyDown(row.id, e) }}
-                    style={{ width: '5rem', padding: '1rem' }} />
-            </td>
+            {props.permissions.view_jobcodes || props.isAdmin ?
+                <td>
+                    <input type='number'
+                        defaultValue={row.price}
+                        className='price'
+                        id={`${row.id}-price`}
+                        onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
+                        onKeyDown={e => { handleKeyDown(row.id, e) }}
+                        style={{ width: '5rem', padding: '1rem' }} />
+                </td>
+                : undefined}
             <td className='isHourly'>
                 <Checkbox id={`${row.id}-isHourly`}
                     checked={row.is_hourly}
@@ -371,7 +373,9 @@ function JobPage(props) {
                         <tr>
                             <th style={{ width: '25vw' }}>Job Code</th>
                             <th style={{ width: '25vw' }}>Job Name</th>
-                            <th style={{ width: '5vw' }}>Price</th>
+                            {props.permissions.view_jobcodes || props.isAdmin ?
+                                <th style={{ width: '5vw' }}>Price</th>
+                                : undefined}
                             <th style={{ width: '7vw' }}>Hourly</th>
                             <th style={{ width: '7vw' }}>Asset</th>
                             <th style={{ width: '5vw' }}>Hrly Target</th>
@@ -385,7 +389,9 @@ function JobPage(props) {
                         <tr>
                             <td><input type='text' placeholder='T-Seets Name' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td><input type='text' placeholder='Proper Name' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
-                            <td><input type='number' placeholder='0' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }}></input></td>
+                            {props.permissions.view_jobcodes || props.isAdmin ?
+                                <td><input type='number' placeholder='0' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }}></input></td>
+                                : undefined}
                             <td className='isHourly'><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             {!newIsHourly ? <>
                                 <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
