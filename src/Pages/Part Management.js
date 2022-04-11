@@ -46,15 +46,13 @@ function PartManagementPage(props) {
         })
         if (res.isErrored) return console.log(res)
         console.log(res.data)
-        setPartsList(res.data || [])
+        setPartsList(res.data.parts || [])
+        setCommonParts(res.data.common || [])
     }
 
     const getCommonParts = () => {
         let ar = []
-        for (let i of partsList) {
-            if (i.is_hourly) continue
-            ar.push({ name: i.job_code, value: i.id })
-        }
+        for (let i of commonParts) ar.push({ name: i.part_type, value: i.part_type })
         return ar
     }
 
@@ -64,7 +62,7 @@ function PartManagementPage(props) {
     const [selectedModel, setSelectedModel] = useState(null)
     const [partsList, setPartsList] = useState(null)
     const [newPart, setNewPart] = useState({})
-    const [commonParts, setCommonParts] = useState({}) //{manufacturer:[common types]}
+    const [commonParts, setCommonParts] = useState([])
 
     // useEffect(s)
     useEffect(getModelList, [])
@@ -89,39 +87,59 @@ function PartManagementPage(props) {
             let newP = { ...newPart }
             newP[field] = e.target.value
             setNewPart(newP)
-            handleChange(id, newP)
-        } else {
-            let formData = {}
-            switch (e.target.id) {
-                case 'part': break
-                default: return
-            }
-
-        }
+            if (newP.part && newP.type && newP.m_stock) handleChange(id, newP)
+        } else handleChange(id, { change: e.target.id, value: e.target.value, id })
     }
 
     const handleSelectChange = async (id, e) => {
+        if (id === 'new') {
+            let newP = { ...newPart }
+            newP.type = e
+            setNewPart(newP)
+            if (newP.part && newP.type && newP.m_stock) handleChange(id, newP)
+        } else handleChange(id, { change: 'type', value: e, id })
 
     }
 
     const handleChange = async (id, formData) => {
-
+        let t = await getTokenSilently()
+        formData.model = selectedModel
+        let res
+        if (id == 'new') res = await PartService.newPart(formData, t)
+        else res = await PartService.editPart(formData, t)
+        getPartList()
     }
+
+    const numberValidatorEventListener = (e) => { e.target.value = e.target.value.replace(/[^.\d]/g, '') }
+
+
 
     // Renderers
     const renderModelList = row => {
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
-            <h2 style={{ width: '33.4%', textAlign: 'left' }}>{row.model_number}</h2>
-            <h2 style={{ width: '33.3%' }}>{row.manufacturer}</h2>
+            <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model_number}</h2>
+            <h2 style={{ width: '33.4%' }}>{row.manufacturer}</h2>
             <h2 style={{ width: '33.3%', textAlign: 'right' }}>0</h2>
         </div>
     }
 
     const renderPartList = row => {
+        console.log(row, row.part_type)
+        console.log(getCommonParts())
         return <tr>
-            <td>part</td>
-            <td>type</td>
-            <td>image</td>
+            <td><input type='text' id='part' placeholder='New...' defaultValue={row.part_number} onBlur={e => handleTextInputChange(e, row.id)} /></td>
+            <td><SelectSearch
+                options={getCommonParts()}
+                search
+                filterOptions={fuzzySearch}
+                value={row.part_type}
+                className='job_list'
+                autoComplete='on'
+                onChange={e => handleSelectChange(row.id, e)}
+                menuPlacement='auto'
+                id='type' /></td>
+            <td><input type='number' id='m_stock' defaultValue={row.minimum_stock} onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, row.id) }} /></td>
+            <td><input type='text' id='image' placeholder='Image URL' defaultValue={row.image === 'null' ? undefined : row.image} onBlur={e => handleTextInputChange(e, row.id)} /></td>
         </tr>
     }
 
@@ -139,24 +157,26 @@ function PartManagementPage(props) {
                     {partsList ? <>
                         <table className='rows' style={{ position: 'relative' }}>
                             <thead>
-                                <tr><th>Part Number</th><th>Common Type</th><th>Image</th></tr>
+                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th></tr>
                             </thead>
                             <tbody>
+                                {localStorage.getItem('newestOnTop') ? partsList.map(renderPartList) : undefined}
                                 <tr>
                                     <td><input type='text' id='part' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
                                     <td><SelectSearch
-                                        options={getJobArray()}
+                                        options={getCommonParts()}
                                         search
-                                        placeholder="Job Code"
+                                        placeholder="New..."
                                         filterOptions={fuzzySearch}
                                         className='job_list'
                                         autoComplete='on'
                                         onChange={e => handleSelectChange('new', e)}
                                         menuPlacement='auto'
-                                        id={`type`} /></td>
+                                        id='type' /></td>
+                                    <td><input type='number' id='m_stock' placeholder='0' onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, 'new') }} /></td>
                                     <td><input type='text' id='image' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
                                 </tr>
-                                {partsList.map(renderPartList)}
+                                {localStorage.getItem('newestOnTop') ? undefined : partsList.map(renderPartList)}
                             </tbody>
                         </table>
                     </> : <CircularProgress size='48px' />}

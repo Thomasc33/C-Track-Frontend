@@ -17,5 +17,15 @@ export default {
         let res = await axios.post(`${BaseApiUrl}/mgmt/models/create`, FormData, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    editPart: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/mgmt/part/edit`, FormData, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    newPart: async (FormData, token) => {
+        let res = await axios.put(`${BaseApiUrl}/mgmt/part/create`, FormData, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }
