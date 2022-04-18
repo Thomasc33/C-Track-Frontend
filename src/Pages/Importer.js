@@ -121,18 +121,22 @@ function ImporterPage(props) {
             <div className='ImporterArea'>
                 <h1>CSV Format - {importerType === 0 ? 'Assets' :
                     importerType === 1 ? 'Models' :
-                        importerType === 2 ? 'Legal Hold' : undefined}
+                        importerType === 2 ? 'Legal Hold' :
+                            importerType === 3 ? 'Parts'
+                                : undefined}
                     {() => {
                         switch (importerType) {
                             case 1: return 'Models';
                             case 2: return 'Legal Hold';
+                            case 3: return 'Parts'
                             default: return 'Assets';
                         }
                     }}</h1>
                 <div style={{ display: 'inline-block', padding: '1rem' }}><h3 style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', fontFamily: 'Consolas, monaco, monospace' }}>
                     {importerType === 0 ? asset_columns.map(m => m.field).join(',') :
                         importerType === 1 ? model_columns.map(m => m.field).join(',') :
-                            importerType === 2 ? legal_hold_columns.map(m => m.field).join(',') : undefined}
+                            importerType === 2 ? legal_hold_columns.map(m => m.field).join(',') :
+                                importerType === 3 ? parts_columns.map(m => m.field).join(',') : undefined}
                 </h3></div>
                 <br />
                 <h3>Do not include header row</h3>
@@ -151,7 +155,7 @@ function ImporterPage(props) {
                     size='large'
                     style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(0)}>
-                    Switch to Asset Importer
+                    Asset Importer
                 </Button>}
                 {importerType === 1 ? undefined : <Button
                     variant='contained'
@@ -159,7 +163,15 @@ function ImporterPage(props) {
                     size='large'
                     style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(1)}>
-                    Switch to Model Importer
+                    Model Importer
+                </Button>}
+                {importerType === 3 ? undefined : <Button
+                    variant='contained'
+                    color='primary'
+                    size='large'
+                    style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
+                    onClick={e => setImporterType(3)}>
+                    Part Importer
                 </Button>}
                 {importerType === 2 ? undefined : <Button
                     variant='contained'
@@ -167,9 +179,8 @@ function ImporterPage(props) {
                     size='large'
                     style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#003994', marginLeft: '1rem', marginRight: '1rem' }}
                     onClick={e => setImporterType(2)}>
-                    Switch to Legal Hold Importer
+                    Legal Hold Importer
                 </Button>}
-
                 <br />
                 <br />
                 <br />
@@ -195,4 +206,8 @@ const model_columns = [
 
 const legal_hold_columns = [
     { field: 'id', headerName: "Asset ID", 'width': 400, editable: true }
+]
+
+const parts_columns = [
+    { field: 'part_number', headerName: 'Part Number', width: 400, editable: true }
 ]

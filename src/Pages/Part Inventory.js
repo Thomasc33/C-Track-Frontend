@@ -80,7 +80,24 @@ function PartInventoryPage(props) {
     }
 
     function RenderPart() {
-
+        let selectedInfo
+        for (let i of data) if (i.model.model_number == selectedModel) { selectedInfo = i; break }
+        return <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedPart(null) }}>Back</Button>
+                <h1>{selectedPart}</h1>
+                <div></div>
+            </div>
+            <hr />
+            <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', width: '90%', padding: '1rem', borderRadius: '.3rem' }}>
+                <h2 style={{ width: '20%' }}>ID</h2>
+                <h2 style={{ width: '20%' }}>Location</h2>
+                <h2 style={{ width: '20%' }}>Used</h2>
+                <h2 style={{ width: '20%' }}>By</h2>
+                <h2 style={{ width: '20%' }}>Added</h2>
+            </div>
+            {selectedInfo.inventory.map(RenderPartRow)}
+        </>
     }
 
     function RenderHomeRow(row) {
@@ -98,6 +115,16 @@ function PartInventoryPage(props) {
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.part_type}</h2>
             <h2 style={{ width: '33.4%' }}>{row.part_number}</h2>
             <h2 style={{ width: '33.3%', textAlign: 'right' }}>{stock}</h2>
+        </div>
+    }
+
+    function RenderPartRow(row) {
+        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
+            <h2 style={{ width: '20%' }}>{row.id}</h2>
+            <h2 style={{ width: '20%' }}>{row.location}</h2>
+            <h2 style={{ width: '20%' }}>{row.used_on}</h2>
+            <h2 style={{ width: '20%' }}>{row.used_by}</h2>
+            <h2 style={{ width: '20%' }}>{row.added_on}</h2>
         </div>
     }
 

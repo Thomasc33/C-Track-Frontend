@@ -624,3 +624,5 @@ function formatAMPM(date) {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     return hours + ':' + minutes + ' ' + ampm;
 }
+
+export { getDate, addDay, removeDay, formatAMPM }

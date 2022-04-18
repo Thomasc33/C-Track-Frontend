@@ -29,7 +29,7 @@ import RepairLogPage from './Pages/Repair Log'
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
-import TSheetsService from './Services/TSheets'
+// import TSheetsService from './Services/TSheets'
 import './App.css';
 import Particles from './Components/Particles';
 const settings = require('./settings.json')

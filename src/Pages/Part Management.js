@@ -10,7 +10,6 @@ import axios from 'axios';
 import PartService from '../Services/Parts'
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import '../css/PartManagement.css'
-const APIBase = require('../settings.json').APIBase
 
 function PartManagementPage(props) {
     // MSAL stuff
@@ -45,9 +44,8 @@ function PartManagementPage(props) {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         })
         if (res.isErrored) return console.log(res)
-        console.log(res.data)
-        setPartsList(res.data.parts || [])
         setCommonParts(res.data.common || [])
+        setPartsList(res.data.parts || [])
     }
 
     const getCommonParts = () => {
@@ -104,9 +102,8 @@ function PartManagementPage(props) {
     const handleChange = async (id, formData) => {
         let t = await getTokenSilently()
         formData.model = selectedModel
-        let res
-        if (id == 'new') res = await PartService.newPart(formData, t)
-        else res = await PartService.editPart(formData, t)
+        if (id === 'new') await PartService.newPart(formData, t)
+        else await PartService.editPart(formData, t)
         getPartList()
     }
 
@@ -124,8 +121,6 @@ function PartManagementPage(props) {
     }
 
     const renderPartList = row => {
-        console.log(row, row.part_type)
-        console.log(getCommonParts())
         return <tr>
             <td><input type='text' id='part' placeholder='New...' defaultValue={row.part_number} onBlur={e => handleTextInputChange(e, row.id)} /></td>
             <td><SelectSearch
