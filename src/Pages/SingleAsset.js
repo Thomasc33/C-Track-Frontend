@@ -13,6 +13,7 @@ import axios from 'axios';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import ModelSelect from '../Components/ModelSelect';
 import '../css/SingleAsset.css'
+import { getDate } from './Asset';
 
 const dontRender = ['id', 'image', 'status']
 const notEditable = []
@@ -27,6 +28,7 @@ function AssetsPage(props) {
     const { instance, accounts } = useMsal()
     const [asset, setAsset] = useState(null)
     const [assetHistory, setHistory] = useState([])
+    const [repairHistory, setRepairHistory] = useState([])
     const [results, setResults] = useState([])
     const [jobCodes, setJobCodes] = useState(null)
     const [editName, setEditName] = useState(false)
@@ -73,6 +75,7 @@ function AssetsPage(props) {
         })
         setModelInfo(null)
         if (res.isErrored) return console.log(res)
+        console.log(res.data)
         if (res.data.resu.notFound) return setAsset(res.data.resu) // Not found
         setUid(res.data.uid)
         if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
@@ -82,6 +85,7 @@ function AssetsPage(props) {
                 })
             } else {
                 setHistory(res.data.resu[0].history)
+                setRepairHistory(res.data.resu[0].repairs)
                 data = { ...res.data.resu[0].info }
                 res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
                     headers: {
@@ -104,12 +108,13 @@ function AssetsPage(props) {
                         type: i.type,
                         data: i.info,
                         history: undefined,
+                        repair: undefined,
                         assets: i.assets
                     }
                     results.push(info)
                 } else {
                     assets.add(i.info.id)
-                    let info = { history: i.history, type: i.type }
+                    let info = { history: i.history, type: i.type, repairs: i.repairs }
                     res = await axios.get(`${settings.APIBase}/model/get/${i.info.model_number}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -194,16 +199,14 @@ function AssetsPage(props) {
 
     function renderResultsRow(row) {
         return <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
-            onClick={() => { if (row.type === 'model') { setModelInfo({ type: 'model', info: row.data, assets: row.assets }) } else { setAsset(row.data); setHistory(row.history) } }}>
+            onClick={() => { if (row.type === 'model') { setModelInfo({ type: 'model', info: row.data, assets: row.assets }) } else { setAsset(row.data); setHistory(row.history); setRepairHistory(row.repairs) } }}>
             {row.type === 'asset' || row.type === 'tracker' ?
                 <>
                     <h2 style={{ fontWeight: '300' }}>Asset: {row.data.id}</h2>
                     <h2 style={{ fontWeight: '200' }}>Model: {row.data.model_number}</h2>
                     <h2 style={{ fontWeight: '200' }}>Status Changes: {row.history ? row.history.length : '0'}</h2>
                     <h2 style={{ fontWeight: '200' }}>Matched: {row.type === 'asset' ? 'Asset' : 'Tracker Comment'}</h2>
-                </>
-                :
-                <>
+                </> : <>
                     <h2 style={{ fontWeight: '300' }}>Model: {row.data.model_number}</h2>
                     <h2 style={{ fontWeight: '200' }}>Model Name: {row.data.name}</h2>
                     <h2 style={{ fontWeight: '200' }}>Device Count: {row.assets.length}</h2>
@@ -327,6 +330,19 @@ function AssetsPage(props) {
         )
     }
 
+    function renderRepairRow(row) {
+        let d = getDate(row.used_on)
+        let t = formatAMPM(row.used_on.slice(11, 16))
+        return (
+            <tr key={row.id}>
+                <td><p>{row.tech}</p></td>
+                <td><p>{row.part_type}</p></td>
+                <td><p>{row.part_number}</p></td>
+                <td><p>{d} {t}</p></td>
+            </tr>
+        )
+    }
+
     function renderModelsAssetsRow(row) {
         return (
             <tr key={row.id}>
@@ -370,11 +386,13 @@ function AssetsPage(props) {
         if (isNaN(j)) return alert("Error going to next")
         if (results[j].type === 'model') {
             setHistory([])
+            setRepairHistory([])
             setAsset(null)
             setModelInfo({ type: 'model', info: results[j].data, assets: results[j].assets })
         } else {
             setModelInfo(null)
             setHistory(results[j].history)
+            setRepairHistory(results[j].repairs)
             setAsset(results[j].data)
         }
     }
@@ -433,7 +451,7 @@ function AssetsPage(props) {
                                 : <div style={{ overflow: 'scroll' }}>
                                     {renderAssetAdding(true) ? <>{renderAssetAdding(true)}<hr /><h2>The following has a matching comment:</h2></> : undefined}
                                     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setHistory([]); setAsset(null) }}>Back</Button> : <></>}
+                                        {results.length > 0 ? <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setHistory([]); setAsset(null); setRepairHistory([]) }}>Back</Button> : <></>}
                                         <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                                             <h1>Asset Information For: </h1>
                                             {editName ?
@@ -458,8 +476,16 @@ function AssetsPage(props) {
                                     <h1>Status History</h1>
                                     <hr />
                                     <div style={{ display: 'flex' }}>
-                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead><tbody>{assetHistory.map(m => renderHistoryRow(m))}</tbody></table> : <h2>No Changes Found</h2>}
+                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead><tbody>{assetHistory.map(m => renderHistoryRow(m))}</tbody></table> : <h2 style={{ width: '100%', textAlign: 'center' }}>No Changes Found</h2>}
                                     </div>
+                                    <hr />
+                                    <br />
+                                    <h1>Repair History</h1>
+                                    <hr />
+                                    <div style={{ display: 'flex' }}>
+                                        {repairHistory && repairHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Repair Type</th><th>Part Number</th><th>Repair Time</th></thead><tbody>{repairHistory.map(m => renderRepairRow(m))}</tbody></table> : <h2 style={{ width: '100%', textAlign: 'center' }}>No Changes Found</h2>}
+                                    </div>
+                                    <hr style={{ marginBottom: '2rem' }} />
                                 </div>
                 }
             </div>
@@ -485,7 +511,7 @@ function formatAMPM(time) {
     let ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12
     hours = hours ? hours : 12;
-    minutes = minutes = ('0' + minutes).slice(-2);
+    minutes = ('0' + minutes).slice(-2);
     return hours + ':' + minutes + ' ' + ampm;
 }
 

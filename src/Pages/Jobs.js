@@ -441,4 +441,5 @@ const multiSelectOptions = [
     { value: 'MiFi', label: 'MiFi' },
 ]
 
-const multiSelectIndexer = { 'IGEL': 0, 'Thick': 1, 'Phone': 2, 'Tablet': 3, 'MiFi': 4 }
+const multiSelectIndexer = {}
+for (let i in multiSelectOptions) multiSelectIndexer[multiSelectOptions[i].value] = i

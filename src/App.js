@@ -20,12 +20,16 @@ import ReportsPage from './Pages/Reports';
 import SingleAssetPage from './Pages/SingleAsset';
 import UserPage from './Pages/User';
 import GuidePage from './Pages/Guide';
+import PartCategoriesPage from './Pages/Part Types'
+import PartInventoryPage from './Pages/Part Inventory'
+import PartManagementPage from './Pages/Part Management'
+import RepairLogPage from './Pages/Repair Log'
 
 // Import Libraries
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
-import TSheetsService from './Services/TSheets'
+// import TSheetsService from './Services/TSheets'
 import './App.css';
 import Particles from './Components/Particles';
 const settings = require('./settings.json')
@@ -40,7 +44,7 @@ function App(props) {
     loading: true,
   })
   const setLoginStatus = (perm, admin) => setState({ permissions: perm, isAdmin: admin, loading: false })
-  const [tsheetsBearer, setTsheetsBearer] = useState(null)
+  // const [tsheetsBearer, setTsheetsBearer] = useState(null)
 
 
   useEffect(() => {
@@ -71,10 +75,10 @@ function App(props) {
       setLoginStatus(data.permissions, data.isAdmin ? true : false,)
 
       //Get TSheets token
-      let ts = await TSheetsService.getToken(t)
-      if (!ts.isErrored) {
-        setTsheetsBearer(ts.token)
-      }
+      // let ts = await TSheetsService.getToken(t)
+      // if (!ts.isErrored) {
+      //   setTsheetsBearer(ts.token)
+      // }
     }
     if (isAuthenticated) loadPermissions()
   }, [isAuthenticated, accounts, instance])
@@ -110,16 +114,20 @@ function App(props) {
       <Route exact path="/asset" render={props => <AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />
+      <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/adas" render={props => <AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} tsheetsBearer={tsheetsBearer} />} />
+      <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/repair" render={props => <RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/inventory" render={props => <PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/parts" render={props => <PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      <Route exact path="/parttypes" render={props => <PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
       <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
     </Switch>
   )

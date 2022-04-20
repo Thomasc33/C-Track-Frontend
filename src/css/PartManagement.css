@@ -1,0 +1,78 @@
+.PartManagementArea {
+    top: 0;
+    padding-top: 2rem;
+    background: transparent;
+    left: 14%;
+    width: 85.5%;
+    position: absolute;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.PartManagementArea * {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.PartManagementArea hr {
+    margin: 1rem;
+    width: 92%;
+    padding: 0;
+    height: 0;
+}
+
+.PartManagementArea h1,
+h2 {
+    text-align: center;
+}
+
+.ResultSection {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: #1b1b1ba7;
+    width: 90%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: .3rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)
+}
+
+.ResultSectionHeader {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 90%;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: .3rem;
+}
+
+.RepairOption {
+    display: flex;
+    width: 50%;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.PartManagementArea input {
+    background-color: #1b1b1b67;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    border-style: none;
+    font-size: 20px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    padding: 1rem;
+    padding-right: 10%;
+    border-radius: .2rem;
+}

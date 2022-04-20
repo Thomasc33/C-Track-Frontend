@@ -11,7 +11,7 @@ const settings = require('../settings.json')
 function HomePage(props) {
     //Get data, and update every 2 seconds
     let APILink = `${settings.APIBase}/home/user`
-    const { loading, data = [] } = useFetch(APILink, 30000)
+    const { loading, data = [] } = useFetch(APILink, 0)
     const { instance, accounts } = useMsal()
     const [tasks, setTasks] = useState([])
 
