@@ -37,6 +37,7 @@ function ImporterPage(props) {
             if (importerType === 0) csv.push({ id: t[0], model_number: t[1] })
             else if (importerType === 1) csv.push({ id: t[0], name: t[1], device_type: t[2], manufacturer: t[3] })
             else if (importerType === 2) csv.push({ id: t[0] })
+            else if (importerType === 3) csv.push({ id: t[0] })
         }
         confirm(csv)
     }
@@ -45,6 +46,7 @@ function ImporterPage(props) {
         if (importerType === 0) for (let i of data) csv.push({ id: i[0], model_number: i[1] })
         else if (importerType === 1) for (let i of data) csv.push({ id: i[0], name: i[1], device_type: i[2], manufacturer: i[3] })
         else if (importerType === 2) for (let i of data) csv.push({ id: i[0] })
+        else if (importerType === 3) for (let i of data) csv.push({ id: i[0] })
         confirm(csv)
     }
 
@@ -60,7 +62,8 @@ function ImporterPage(props) {
                             className='grid'
                             columns={importerType === 0 ? asset_columns :
                                 importerType === 1 ? model_columns :
-                                    importerType === 2 ? legal_hold_columns : undefined}
+                                    importerType === 2 ? legal_hold_columns :
+                                        importerType === 3 ? parts_columns : undefined}
                             rows={data}
                             disableSelectionOnClick
                             hideFooterSelectedRowCount
@@ -100,7 +103,7 @@ function ImporterPage(props) {
             }
         }
         async function req(section) {
-            let res = await axios.post(`${settings.APIBase}/importer/${importerType === 0 ? 'asset' : importerType === 1 ? 'model' : importerType === 2 ? 'legal' : undefined}`, section, {
+            let res = await axios.post(`${settings.APIBase}/importer/${importerType === 0 ? 'asset' : importerType === 1 ? 'model' : importerType === 2 ? 'legal' : importerType === 3 ? 'parts' : undefined}`, section, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Authorization': `Bearer ${token}`,

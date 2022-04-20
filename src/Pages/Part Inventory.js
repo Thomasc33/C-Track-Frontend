@@ -5,7 +5,6 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import axios from 'axios'
 import { Button } from '@material-ui/core';
-const settings = require('../settings.json')
 
 function PartInventoryPage(props) {
     // MSAL stuff
@@ -37,7 +36,6 @@ function PartInventoryPage(props) {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         })
         if (res.isErrored) return console.log(res)
-        console.log(res.data)
         setData(res.data || [])
     }
 
@@ -62,7 +60,7 @@ function PartInventoryPage(props) {
 
     function RenderModel() {
         let selectedInfo
-        for (let i of data) if (i.model.model_number == selectedModel) { selectedInfo = i; break }
+        for (let i of data) if (i.model.model_number === selectedModel) { selectedInfo = i; break }
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedModel(null) }}>Back</Button>
@@ -81,7 +79,7 @@ function PartInventoryPage(props) {
 
     function RenderPart() {
         let selectedInfo
-        for (let i of data) if (i.model.model_number == selectedModel) { selectedInfo = i; break }
+        for (let i of data) if (i.model.model_number === selectedModel) { selectedInfo = i; break }
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedPart(null) }}>Back</Button>
@@ -95,13 +93,15 @@ function PartInventoryPage(props) {
                 <h2 style={{ width: '20%' }}>Used</h2>
                 <h2 style={{ width: '20%' }}>By</h2>
                 <h2 style={{ width: '20%' }}>Added</h2>
+                <h2 style={{ width: '20%' }}>By</h2>
             </div>
-            {selectedInfo.inventory.map(RenderPartRow)}
+            {selectedInfo.inventory.filter(a => a.part_id === selectedPart).map(RenderPartRow)}
         </>
     }
 
     function RenderHomeRow(row) {
-        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
+        console.log(row)
+        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} key={row.model.model_number} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model.model_number}</h2>
             <h2 style={{ width: '33.4%' }}>{row.parts.length}</h2>
             <h2 style={{ width: '33.3%', textAlign: 'right' }}>{row.total_stock}</h2>
@@ -109,9 +109,10 @@ function PartInventoryPage(props) {
     }
 
     function RenderModelRow(row, parent) {
+        console.log(row)
         let stock = 0
-        if (parent.inventory.length) stock = parent.inventory.reduce((a, b) => b.part_id === row.id ? a++ : a)
-        return <div className='ResultSection' onClick={() => { setSelectedPart(row.id) }} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
+        if (parent.inventory.length) stock = parent.inventory.filter(a => a.part_id === row.id).length
+        return <div className='ResultSection' onClick={() => { setSelectedPart(row.id) }} key={row.id} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.part_type}</h2>
             <h2 style={{ width: '33.4%' }}>{row.part_number}</h2>
             <h2 style={{ width: '33.3%', textAlign: 'right' }}>{stock}</h2>
@@ -119,12 +120,13 @@ function PartInventoryPage(props) {
     }
 
     function RenderPartRow(row) {
-        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
+        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} key={row.id} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
             <h2 style={{ width: '20%' }}>{row.id}</h2>
-            <h2 style={{ width: '20%' }}>{row.location}</h2>
-            <h2 style={{ width: '20%' }}>{row.used_on}</h2>
+            <h2 style={{ width: '20%' }}>{row.location || 'Inventory'}</h2>
+            <h2 style={{ width: '20%' }}>{row.used_on ? row.used_on.split('T')[0] : ''}</h2>
             <h2 style={{ width: '20%' }}>{row.used_by}</h2>
-            <h2 style={{ width: '20%' }}>{row.added_on}</h2>
+            <h2 style={{ width: '20%' }}>{row.added_on ? row.added_on.split('T')[0] : ''}</h2>
+            <h2 style={{ width: '20%' }}>{row.added_by}</h2>
         </div>
     }
 
