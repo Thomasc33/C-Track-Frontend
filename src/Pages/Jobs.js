@@ -296,8 +296,8 @@ function JobPage(props) {
                         id={`${row.id}-price`}
                         onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
                         onKeyDown={e => { handleKeyDown(row.id, e) }}
-                        style={{ width: '5rem', padding: '1rem' }} 
-                        step='0.01 />
+                        style={{ width: '5rem', padding: '1rem' }}
+                        step='0.01' />
                 </td>
                 : undefined}
             <td className='isHourly'>
