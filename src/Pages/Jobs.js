@@ -214,7 +214,7 @@ function JobPage(props) {
                     case 'price':
                         if (e.target.value !== i.price) if (e.target.value) {
                             formData.change = 'price'
-                            formData.value = e.target.value.replace(/[^\d]/g, '')
+                            formData.value = e.target.value.replace(/[^.\d]/g, '')
                         }
                         break;
                     case 'hourly_goal':
