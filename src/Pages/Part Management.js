@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import PartService from '../Services/Parts'
 import SelectSearch, { fuzzySearch } from 'react-select-search';
+import Select from 'react-select';
 import '../css/PartManagement.css'
 
 function PartManagementPage(props) {
@@ -54,6 +55,72 @@ function PartManagementPage(props) {
         return ar
     }
 
+    const getModels = async () => {
+        const token = await getTokenSilently()
+        let res = await axios.get(`${require('../settings.json').APIBase}/model/all/numbers`, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+        })
+        if (res.isErrored) return console.log(res)
+        let opt = []
+        for (let i of res.data.models) {
+            opt.push({ value: i.model_number, label: i.model_number })
+        }
+        setMultiSelectOptions(opt)
+    }
+
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({
+            ...styles,
+            backgroundColor: 'transparent',
+            width
+        }),
+        menu: (provided, state) => ({
+            ...provided,
+            width: state.selectProps.width,
+        }),
+        noOptionsMessage: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        menuList: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            return {
+                ...styles,
+                backgroundColor: '#1b1b1b',
+                color: 'white',
+                ':active': {
+                    ...styles[':active'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#003994',
+                },
+                ':hover': {
+                    ...styles[':hover'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#003994'
+                }
+            };
+        },
+        multiValue: (styles, { data }) => {
+            return {
+                ...styles,
+                backgroundColor: localStorage.getItem('accentColor') || '#003994',
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: 'white',
+            ':hover': {
+                color: 'red',
+            },
+        }),
+
+    }
+
     // States
     const [modelList, setModelList] = useState([])
     const [modelAddSelect, setModelAddSelect] = useState(null)
@@ -61,9 +128,11 @@ function PartManagementPage(props) {
     const [partsList, setPartsList] = useState(null)
     const [newPart, setNewPart] = useState({})
     const [commonParts, setCommonParts] = useState([])
+    const [multiSelectOptions, setMultiSelectOptions] = useState([])
 
     // useEffect(s)
-    useEffect(getModelList, [])
+    useEffect(getModelList, []) // Gets all models with parts enabled
+    useEffect(getModels, []) // Gets all model numbers
     useEffect(getPartList, [selectedModel])
 
 
@@ -99,6 +168,15 @@ function PartManagementPage(props) {
 
     }
 
+    const handleMultiSelectChange = async (id, e) => {
+        let models = e.map(m => m.value).join(',')
+        if (id === 'new') {
+            let t = { ...newPart }
+            t.alt_models = models
+            setNewPart(t)
+        } else handleChange(id, { change: 'alt_models', value: models, id })
+    }
+
     const handleChange = async (id, formData) => {
         let t = await getTokenSilently()
         formData.model = selectedModel
@@ -116,11 +194,14 @@ function PartManagementPage(props) {
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model_number}</h2>
             <h2 style={{ width: '33.4%' }}>{row.manufacturer}</h2>
-            <h2 style={{ width: '33.3%', textAlign: 'right' }}>0</h2>
+            <h2 style={{ width: '33.3%', textAlign: 'right' }}>TBI</h2>
         </div>
     }
 
     const renderPartList = row => {
+        let defaultOptions = []
+        if (row.alt_models) for (let i of multiSelectOptions)
+            if (row.alt_models.includes(i.value)) defaultOptions.push(i)
         return <tr>
             <td><input type='text' id='part' placeholder='New...' defaultValue={row.part_number} onBlur={e => handleTextInputChange(e, row.id)} /></td>
             <td><SelectSearch
@@ -135,6 +216,17 @@ function PartManagementPage(props) {
                 id='type' /></td>
             <td><input type='number' id='m_stock' defaultValue={row.minimum_stock} onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, row.id) }} /></td>
             <td><input type='text' id='image' placeholder='Image URL' defaultValue={row.image === 'null' ? undefined : row.image} onBlur={e => handleTextInputChange(e, row.id)} /></td>
+            <td><Select
+                options={multiSelectOptions}
+                isMulti
+                width='20vw'
+                closeMenuOnSelect={false}
+                styles={selectStyles}
+                defaultValue={defaultOptions}
+                isSearchable
+                onChange={e => handleMultiSelectChange(row.id, e)}
+                menuPlacement='auto'
+            /></td>
         </tr>
     }
 
@@ -152,7 +244,7 @@ function PartManagementPage(props) {
                     {partsList ? <>
                         <table className='rows' style={{ position: 'relative' }}>
                             <thead>
-                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th></tr>
+                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th><th>Alternate Models</th></tr>
                             </thead>
                             <tbody>
                                 {localStorage.getItem('newestOnTop') ? partsList.map(renderPartList) : undefined}
@@ -170,6 +262,16 @@ function PartManagementPage(props) {
                                         id='type' /></td>
                                     <td><input type='number' id='m_stock' placeholder='0' onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, 'new') }} /></td>
                                     <td><input type='text' id='image' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
+                                    <td><Select
+                                        options={multiSelectOptions}
+                                        isMulti
+                                        width='20vw'
+                                        closeMenuOnSelect={false}
+                                        styles={selectStyles}
+                                        isSearchable
+                                        onChange={e => handleMultiSelectChange('new', e)}
+                                        menuPlacement='auto'
+                                    /></td>
                                 </tr>
                                 {localStorage.getItem('newestOnTop') ? undefined : partsList.map(renderPartList)}
                             </tbody>

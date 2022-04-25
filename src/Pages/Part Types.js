@@ -60,14 +60,12 @@ function PartCategoriesPage(props) {
     }
 
     const handleSelectionChange = (e, id) => {
-        console.log('ye1')
         if (id !== 'new') sendData({ value: e.map(m => m.value).join(','), change: 'manufacturer', part: id }, id)
         setNewData({ ...newData, manufacturer: e.map(m => m.value).join(',') })
     }
 
     // Misc Functions
     const sendData = async (data, id) => {
-        console.log('ye')
         const token = await getTokenSilently()
         let res
         if (id === 'new') res = PartService.newPartType(data, token)
