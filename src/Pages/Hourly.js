@@ -158,7 +158,10 @@ function HourlyPage(props) {
 
             // Make sure the end date is after start date
             // Parses the date as a number for simple conversion for time savings. More in depth methods used below for getting actual times
-            if (parseInt(dateInfo.startTime.replace(':', '')) >= parseInt(dateInfo.endTime.replace(':', ''))) return alert('End Time Must be Later Than Start Time')
+            if (parseInt(dateInfo.startTime.replace(':', '')) >= parseInt(dateInfo.endTime.replace(':', ''))) {
+                if (!dateInfo.in_progress) return alert('End Time Must be Later Than Start Time')
+                dateInfo.endTime = addHourToTime(dateInfo.startTime)
+            }
 
             let total_hours = getTotalHours(dateInfo.startTime, dateInfo.endTime)
             if (total_hours < 0) return document.getElementById('new-End').classList.add('invalid')
@@ -612,4 +615,10 @@ function getClosestTime() {
     if (mod === 0) return `${now.getHours()}:${now.getMinutes()}`
     if (mod >= 7) if (now.getMinutes() > 45) return `${now.getHours() + 1}:00`
     if (mod < 7) return `${now.getHours() + 1}:${now.getMinutes() - mod}`
+}
+
+function addHourToTime(time) {
+    let t = time.split(':')
+    if (t.length !== 2) { console.log(`Received Invalid Time in addHourToTime: ${time}`) }
+    return `${parseInt(t[0]) + 1}:${t[1]}`
 }
