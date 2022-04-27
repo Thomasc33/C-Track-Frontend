@@ -100,7 +100,6 @@ function PartInventoryPage(props) {
     }
 
     function RenderHomeRow(row) {
-        console.log(row)
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model.model_number) }} key={row.model.model_number} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model.model_number}</h2>
             <h2 style={{ width: '33.4%' }}>{row.parts.length}</h2>
@@ -109,7 +108,6 @@ function PartInventoryPage(props) {
     }
 
     function RenderModelRow(row, parent) {
-        console.log(row)
         let stock = 0
         if (parent.inventory.length) stock = parent.inventory.filter(a => a.part_id === row.id && !a.location).length
         return <div className='ResultSection' onClick={() => { setSelectedPart(row.id) }} key={row.id} style={{ backgroundColor: row.low_stock ? '#781c19' : null }}>

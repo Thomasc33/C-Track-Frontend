@@ -75,7 +75,6 @@ function AssetsPage(props) {
         })
         setModelInfo(null)
         if (res.isErrored) return console.log(res)
-        console.log(res.data)
         if (res.data.resu.notFound) return setAsset(res.data.resu) // Not found
         setUid(res.data.uid)
         if (res.data.resu.length === 1 || props.assetOnly) { //1 result found

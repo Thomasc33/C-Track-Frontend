@@ -82,7 +82,6 @@ function AssetManagement(props) {
 
     const handleSave = async (column, e) => {
         if (!updatedRows[column]) return console.log(`save attempted with nothing in udpated rows, ${column}, ${updatedRows}`)
-        console.log(updatedRows[column])
         let token = await getTokenSilently()
         let r = await Asset.alter(updatedRows[column], token)
         if (r.isErrored) alert(`Errored:\n${r.error}`)
