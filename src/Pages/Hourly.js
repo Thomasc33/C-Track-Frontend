@@ -409,7 +409,7 @@ function HourlyPage(props) {
                     </button>} />
             </td>
             <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-Start`}
-                style={{ border: (parseInt(row.start_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.start_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
+                style={{ border: (parseInt(row.start_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.start_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 3px #b8680d' : undefined, paddingBottom: '10px' }}>
                 <TimeKeeper
                     coarseMinutes='15'
                     time={row.start_time.substr(11, 5)}
@@ -418,7 +418,7 @@ function HourlyPage(props) {
                     onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
                 /></div></td>
             <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-End`}
-                style={{ border: (parseInt(row.end_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.end_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
+                style={{ border: (parseInt(row.end_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.end_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 3px #b8680d' : undefined, paddingBottom: '10px' }}>
                 {row.in_progress ? undefined :
                     <TimeKeeper
                         coarseMinutes='15'

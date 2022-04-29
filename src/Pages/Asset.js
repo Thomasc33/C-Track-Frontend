@@ -432,8 +432,12 @@ function AssetPage(props) {
             if (row.notes) for (let i of row.notes.split(',')) if (flatrs.includes(i)) defaultRestrictedComment.push({ value: i, label: i })
         }
 
+        // Check for duplicate asset
+        let duplicate = false
+        for (let i of data.records) if (i.id == row.id) continue; else if (i.asset_id && asset === i.asset_id && i.job_code === row.job_code) duplicate = true
+
         // Return the JSX
-        return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
+        return (<tr id={`${row.id}-row`} key={`${row.id}-row`} >
             <td><Checkbox id={`${row.id}-isHourly`}
                 checked={selected.includes(row.id)}
                 borderWidth='2px'
@@ -461,6 +465,7 @@ function AssetPage(props) {
                     </button>} />
             </td>
             <td><div style={{ padding: 0, margin: 0, display: 'flex', alignContent: 'center' }}><input type='text'
+                style={{ border: duplicate ? '3px solid #b8680d' : undefined }}
                 defaultValue={asset}
                 className='asset_id'
                 id={`${row.id}-assetid`}
@@ -621,7 +626,7 @@ function formatAMPM(date) {
     let ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
     hours = hours ? hours : 12;
-    minutes = minutes 
+    minutes = minutes
     return hours + ':' + minutes + ' ' + ampm;
 }
 
