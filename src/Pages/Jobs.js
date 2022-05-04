@@ -176,7 +176,7 @@ function JobPage(props) {
                 let res = await jobService.edit(formData, token)
                 if (res.isErrored) {
                     console.error(res.error.response)
-                    if (!e.isHourly && !e.isSelect && !e.isAsset) e.target.classList.add('invalid')
+                    if (!e.isHourly && !e.isSelect && !e.isAsset && e.target) e.target.classList.add('invalid')
                 }
             }
         }

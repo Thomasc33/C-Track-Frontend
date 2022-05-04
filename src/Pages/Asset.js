@@ -280,7 +280,7 @@ function AssetPage(props) {
     // {count: int, split: {restrictedcomment: int}}
     const promptForMultiple = async jobId => {
         return new Promise(async res => {
-            let restrictedComments = getRestrictedComments(jobId, true)
+            let restrictedComments = getRestrictedComments(jobId, true) || []
             let breakDown = {}
             let selectCount = 1
             confirmAlert({
