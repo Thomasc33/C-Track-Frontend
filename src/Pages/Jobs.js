@@ -23,6 +23,7 @@ function JobPage(props) {
     const [newIsHourly, setNewIsHourly] = useState(false)
     const [newIsAsset, setNewIsAsset] = useState(false)
     const [newStatusOnly, setNewStatusOnly] = useState(false)
+    const [newPromptCount, setNewPromptCount] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])
     const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
@@ -98,13 +99,14 @@ function JobPage(props) {
     }
 
     const handleTextInputChange = async (id, e) => {
-        if (!e.isHourly && !e.isSelect && !e.isAsset && !e.statusOnly) {
+        if (!e.isHourly && !e.isSelect && !e.isAsset && !e.statusOnly && !e.promptCount) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
             if (e.isHourly) setNewIsHourly(e.selection)
             else if (e.isAsset) setNewIsAsset(e.selection)
             else if (e.statusOnly) setNewStatusOnly(e.selection)
+            else if (e.promptCount) setNewPromptCount(e.selection)
             else switch (e.target.id) {
                 case 'new-price': setNewPrice(e.target.value); break;
                 case 'new-hourly_goal': setNewHourlyGoal(e.target.value); break;
@@ -135,6 +137,9 @@ function JobPage(props) {
                     // eslint-disable-next-line default-case
                 } else if (e.statusOnly) {
                     formData.change = 'statusOnly'
+                    formData.value = e.selection.toString()
+                } else if (e.promptCount) {
+                    formData.change = 'promptCount'
                     formData.value = e.selection.toString()
                 } else switch (e.target.className) {
                     case 'price':
@@ -187,7 +192,8 @@ function JobPage(props) {
             isAsset: newIsAsset,
             hourly_goal: newHourlyGoal,
             statusOnly: newStatusOnly,
-            restricted_comments: newRestrictedComments
+            restricted_comments: newRestrictedComments,
+            promptCount: newPromptCount,
         }
         setLoading(true)
         let token = await getTokenSilently()
@@ -245,7 +251,8 @@ function JobPage(props) {
                     className='job_code'
                     id={`${row.id}-job_code`}
                     onBlur={e => handleTextInputChange(row.id, e)}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
+                    onKeyDown={e => handleKeyDown(row.id, e)}
+                    style={{ width: '15vw', padding: '1rem' }} />
             </td>
             <td>
                 <input type='text'
@@ -253,7 +260,8 @@ function JobPage(props) {
                     className='job_name'
                     id={`${row.id}-job_name`}
                     onBlur={e => handleTextInputChange(row.id, e)}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
+                    onKeyDown={e => handleKeyDown(row.id, e)}
+                    style={{ width: '15vw', padding: '1rem' }} />
             </td>
             {props.permissions.view_reports || props.isAdmin ?
                 <td>
@@ -267,7 +275,7 @@ function JobPage(props) {
                         step='0.01' />
                 </td>
                 : undefined}
-            <td className='isHourly'>
+            <td>
                 <Checkbox id={`${row.id}-isHourly`}
                     checked={row.is_hourly}
                     borderWidth='2px'
@@ -275,7 +283,7 @@ function JobPage(props) {
                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                     size='30px'
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
-                    onChange={e => { row.is_hourly = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
+                    onChange={e => { row.is_hourly = e; setUpdated(updated + 1); handleTextInputChange(row.id, { isHourly: true, selection: e }) }} />
             </td>
 
             {!row.is_hourly ?
@@ -292,11 +300,12 @@ function JobPage(props) {
                     <td>
                         <input type='number'
                             defaultValue={row.hourly_goal}
+                            placeholder='Target'
                             className='hourly_goal'
                             id={`${row.id}-hourly_goal`}
                             onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
                             onKeyDown={e => { handleKeyDown(row.id, e) }}
-                            style={{ width: '5rem', padding: '1rem' }} />
+                            style={{ width: '7rem', padding: '1rem' }} />
                     </td>
                     <td>
                         <Select menuPlacement='auto' options={multiSelectOptions}
@@ -305,10 +314,10 @@ function JobPage(props) {
                             styles={selectStyles}
                             defaultValue={defaultOptions}
                             isSearchable
+                            width='20vw'
                             onChange={e => selectionChange(row.id, e)} />
                     </td></> : <><td /><td /><td /></>}
-
-            <td className='statusOnly'>
+            <td>
                 <Checkbox id={`${row.id}-statusOnly`}
                     checked={row.status_only}
                     borderWidth='2px'
@@ -318,6 +327,16 @@ function JobPage(props) {
                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                     onChange={e => { row.status_only = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
             </td>
+            <td >
+                <Checkbox id={`${row.id}-promptCount`}
+                    checked={row.prompt_count}
+                    borderWidth='2px'
+                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    onChange={e => { row.prompt_count = e; setUpdated(updated + 1); handleTextInputChange(row.id, { promptCount: true, selection: e }) }} />
+            </td>
             <td>
                 <input type='text'
                     defaultValue={row.restricted_comments}
@@ -325,7 +344,8 @@ function JobPage(props) {
                     className='comments'
                     id={`${row.id}-comments`}
                     onBlur={(e) => handleTextInputChange(row.id, e)}
-                    onKeyDown={e => handleKeyDown(row.id, e)} />
+                    onKeyDown={e => handleKeyDown(row.id, e)}
+                    style={{ width: '15vw', padding: '1rem' }} />
             </td>
         </tr>)
     }
@@ -336,20 +356,19 @@ function JobPage(props) {
     else return (
         <>
             <div className='AssetArea' style={{ top: '3vh', height: '97vh' }}>
-                <table className='rows' style={{ overflowX: 'auto', width: '100vw', left: 0, top: 0 }}>
+                <table className='rows' style={{ overflowX: 'auto', minWidth: '100vw', left: 0, top: 0 }}>
                     <thead>
                         <tr>
-                            <th style={{ width: '25vw' }}>Job Code</th>
-                            <th style={{ width: '25vw' }}>Job Name</th>
-                            {props.permissions.view_reports || props.isAdmin ?
-                                <th style={{ width: '5vw' }}>Price</th>
-                                : undefined}
-                            <th style={{ width: '7vw' }}>Hourly</th>
-                            <th style={{ width: '7vw' }}>Asset</th>
-                            <th style={{ width: '5vw' }}>Hrly Target</th>
-                            <th style={{ width: '25vw' }}>Applies To</th>
-                            <th style={{ width: '7vw' }}>Usable</th>
-                            <th style={{ width: '25vw' }}>Comments</th>
+                            <th style={{ width: '30vw', padding: '1rem' }}>Job Code</th>
+                            <th style={{ width: '30vw', padding: '1rem' }}>Job Name</th>
+                            {props.permissions.view_reports || props.isAdmin ? <th style={{ width: '5vw', padding: '1rem' }}>Price</th> : undefined}
+                            <th style={{ width: '25vw', padding: '1rem' }}>Hourly</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Asset</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Hrly Target</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Applies To</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Not Usable</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Prompt Count</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Comments</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -362,16 +381,17 @@ function JobPage(props) {
                             {props.permissions.view_reports || props.isAdmin ?
                                 <td><input type='number' placeholder='0' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }} step='0.01'></input></td>
                                 : undefined}
-                            <td className='isHourly'><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                            <td><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             {!newIsHourly ? <>
                                 <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
                                 <td>
                                     <input type='number'
                                         className='hourly_goal'
                                         id={`new-hourly_goal`}
+                                        placeholder='Target'
                                         onBlur={e => { numberValidatorEventListener(e); handleTextInputChange('new', e) }}
                                         onKeyDown={e => { handleKeyDown('new', e) }}
-                                        style={{ width: '5rem', padding: '1rem' }} />
+                                        style={{ width: '7rem', padding: '1rem' }} />
                                 </td>
                                 <td><Select menuPlacement='auto' options={multiSelectOptions}
                                     isMulti
@@ -380,7 +400,7 @@ function JobPage(props) {
                                     isSearchable
                                     onChange={e => selectionChange('new', e)} /></td>
                             </> : <><td /><td /><td /></>}
-                            <td className='statusOnly'>
+                            <td>
                                 <Checkbox id={`new-statusOnly`}
                                     borderWidth='2px'
                                     borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
@@ -388,6 +408,15 @@ function JobPage(props) {
                                     size='30px'
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                                     onChange={e => { handleTextInputChange('new', { statusOnly: true, selection: e }) }} />
+                            </td>
+                            <td>
+                                <Checkbox id={`new-promptCount`}
+                                    borderWidth='2px'
+                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
+                                    size='30px'
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                    onChange={e => { handleTextInputChange('new', { promptCount: true, selection: e }) }} />
                             </td>
                             <td className='comments'>
                                 <input type='text' placeholder='Comma Seperated Comments' className='comments' id={`new-comments`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)} />

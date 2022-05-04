@@ -14,6 +14,7 @@ import * as Icon from 'react-icons/fi';
 import { confirmAlert } from 'react-confirm-alert';
 import Select from 'react-select';
 import '../css/Asset.css'
+import { Slider } from '@mui/material';
 const settings = require('../settings.json')
 
 function AssetPage(props) {
@@ -34,6 +35,7 @@ function AssetPage(props) {
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
     const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') === 'true' || false)
     const [selected, setSelected] = useState([])
+    const [multipleSelectCount, setMultipleSelectCount] = useState(1)
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -158,13 +160,17 @@ function AssetPage(props) {
             }
             if (!cont) return
 
+            // Check for multiple prompt
+            let multiple = jobPromptsCount(job_code) ? await promptForMultiple(job_code) : null
+
             //send to api
             let formData = {
                 date: dateString,
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
-                uid: props.location.state && props.location.state.uid
+                uid: props.location.state && props.location.state.uid,
+                multiple
             }
             let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
@@ -269,6 +275,61 @@ function AssetPage(props) {
                 }
             }
         }
+    }
+
+    // {count: int, split: {restrictedcomment: int}}
+    const promptForMultiple = async jobId => {
+        return new Promise(async res => {
+            let restrictedComments = getRestrictedComments(jobId, true)
+            let breakDown = {}
+            let selectCount = 1
+            confirmAlert({
+                customUI: ({ onClose }) => {
+                    return (
+                        <div className='confirm-alert'>
+                            <h1>Are You Doing Multiple?</h1>
+                            <br />
+                            <label for='multi-count'>Count: </label>
+                            <input id='multi-count' defaultValue={1} type='number' step='1' min='1' max='50' onChange={e => selectCount = e.target.valueAsNumber} />
+                            <div style={{ display: 'flex' }}>
+                                {selectCount ? restrictedComments.map(m =>
+                                    <div style={{ width: `${100 / restrictedComments.length}%`, padding: '1rem' }}>
+                                        <h3>{m}</h3>
+                                        <Slider
+                                            className='MultipleSlider'
+                                            aria-label='small'
+                                            defaultValue={0}
+                                            step={1}
+                                            min={0}
+                                            max={25}
+                                            valueLabelDisplay="auto"
+                                            marks
+                                            onChangeCommitted={e => breakDown[m] = parseInt(e.target.innerText)}
+                                        />
+                                    </div>
+                                ) : undefined}
+                            </div>
+                            <span style={{ margins: '1rem' }}>
+                                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                                    if (selectCount < Object.values(breakDown).reduce((a, b) => a + b, 0)) {
+                                        alert('too many in slider')
+                                    } else {
+                                        res({ count: selectCount, split: breakDown })
+                                        onClose()
+                                    }
+                                }}
+                                >Confirm</Button>
+                                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                    onClose()
+                                    res(null)
+                                }}>No</Button>
+                            </span>
+                        </div>
+                    )
+                }
+            }, multipleSelectCount)
+
+        })
     }
 
     const handleAssetAdding = async () => {
@@ -393,12 +454,21 @@ function AssetPage(props) {
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
 
-    const getRestrictedComments = jobId => {
+    const getRestrictedComments = (jobId, array = false) => {
         let job
         for (let i of jobCodes) if (i.id === jobId) job = i
         if (!job) { console.log('no job found for', jobId); return null }
         if (!job.restricted_comments) return null
+        if (array) return job.restricted_comments.split(',')
         return job.restricted_comments.split(',').map(m => { return { value: m, label: m } })
+    }
+
+    const jobPromptsCount = jobId => {
+        let job
+        for (let i of jobCodes) if (i.id === jobId) job = i
+        if (!job) { console.log('no job found for', jobId); return false }
+        if (job.prompt_count) return true
+        return false
     }
 
     let newJobRestrictedComments
@@ -475,16 +545,18 @@ function AssetPage(props) {
             </div></td>
             <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 {job.restricted_comments ?
-                    <Select
-                        options={restrictedComments}
-                        isMulti
-                        closeMenuOnSelect={false}
-                        styles={selectStyles}
-                        defaultValue={defaultRestrictedComment}
-                        isSearchable
-                        onChange={e => handleTextInputChange(row.id, e, false, true)}
-                        menuPlacement='auto'
-                    />
+                    <div style={{ width: '90%' }}>
+                        <Select
+                            options={restrictedComments}
+                            isMulti
+                            closeMenuOnSelect={false}
+                            styles={selectStyles}
+                            defaultValue={defaultRestrictedComment}
+                            isSearchable
+                            onChange={e => handleTextInputChange(row.id, e, false, true)}
+                            menuPlacement='auto'
+                        />
+                    </div>
                     :
                     <input type='text'
                         defaultValue={row.notes ? row.notes : ''}
