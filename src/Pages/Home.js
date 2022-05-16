@@ -48,7 +48,7 @@ function HomePage(props) {
      * 
      */
     function renderStatsData(k, v) {
-        if(k === 'Daily Dollars' && !props.permissions.view_reports && !props.isAdmin)  return <></>
+        if (k === 'Daily Dollars' && !props.permissions.view_reports && !props.isAdmin) return <></>
         return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#003994'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#003994', '#1b1b1b', .9)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#003994' : '#1b1b1b67' }}>
             <h1 style={{ float: 'left' }}>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
             <h1 style={{ float: 'right' }}>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
@@ -77,7 +77,7 @@ function HomePage(props) {
                 <div className='UserReports'>
                     <h1 style={{ textDecoration: 'underline', padding: '1rem', paddingTop: '2rem' }}>To Do</h1>
                     {tasks.length > 0 ?
-                        tasks.map(m => { if (!m.completedBy) return renderTasks(m) })
+                        tasks.filter(task => !(task.completedBy || (accounts.length && task.title.toLowerCase().includes(accounts[0].name.split(' ')[0].toLowerCase())))).map(m => { if (!m.completedBy) return renderTasks(m) })
                         : <CircularProgress size='48px' />}
                 </div>
                 <div className='UserReports'>
