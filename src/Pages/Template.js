@@ -28,11 +28,6 @@ function PageTemplate(props) {
 
     // React Effects
     useEffect(() => {
-        async function getNotifications() {
-            let token = await getTokenSilently()
-            let res = await UserService.getNotifications(token)
-            setNotifications(res.data)
-        }
         getNotifications()
         let int = setInterval(getNotifications, 15000)
         return () => clearInterval(int)
@@ -55,6 +50,13 @@ function PageTemplate(props) {
                 }
             })
         return res.accessToken
+    }
+
+    async function getNotifications() {
+        let token = await getTokenSilently()
+        let res = await UserService.getNotifications(token)
+        if (res.isErrored) console.log(res.error)
+        else setNotifications(res.data)
     }
 
     const clickHandler = async () => {
@@ -85,17 +87,20 @@ function PageTemplate(props) {
 
     const checkForImportantNotification = () => {
         for (let i of Notifications.unread) if (i.important) return true
+        for (let i of Notifications.read) if (i.important) return true
         return false
     }
 
     const handleTogglePriority = async (id) => {
         let t = await getTokenSilently()
-        UserService.flagNotificationImportant({ id }, t)
+        await UserService.flagNotificationImportant({ id }, t)
+        getNotifications()
     }
 
     const handleNotificationClose = async (id) => {
         let t = await getTokenSilently()
-        UserService.closeNotification({ id }, t)
+        await UserService.closeNotification({ id }, t)
+        getNotifications()
     }
 
     const handleReadingNotifications = async () => {
@@ -141,7 +146,7 @@ function PageTemplate(props) {
                 </div>
                 <div className='IconGroup isDropDown'>
                     <div>
-                        <i className='material-icons NotificationSelection' style={{ cursor: 'pointer', color: Notifications.unread.length ? accent : '#fff' }} onClickCapture={() => { setDropDownOpened(1); handleReadingNotifications() }}>{Notifications.unread.length ? checkForImportantNotification() ? 'notification_important' : 'notifications_active' : 'notifications'}</i>
+                        <i className='material-icons NotificationSelection' style={{ cursor: 'pointer', color: Notifications.unread.length || checkForImportantNotification() ? accent : '#fff' }} onClickCapture={() => { setDropDownOpened(1); handleReadingNotifications() }}>{checkForImportantNotification() ? 'notification_important' : Notifications.unread.length ? 'notifications_active' : 'notifications'}</i>
                         {DropDownOpened === 1 ? <div className='HeaderDropDown' style={{ right: '8rem' }}>
                             <span className='inlineText'><h5>You have </h5><h5 style={{ color: accent }}>{Notifications.unread.length}</h5><h5> new notifications</h5></span>
                             <hr style={{ width: '496px' }} />
