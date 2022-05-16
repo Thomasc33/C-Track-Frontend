@@ -134,7 +134,7 @@ function PartInventoryPage(props) {
             <div className='PartManagementArea'>
                 {selectedModel ? selectedPart ? RenderPart() : RenderModel() : RenderHome()}
             </div>
-            <PageTemplate highLight='9' disableSearch {...props} />
+            <PageTemplate highLight='part_inventory' {...props} />
         </>
     )
 }

@@ -102,7 +102,7 @@ function PartCategoriesPage(props) {
     // Base JSX
     return (
         <>
-            <div className='AssetArea' style={{ top: '3vh', height: '97vh' }}>
+            <div className='AssetArea' style={{ top: '8vh', height: '92vh' }}>
                 <table className='rows'>
                     <thead>
                         <tr>
@@ -131,7 +131,7 @@ function PartCategoriesPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='7' disableSearch {...props} />
+            <PageTemplate highLight='part_types' {...props} />
         </>
     )
 }

@@ -152,7 +152,7 @@ function UserPage(props) {
 
 
     //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='7' {...props} />
+    if (loading || !data) return <PageTemplate highLight='user' {...props} />
     else return (
         <>
             <div className='AssetArea'>
@@ -170,7 +170,7 @@ function UserPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='7' {...props} />
+            <PageTemplate highLight='user' {...props} />
         </>
     )
 }

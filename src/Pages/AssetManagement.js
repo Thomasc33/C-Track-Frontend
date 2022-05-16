@@ -172,7 +172,7 @@ function AssetManagement(props) {
 
 
     //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='7' {...props} />
+    if (loading || !data) return <PageTemplate highLight='assetmanagement' {...props} />
     else return (
         <>
             <div className='AssetArea'>
@@ -192,7 +192,7 @@ function AssetManagement(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='7' {...props} />
+            <PageTemplate highLight='assetmanagement' {...props} />
         </>
     )
 }

@@ -22,8 +22,9 @@ function GuidePage(props) {
     }
     return (
         <>
-            <PageTemplate disableSearch highLight='6' {...props} />
+            <PageTemplate highLight='guide' {...props} />
             <div className='GuidePage'><div className='GuideContainer'>
+                <h1>Outdated, to be updated soon</h1>
                 <h1>Changing Accent Color</h1>
                 <p>Just set it below and refresh</p>
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -33,7 +34,7 @@ function GuidePage(props) {
                 <h1>Search</h1>
                 <p>Hovering over the search icon in the top middle of most pages will reveal a search bar. The search bar allows for Asset ID's/IMEI's to be searched to get more information about the device and the job code history of the asset.</p>
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem 0' }}>
-                    <div className="searchBox" style={{ position: 'relative', maxWidth: '300px', left: 0 }}>
+                    <div className="SearchBox" style={{ position: 'relative', maxWidth: '400px', left: 0 }}>
                         <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
                         <button className="searchButton" onClick={clickHandler}>
                             <i className="material-icons">search</i>

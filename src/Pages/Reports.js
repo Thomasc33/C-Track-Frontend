@@ -226,7 +226,7 @@ function ReportsPage(props) {
                 <CircularProgress size='10rem' />
             </div>
         </div>
-        <PageTemplate highLight='3' disableSearch {...props} />
+        <PageTemplate highLight='reports' disableHeader {...props} />
     </>
     )
     return (<>
@@ -318,7 +318,7 @@ function ReportsPage(props) {
             }
         </div>
 
-        <PageTemplate highLight='3' disableSearch {...props} />
+        <PageTemplate highLight='reports' disableHeader {...props} />
     </>)
 }
 

@@ -398,7 +398,7 @@ function AssetsPage(props) {
 
     return (
         <>
-            <PageTemplate highLight='4' {...props} setSearch={setSearch} />
+            <PageTemplate highLight='singleasset' {...props} setSearch={setSearch} />
             <div className='AssetArea'>
                 {!search ? <h1>No search term provided</h1> :
                     modelInfo ?

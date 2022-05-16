@@ -352,10 +352,10 @@ function JobPage(props) {
 
 
     //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='7' disableSearch {...props} />
+    if (loading || !data) return <PageTemplate highLight='jobs' {...props} />
     else return (
         <>
-            <div className='AssetArea' style={{ top: '3vh', height: '97vh' }}>
+            <div className='AssetArea' style={{ top: '8vh', height: '92vh' }}>
                 <table className='rows' style={{ overflowX: 'auto', minWidth: '100vw', left: 0, top: 0 }}>
                     <thead>
                         <tr>
@@ -426,7 +426,7 @@ function JobPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='7' disableSearch {...props} />
+            <PageTemplate highLight='jobs' {...props} />
         </>
     )
 }

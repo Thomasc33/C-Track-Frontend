@@ -222,7 +222,7 @@ function RepairLogPage(props) {
     // Base JSX
     return (
         <>
-            <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '8vh', left: '14vw', display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
@@ -263,7 +263,7 @@ function RepairLogPage(props) {
                 {loading ? <CircularProgress /> : undefined}
                 {data.map(m => RenderRow(m))}
             </div>
-            <PageTemplate highLight='8' {...props} />
+            <PageTemplate highLight='repair_log' {...props} />
         </>
     )
 }

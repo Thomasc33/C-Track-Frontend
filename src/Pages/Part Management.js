@@ -295,7 +295,7 @@ function PartManagementPage(props) {
                     <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
                 </>
             }
-        </div><PageTemplate highLight='7' disableSearch {...props} /></>
+        </div><PageTemplate highLight='part_management' {...props} /></>
     )
 }
 

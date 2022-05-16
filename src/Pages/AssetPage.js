@@ -74,7 +74,7 @@ function AssetsPage(props) {
 
     return (
         <>
-            <PageTemplate highLight='4' {...props} />
+            <PageTemplate highLight='assetpage' {...props} />
             <div className='AssetGridArea'>
                 <DataGrid
                     className='Grid'

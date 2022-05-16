@@ -573,22 +573,22 @@ function AssetPage(props) {
     }
 
     //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='1' {...props} />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='asset' {...props} />
     else return (
         <>
-            <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '8vh', left: '13vw', display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
-            <div style={{ position: 'absolute', top: '2%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '8vh', right: '2vw', display: 'inline-flex', alignItems: 'center' }}>
                 {selected.length > 0 ? <>
                     <i id='copy_content' className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { copySelected() }}>content_copy</i>
                 </> : undefined}
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
-            <div className='AssetArea'>
+            <div className='AssetArea' style={{ top: '14vh' }}>
                 <table className='rows'>
                     <thead>
                         <tr>
@@ -652,7 +652,7 @@ function AssetPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='1' {...props} />
+            <PageTemplate highLight='asset' {...props} />
             <div id='missingAssetBox' className='AddAssetPrompt'>
                 <h1 style={{ textDecoration: 'underline', marginLeft: '3rem', marginRight: '3rem' }}>Asset Does Not Exist:</h1>
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>

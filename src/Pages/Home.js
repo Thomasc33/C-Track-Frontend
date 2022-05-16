@@ -69,7 +69,7 @@ function HomePage(props) {
     }
 
     //returns blank page if data is loading
-    if (loading) return <PageTemplate highLight='0' {...props} />
+    if (loading) return <PageTemplate highLight='home' {...props} />
 
     else return (
         <div>
@@ -85,7 +85,7 @@ function HomePage(props) {
                     {Object.keys(data).map(m => renderStatsData(m, data[m]))}
                 </div>
             </div>
-            <PageTemplate highLight='0' {...props} />
+            <PageTemplate highLight='home' {...props} />
         </div>
     )
 }

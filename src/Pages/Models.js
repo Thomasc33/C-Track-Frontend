@@ -197,7 +197,7 @@ function ModelPage(props) {
 
     return (
         <>
-            <PageTemplate highLight='5' {...props} />
+            <PageTemplate highLight='models' {...props} />
             <div className='PageNavigation'>
                 <i className='material-icons PageArrow'
                     style={pageNumber === 1 ? { color: 'gray' } : {}}

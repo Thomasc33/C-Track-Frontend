@@ -188,7 +188,7 @@ function ImporterPage(props) {
                 <br />
                 <br />
             </div>
-            <PageTemplate highLight='7' disableSearch {...props} />
+            <PageTemplate highLight='importer' {...props} />
         </>
     )
 }

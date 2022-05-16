@@ -453,21 +453,21 @@ function HourlyPage(props) {
     }
 
     //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='2' {...props} />
+    if (loading || !data || !jobCodes) return <PageTemplate highLight='hourly' {...props} />
     else return (
         <>
             {data.records.length > Object.keys(times).length ? parseTime() : <></>}
-            <div style={{ position: 'absolute', top: '2%', left: '14%', display: 'inline-flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '8vh', left: '13vw', display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='date' id='date_selector' value={getDate(date)} onChange={handleDateChange} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
 
-            <div style={{ position: 'absolute', top: '4%', right: '4%', display: 'inline-flex', alignItems: 'center' }}>
+            <div style={{ position: 'absolute', top: '8vh', right: '4vw', display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
-            <div className='AssetArea' style={{ overflowX: 'scroll' }}>
+            <div className='AssetArea' style={{ overflowX: 'scroll', top: '15vh' }} >
                 <table className='rows'>
                     <thead>
                         <tr>
@@ -541,7 +541,7 @@ function HourlyPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='2' {...props} />
+            <PageTemplate highLight='hourly' {...props} />
         </>
     )
 }

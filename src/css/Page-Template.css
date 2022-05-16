@@ -26,23 +26,16 @@
     top: 0;
     height: 99vh;
     width: auto;
-    max-width: 14%;
     position: absolute;
     background-color: #1b1b1b67;
     text-align: left;
     padding-top: 1vh;
-    overflow: hidden;
+    overflow-y: scroll;
+    animation: ease-in-out .5s;
+    max-width: 13vw;
 }
 
-.SideBar p {
-    color: #fff;
-    text-transform: uppercase;
-    text-decoration: none;
-    letter-spacing: 0.2em;
-    display: inline-block;
-    padding: 15px 25px;
-    position: relative;
-    cursor: pointer;
+.SideBar * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -51,158 +44,109 @@
     user-select: none;
 }
 
-.SideBar p:after {
-    background: none repeat scroll 0 0 transparent;
-    bottom: 0;
-    content: "";
-    display: block;
-    height: 2px;
-    left: 50%;
-    position: absolute;
-    background: #fff;
-    transition: width 0.3s ease 0s, left 0.3s ease 0s;
-    width: 0;
+.SideBar span {
+    display: inline-flex;
+    justify-content: left;
+    align-items: center;
+    width: 11vw;
+    padding-left: 1vw;
+    padding-right: 1vw;
 }
 
-.SideBar * {
-    transition: ease-in-out .5s;
-}
+.SideBar i {}
 
-.SideBar p:hover:after {
-    width: 100%;
-    left: 0;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #1c1b1d;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    width: 100%;
-    padding: 0;
-}
-
-.dropdown-content p {
-    padding: 12px 16px;
+.SideBar p {
+    text-transform: uppercase;
     text-decoration: none;
-    display: block;
+    letter-spacing: 0.15em;
+    display: inline-block;
+    padding: 15px 25px;
+    position: relative;
     cursor: pointer;
 }
 
-.dropdown-content * {
-    transition: ease-in-out .5s;
+.SideBar li {
+    cursor: pointer;
+    max-width: 13vw;
 }
 
-.dropDownHeader:hover .dropdown-content {
-    display: block;
-}
-
-.AccountButton {
-    width: 90%;
-    height: auto;
-    bottom: 3vh;
-    left: 5%;
-    position: absolute;
-    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
-}
-
-.AccountButton button {
-    width: 100%;
-    bottom: 100%;
-    background-color: transparent;
-    border-style: none;
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.2em;
-    left: 0;
-    padding: 1rem;
-    border-radius: .6rem;
-}
-
-.AccountButton:hover .AccountDropDown {
-    display: block;
-    max-height: 300px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.AccountButton:hover .AccountDropDown button {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: .6rem;
-    border-bottom-right-radius: .6rem;
-}
-
-.AccountButton:hover button {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.AccountDropDown {
+.SideBar .DropDown {
+    padding-left: 3vw;
+    width: auto;
     display: none;
-    bottom: 100%;
+    list-style: none
 }
 
-.AccountDropDown button {
-    width: 100%;
-    bottom: 100%;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    border-style: none;
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    letter-spacing: 0.2em;
-    left: 0;
-    padding: 1rem;
-    border-bottom-left-radius: .6rem;
-    border-bottom-right-radius: .6rem;
+.Show {
+    display: inline-block !important;
 }
 
-.AccountDropDown button:hover {
-    text-decoration: underline 2px;
+.SideBar .DropDown .Animate {
+    animation: rotateMenu 400ms ease-in-out forwards;
+    transform-origin: top center;
 }
 
+.DropDown p {
+    font-size: 1rem;
+    text-transform: capitalize;
+    letter-spacing: normal;
+}
 
-
-/*
-    TOP HEADER
-*/
-
-.searchBox {
+.DropDown p::before {
+    content: '';
     position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    bottom: 0;
+    left: 0;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform .3s ease-in-out;
+}
+
+.DropDown p:hover::before {
+    transform-origin: left;
+    transform: scaleX(1);
+}
+
+.DropDownArrow {
+    transition: scaleY(1) .4s ease-in-out;
+}
+
+.Header {
+    width: 87vw;
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 8vh;
     top: 0;
-    left: 50%;
-    transform: translate(-50%, 50%);
+    right: 0;
+}
+
+.SearchBox {
     background: #1b1b1b67;
     height: 40px;
     border-radius: 40px;
     padding: 4px;
 }
 
-.searchBox:hover>.searchInput {
-    width: 240px;
-    padding: 0 6px;
-}
-
-.searchBox:hover>.searchButton {
-    background: white;
-    color: #1b1b1b67;
-}
-
 .searchButton {
-    color: white;
     float: right;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #1b1b1b67;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: 0.4s;
+    background: white;
+}
+
+.searchButton * {
+    color: #1b1b1b67;
+    cursor: pointer;
 }
 
 .searchInput {
@@ -210,22 +154,143 @@
     background: none;
     outline: none;
     float: left;
-    padding: 0;
     color: white;
     font-size: 16px;
     transition: 0.4s;
     line-height: 40px;
-    width: 0px;
+    width: 240px;
+    padding: 0 12px;
 }
 
-@media screen and (max-width: 620px) {
-    .searchBox:hover>.searchInput {
-        width: 150px;
-        padding: 0 6px;
-    }
+.Header .IconGroup {
+    display: flex;
+    padding: 1rem;
+    right: 0;
+}
+
+.Header .IconGroup * {
+    padding: .5rem;
+}
+
+.Header .ProfileSection * {
+    padding: 0;
+    margin: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.Header .ProfileSection {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    cursor: pointer;
+}
+
+.Header .HeaderDropDown {
+    display: block;
+    position: absolute;
+    background-color: #1b1b1bc5;
+    min-width: 80px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+    z-index: 9;
+    right: 4rem;
+    left: initial;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.Header .HeaderDropDown * {
+    padding: .5rem;
+    margin: 0;
+    font-weight: 100;
+}
+
+.Header h5 {
+    float: left;
+}
+
+.Header .HeaderDropDown hr {
+    padding: 0;
+    margin: 0;
+    width: 90%;
+    size: 1px;
+}
+
+.Header .HeaderDropDown .inlineText {
+    padding: .5rem;
+    margin: .5rem;
+}
+
+.Header .HeaderDropDown .inlineText * {
+    padding: 0;
+    margin: .2em;
+}
+
+.Header .HeaderDropDown .Notification {
+    display: flex;
+    flex-wrap: wrap;
+    width: 480px;
+    margin: 1rem 0;
+    border-radius: .5rem;
+    box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13);
+}
+
+.Header .HeaderDropDown .Notification .NotificationTitleRow {
+    width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0;
+}
+
+.Header .HeaderDropDown .Notification .break {
+    flex-basis: 100%;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.Header .HeaderDropDown .Notification .DateAndManagementGroup {
+    padding: 0;
+}
+
+.Header .HeaderDropDown .Notification .DateAndManagementGroup * {
+    padding: 0;
+}
+
+.Header .HeaderDropDown .Notification .NotificationManagementRow * {
+    font-size: 1.1rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.NotificationManagementRow {
+    justify-content: right;
+    display: flex;
+}
+
+i {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 
+/* .Header .HeaderDropDown .Notification .NotificationManagementRow {
+    display: flex;
+    width: 480px;
+    justify-content: right;
+    margin: 0;
+    padding: 0;
+} */
 
 
 
@@ -236,6 +301,7 @@
     margin: 0px;
     font-family: 'Montserrat', sans-serif;
     -ms-overflow-style: none;
+    color: white;
 }
 
 ::-webkit-scrollbar {
@@ -245,4 +311,18 @@
 .body {
     padding-bottom: 0px;
     scrollbar-width: none;
+}
+
+@keyframes rotateMenu {
+    0% {
+        transform: rotateX(-90deg)
+    }
+
+    70% {
+        transform: rotateX(20deg)
+    }
+
+    100% {
+        transform: rotateX(0deg)
+    }
 }
