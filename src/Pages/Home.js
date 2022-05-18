@@ -58,7 +58,7 @@ function HomePage(props) {
                             <br />
                             <p>Checking all discrepancies will send every extra notifications on top of the automtically scheduled checks at 11:45am and 4:45pm. Avoid sending too many notifications to users.</p>
                             <span style={{ margins: '1rem' }}>
-                                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                                <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
                                     UserService.discrepancyCheckAll(t)
                                     onClose()
                                 }}
@@ -120,10 +120,10 @@ function HomePage(props) {
                 <div className='UserReports'>
                     <h1 style={{ textDecoration: 'underline', padding: '1rem', paddingTop: '2rem' }}>Daily Statistics</h1>
                     {props.isAdmin || (props.permissions && props.permissions.use_discrepancy_check) ?
-                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} size='large' onClick={() => handleDiscrepancyCheck()}>Check For Discrepancies</Button>
+                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} size='large' onClick={() => handleDiscrepancyCheck()}>Check For Discrepancies</Button>
                         : undefined}
                     {props.isAdmin || (props.permissions && props.permissions.use_all_discrepancy_check) ?
-                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} size='large' onClick={() => handleDiscrepancyCheck(true)}>Check For All Discrepancies</Button>
+                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} size='large' onClick={() => handleDiscrepancyCheck(true)}>Check For All Discrepancies</Button>
                         : undefined}
                     {Object.keys(data).map(m => renderStatsData(m, data[m]))}
                 </div>
