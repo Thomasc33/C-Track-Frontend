@@ -467,7 +467,7 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
-            <div className='AssetArea' style={{ overflowX: 'scroll', top: '15vh' }} >
+            <div className='AssetArea' style={{ overflowX: 'scroll', top: '15vh', height: '85vh' }} >
                 <table className='rows'>
                     <thead>
                         <tr>

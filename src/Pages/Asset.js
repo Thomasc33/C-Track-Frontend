@@ -588,7 +588,7 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
-            <div className='AssetArea' style={{ top: '14vh' }}>
+            <div className='AssetArea' style={{ top: '14vh', height:'86vh' }}>
                 <table className='rows'>
                     <thead>
                         <tr>
