@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API'
+import UserService from '../Services/User'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import CircularProgress from '@mui/material/CircularProgress';
+import { Button } from '@material-ui/core';
 import '../css/Home.css'
 const settings = require('../settings.json')
 
@@ -13,6 +15,7 @@ function HomePage(props) {
     let APILink = `${settings.APIBase}/home/user`
     const { loading, data = [] } = useFetch(APILink, 0)
     const { instance, accounts } = useMsal()
+    const [isGettingDiscrepancy, setIsGettingDiscrepancy] = useState(false)
     const [tasks, setTasks] = useState([])
 
     useEffect(() => {
@@ -41,6 +44,14 @@ function HomePage(props) {
                 }
             })
         return res.accessToken
+    }
+
+    const handleDiscrepancyCheck = async () => {
+        setIsGettingDiscrepancy(true)
+        let t = await getTokenSilently()
+        let res = await UserService.discrepancyCheck(t)
+        if(!res.error) alert(`${res.data.count} Discrepancies Found`)
+        setTimeout(() => setIsGettingDiscrepancy(false), 15000)
     }
 
     /**
@@ -82,6 +93,9 @@ function HomePage(props) {
                 </div>
                 <div className='UserReports'>
                     <h1 style={{ textDecoration: 'underline', padding: '1rem', paddingTop: '2rem' }}>Daily Statistics</h1>
+                    {props.isAdmin || (props.permissions && props.permissions.use_discrepancy_check) ?
+                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} size='large' onClick={handleDiscrepancyCheck}>Check For Discrepancies</Button>
+                        : undefined}
                     {Object.keys(data).map(m => renderStatsData(m, data[m]))}
                 </div>
             </div>

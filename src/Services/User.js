@@ -53,4 +53,9 @@ export default {
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
+    discrepancyCheck: async token => {
+        let res = await axios.get(`${BaseApiUrl}/user/discrepancy`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    }
 }

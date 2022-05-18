@@ -29,7 +29,7 @@ function PageTemplate(props) {
     // React Effects
     useEffect(() => {
         getNotifications()
-        let int = setInterval(getNotifications, 15000)
+        let int = setInterval(getNotifications, 5000)
         return () => clearInterval(int)
     }, [])
     useEffect(() => {

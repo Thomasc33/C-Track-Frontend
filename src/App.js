@@ -34,7 +34,7 @@ import './App.css';
 import Particles from './Components/Particles';
 const settings = require('./settings.json')
 
-function App(props) {
+function App() {
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal()
   const [isAuthed, setAuthed] = useState(localStorage.getItem('isVerified'))
