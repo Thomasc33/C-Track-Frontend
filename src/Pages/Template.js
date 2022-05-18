@@ -112,7 +112,6 @@ function PageTemplate(props) {
 
     // Renderers
     const renderNotification = (n) => {
-        console.log(n)
         return <div className='Notification' onClick={() => { if (n.url) window.open(n.url, '_blank') }} style={{ cursor: n.url ? 'pointer' : 'initial', backgroundColor: n.important ? '#e8533c' : n.color || accent }}>
             <div className='NotificationTitleRow'>
                 <span className='ProfileSection' style={{ cursor: 'inherit' }}>
@@ -125,7 +124,7 @@ function PageTemplate(props) {
                         <i className='material-icons menuContext' onClick={() => handleTogglePriority(n.id)}>priority_high</i>
                         <i className='material-icons menuContext' onClick={() => handleNotificationClose(n.id)}>close</i>
                     </div>
-                    {n.date ? <h5>{timeago.format(n.date)}</h5> : undefined}
+                    {n.date ? <h5>{timeago.format(new Date(n.date), 'en_US', { relativeDate: new Date().setHours(new Date().getHours() - 4) })}</h5> : undefined}
                 </div>
             </div>
             <div className='break' />

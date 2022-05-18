@@ -199,6 +199,8 @@
     left: initial;
     border-radius: 1rem;
     padding: 1rem;
+    max-height: 85vh;
+    overflow-y: scroll;
 }
 
 .Header .HeaderDropDown * {
