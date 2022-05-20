@@ -114,17 +114,17 @@ function PageTemplate(props) {
     const renderNotification = (n) => {
         return <div className='Notification' onClick={() => { if (n.url) window.open(n.url, '_blank') }} style={{ cursor: n.url ? 'pointer' : 'initial', backgroundColor: n.important ? '#e8533c' : n.color || accent }}>
             <div className='NotificationTitleRow'>
-                <span className='ProfileSection' style={{ cursor: 'inherit' }}>
+                <span className='ProfileSection' style={{ cursor: 'inherit', paddingLeft: 0 }}>
                     {n.image ? <img src={n.image} alt={n.title} width='50' height='50' style={{ margin: 0, padding: 0 }} /> : undefined}
-                    <h4 style={{ paddingRight: 0 }}>{n.title}</h4>
+                    <h4 style={{ paddingRight: 0, textAlign: 'left' }}>{n.title}</h4>
                     {n.important ? <i className='material-icons' style={{ padding: 0 }}>priority_high</i> : undefined}
                 </span>
-                <div className='DateAndManagementGroup'>
+                <div className='DateAndManagementGroup' style={{ padding: '.5rem' }}>
                     <div className='NotificationManagementRow'>
                         <i className='material-icons menuContext' onClick={() => handleTogglePriority(n.id)}>priority_high</i>
                         <i className='material-icons menuContext' onClick={() => handleNotificationClose(n.id)}>close</i>
                     </div>
-                    {n.date ? <h5>{timeago.format(new Date(n.date), 'en_US', { relativeDate: new Date().setHours(new Date().getHours() - 4) })}</h5> : undefined}
+                    {n.date ? <h5 style={{ textAlign: 'right' }}>{timeago.format(new Date(n.date), 'en_US', { relativeDate: new Date().setHours(new Date().getHours() - 4) })}</h5> : undefined}
                 </div>
             </div>
             <div className='break' />
