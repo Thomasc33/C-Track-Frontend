@@ -221,8 +221,17 @@
 }
 
 .Header .HeaderDropDown .inlineText {
-    padding: .5rem;
-    margin: .5rem;
+    padding: 0;
+    margin: 0;
+}
+
+.deleteSpan {
+    transition: ease-in-out .5s;
+}
+
+.deleteSpan:hover {
+    position: relative;
+    border-bottom: 1px solid;
 }
 
 .Header .HeaderDropDown .inlineText * {
@@ -275,6 +284,15 @@
 }
 
 i {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.NoSelect {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

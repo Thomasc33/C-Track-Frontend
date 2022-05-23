@@ -110,6 +110,13 @@ function PageTemplate(props) {
         UserService.readNotifications({ ids }, t)
     }
 
+    const handleDeleteAllNotifications = async () => {
+        if (!Notifications.unread.length || !Notifications.read.length) return
+        let t = await getTokenSilently()
+        await UserService.deleteAllNotifications(t)
+        getNotifications()
+    }
+
     // Renderers
     const renderNotification = (n) => {
         return <div className='Notification' onClick={() => { if (n.url) window.open(n.url, '_blank') }} style={{ cursor: n.url ? 'pointer' : 'initial', backgroundColor: n.important ? '#e8533c' : n.color || accent }}>
@@ -122,7 +129,7 @@ function PageTemplate(props) {
                 <div className='DateAndManagementGroup' style={{ padding: '.5rem' }}>
                     <div className='NotificationManagementRow'>
                         <i className='material-icons menuContext' onClick={() => handleTogglePriority(n.id)}>priority_high</i>
-                        <i className='material-icons menuContext' onClick={() => handleNotificationClose(n.id)}>close</i>
+                        <i className='material-icons menuContext' onClick={() => handleNotificationClose(n.id)}>delete_outline</i>
                     </div>
                     {n.date ? <h5 style={{ textAlign: 'right' }}>{timeago.format(new Date(n.date), 'en_US', { relativeDate: new Date().setHours(new Date().getHours() - 4) })}</h5> : undefined}
                 </div>
@@ -147,8 +154,12 @@ function PageTemplate(props) {
                     <div>
                         <i className='material-icons NotificationSelection' style={{ cursor: 'pointer', color: Notifications.unread.length || checkForImportantNotification() ? accent : '#fff' }} onClickCapture={() => { setDropDownOpened(1); handleReadingNotifications() }}>{checkForImportantNotification() ? 'notification_important' : Notifications.unread.length ? 'notifications_active' : 'notifications'}</i>
                         {DropDownOpened === 1 ? <div className='HeaderDropDown' style={{ right: '8rem' }}>
-                            <span className='inlineText'><h5>You have </h5><h5 style={{ color: accent }}>{Notifications.unread.length}</h5><h5> new notifications</h5></span>
-                            <hr style={{ width: '496px' }} />
+                            <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
+                                <span className='inlineText' style={{ borderBottom: '1px solid transparent' }}><h5>You have </h5><h5 style={{ color: accent }}>{Notifications.unread.length}</h5><h5> new notifications</h5></span>
+                                <span className='inlineText deleteSpan NoSelect' style={{ cursor: 'pointer', borderColor: accent }} onClick={handleDeleteAllNotifications}>
+                                    <h5>Delete all</h5><h5 style={{ color: accent }}>{+Notifications.unread.length + +Notifications.read.length}</h5><h5> notifications</h5></span>
+                            </div>
+                            <hr style={{ marginTop: '.5rem', width: '496px' }} />
                             {Notifications.unread.map(m => renderNotification(m))}
                             {Notifications.read.length && Notifications.unread.length ?
                                 <span style={{ display: 'flex', alignItems: 'center', padding: '0' }}>
@@ -288,24 +299,7 @@ function PageTemplate(props) {
                         </span>
                     </li>
                 </ul>
-
-
-                {/* <div className='AccountButton'>
-                    <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#003994' }}>{accounts[0] ? accounts[0].name : ''}</button>
-                    <div className='AccountDropDown'>
-                        <button style={{ backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => LogoutHandler()}>Logout</button>
-                    </div>
-                </div> */}
             </div>
-            {/* {
-                props.disableHeader ? <></> :
-                    <div className="searchBox">
-                        <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
-                        <button className="searchButton" onClick={clickHandler}>
-                            <i className="material-icons">search</i>
-                        </button>
-                    </div>
-            } */}
         </div >
     )
 }

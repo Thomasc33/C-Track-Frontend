@@ -28,6 +28,7 @@ function JobPage(props) {
     const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
     const [newRestrictedComments, setNewRestrictedComments] = useState(null)
+    const [newSnipeId, setNewSnipeId] = useState(null)
     const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
@@ -113,6 +114,7 @@ function JobPage(props) {
                 case 'new-jobname': setNewJobName(e.target.value); break;
                 case 'new-jobcode': setNewJobCode(e.target.value); break;
                 case 'new-comments': setNewRestrictedComments(e.target.value); break
+                case 'new-snipe_id': setNewSnipeId(e.target.value); break;
                 default: console.log('Default Case hit for new in jobs'); return
             }
         } else for (let i of data.job_codes) {
@@ -149,9 +151,15 @@ function JobPage(props) {
                         }
                         break;
                     case 'hourly_goal':
-                        if (e.target.value !== i.hourly_goal) if (e.target.value) {
+                        if (e.target.value !== i.hourly_goal) {
                             formData.change = 'hourly_goal'
-                            formData.value = e.target.value.replace(/[^.\d]/g, '')
+                            if (e.target.value) formData.value = e.target.value.replace(/[^.\d]/g, '')
+                        }
+                        break;
+                    case 'snipe_id':
+                        if (e.target.value !== i.price) {
+                            formData.change = 'snipe_id'
+                            if (e.target.value) formData.value = e.target.value.replace(/[^.\d]/g, '')
                         }
                         break;
                     case 'job_name':
@@ -161,7 +169,7 @@ function JobPage(props) {
                         if (e.target.value !== i.job_code) if (e.target.value) formData.change = 'job_code'
                         break;
                     case 'comments':
-                        if (e.target.value !== i.restricted_comments) if (e.target.value) formData.change = 'restricted_comments'
+                        if (e.target.value !== i.restricted_comments) formData.change = 'restricted_comments'
                         break
                     default:
                         return alert('Default case hit, please contact Thomas C')
@@ -169,7 +177,7 @@ function JobPage(props) {
 
                 if (!formData.change) return
 
-                if (!formData.value && !e.isSelect) formData.value = e.target.value
+                if (!formData.value && !e.isSelect) formData.value = e.target.value || null
 
                 //send to api
                 let token = await getTokenSilently()
@@ -194,6 +202,7 @@ function JobPage(props) {
             statusOnly: newStatusOnly,
             restricted_comments: newRestrictedComments,
             promptCount: newPromptCount,
+            snipe_id: newSnipeId
         }
         setLoading(true)
         let token = await getTokenSilently()
@@ -347,6 +356,18 @@ function JobPage(props) {
                     onKeyDown={e => handleKeyDown(row.id, e)}
                     style={{ width: '15vw', padding: '1rem' }} />
             </td>
+            <td>
+                {!row.isHourly && row.requires_asset ?
+                    <input type='number'
+                        defaultValue={row.snipe_id}
+                        placeholder='Snipe ID'
+                        className='snipe_id'
+                        id={`${row.id}-snipe_id`}
+                        onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(row.id, e) }}
+                        onKeyDown={e => { handleKeyDown(row.id, e) }}
+                        style={{ width: '7rem', padding: '1rem' }} />
+                    : undefined}
+            </td>
         </tr>)
     }
 
@@ -369,6 +390,7 @@ function JobPage(props) {
                             <th style={{ width: '25vw', padding: '1rem' }}>Not Usable</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Prompt Count</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Comments</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Snipe ID</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -420,6 +442,15 @@ function JobPage(props) {
                             </td>
                             <td className='comments'>
                                 <input type='text' placeholder='Comma Seperated Comments' className='comments' id={`new-comments`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)} />
+                            </td>
+                            <td>
+                                <input type='number'
+                                    className='snipe_id'
+                                    id={`new-snipe_id`}
+                                    placeholder='Snipe ID'
+                                    onBlur={e => { numberValidatorEventListener(e); handleTextInputChange('new', e) }}
+                                    onKeyDown={e => { handleKeyDown('new', e) }}
+                                    style={{ width: '7rem', padding: '1rem' }} />
                             </td>
                         </tr>
                         {data.job_codes ? data.job_codes.map(m => RenderRow(m)) : <></>}
