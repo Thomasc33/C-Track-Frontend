@@ -111,7 +111,7 @@ function PageTemplate(props) {
     }
 
     const handleDeleteAllNotifications = async () => {
-        if (!Notifications.unread.length || !Notifications.read.length) return
+        if (!Notifications.unread.length && !Notifications.read.length) return
         let t = await getTokenSilently()
         await UserService.deleteAllNotifications(t)
         getNotifications()
