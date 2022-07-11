@@ -194,7 +194,7 @@ function PartManagementPage(props) {
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model_number}</h2>
             <h2 style={{ width: '33.4%' }}>{row.manufacturer}</h2>
-            <h2 style={{ width: '33.3%', textAlign: 'right' }}>TBI</h2>
+            <h2 style={{ width: '33.3%', textAlign: 'right' }}>{row.part_count}</h2>
         </div>
     }
 
