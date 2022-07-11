@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import PartService from '../Services/Parts'
 import SelectSearch, { fuzzySearch } from 'react-select-search';
+import { confirmAlert } from 'react-confirm-alert';
 import Select from 'react-select';
 import '../css/PartManagement.css'
 
@@ -187,7 +188,35 @@ function PartManagementPage(props) {
 
     const numberValidatorEventListener = (e) => { e.target.value = e.target.value.replace(/[^.\d]/g, '') }
 
+    const handleDelete = async (id, e, row) => {
+        confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>Confirm the deletion</h1>
+                        <br />
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                                sendDelete(id, e, row)
+                                onClose()
+                            }}
+                            >Confirm</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                onClose()
+                            }}>Nevermind</Button>
+                        </span>
+                    </div>
+                )
+            }
+        })
+    }
 
+    const sendDelete = async (id, e, row) => {
+        let t = await getTokenSilently()
+        await PartService.deletePart(id, t)
+        let temp = [...partsList].filter(p => !(p.id === id && p.part_number === row.part_number))
+        setPartsList(temp)
+    }
 
     // Renderers
     const renderModelList = row => {
@@ -216,17 +245,21 @@ function PartManagementPage(props) {
                 id='type' /></td>
             <td><input type='number' id='m_stock' defaultValue={row.minimum_stock} onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, row.id) }} /></td>
             <td><input type='text' id='image' placeholder='Image URL' defaultValue={row.image === 'null' ? undefined : row.image} onBlur={e => handleTextInputChange(e, row.id)} /></td>
-            <td><Select
-                options={multiSelectOptions}
-                isMulti
-                width='20vw'
-                closeMenuOnSelect={false}
-                styles={selectStyles}
-                defaultValue={defaultOptions}
-                isSearchable
-                onChange={e => handleMultiSelectChange(row.id, e)}
-                menuPlacement='auto'
-            /></td>
+            <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Select
+                    options={multiSelectOptions}
+                    isMulti
+                    width='20vw'
+                    closeMenuOnSelect={false}
+                    styles={selectStyles}
+                    defaultValue={defaultOptions}
+                    isSearchable
+                    onChange={e => handleMultiSelectChange(row.id, e)}
+                    menuPlacement='auto'
+                />
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
+                    delete_outline</i>
+            </td>
         </tr>
     }
 
