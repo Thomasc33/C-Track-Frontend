@@ -185,7 +185,7 @@ function PageTemplate(props) {
                 </div>
             </div>}
             <div className='SideBar'>
-                <span style={{ justifyContent: 'space-between', padding: '1vw' }}>
+                <span style={{ justifyContent: 'space-between', padding: '1vw', cursor: 'pointer' }} onClick={e => props.history.push('/')}>
                     <Logo />
                     {/* <i className='material-icons' style={{ cursor: 'pointer' }} onClickCapture={() => { localStorage.setItem('sideNavOpen', !sideNavOpen ? '1' : '0'); setSideNavOpen(!sideNavOpen) }}>{sideNavOpen ? 'format_align_right' : 'format_align_center'}</i> */}
                 </span>

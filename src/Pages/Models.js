@@ -25,6 +25,59 @@ function ModelPage(props) {
 
     if (!props.permissions.view_models && !props.isAdmin) return <Redirect to='/' />
 
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({
+            ...styles,
+            backgroundColor: 'transparent',
+            width
+        }),
+        menu: (provided, state) => ({
+            ...provided,
+            width: state.selectProps.width,
+        }),
+        noOptionsMessage: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        menuList: (styles) => ({
+            ...styles,
+            backgroundColor: '#1b1b1b'
+        }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            return {
+                ...styles,
+                backgroundColor: '#1b1b1b',
+                color: 'white',
+                ':active': {
+                    ...styles[':active'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#003994',
+                },
+                ':hover': {
+                    ...styles[':hover'],
+                    backgroundColor: localStorage.getItem('accentColor') || '#003994'
+                }
+            };
+        },
+        multiValue: (styles, { data }) => {
+            return {
+                ...styles,
+                backgroundColor: localStorage.getItem('accentColor') || '#003994',
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: 'white',
+            ':hover': {
+                color: 'red',
+            },
+        }),
+
+    }
+
     async function getCatalog(offset = 0) {
         const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
@@ -34,7 +87,7 @@ function ModelPage(props) {
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*', 
+                'Access-Control-Allow-Origin': '*',
                 'X-Version': require('../backendVersion.json').version
             }
         })
@@ -55,12 +108,12 @@ function ModelPage(props) {
         return res.accessToken
     }
 
-    const handleTextInputChange = async (id, e) => {
-        if (!e.isSelect && e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
+    const handleTextInputChange = async (id, e, isSelect = false) => {
+        if (!isSelect && e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         if (id === 'new') {
             // Update state
             const z = { ...newInfo }
-            if (e.isSelect) { z.category = e.value; setNewInfo(z) }
+            if (isSelect) { z.category = e.value; setNewInfo(z) }
             else if (e.target.value !== newInfo[e.target.classList[0]]) {
                 z[e.target.classList[0]] = e.target.value
                 setNewInfo(z)
@@ -94,8 +147,9 @@ function ModelPage(props) {
                     change: null,
                     value: null
                 }
+                console.log(e.map(m => m.value).join(','))
 
-                if (e.isSelect) { formData.change = 'category'; formData.value = e.value }
+                if (isSelect) { formData.change = 'category'; formData.value = e.map(m => m.value).join(',') }
                 // eslint-disable-next-line default-case
                 else switch (e.target.className) {
                     case 'model_number':
@@ -115,7 +169,7 @@ function ModelPage(props) {
                 let res = await ModelService.edit(formData, token)
                 if (res.isErrored) {
                     console.log(res.error)
-                    if (!e.isSelect) e.target.classList.add('invalid')
+                    if (!isSelect) e.target.classList.add('invalid')
                 }
             }
         }
@@ -126,7 +180,7 @@ function ModelPage(props) {
     }
 
     const handleSelectChange = async (e, id) => {
-        handleTextInputChange(id, { ...e, isSelect: true })
+        handleTextInputChange(id, e, true)
     }
 
     const handlePageChange = async (e) => {
@@ -143,9 +197,10 @@ function ModelPage(props) {
     }
 
     function RenderRow(row) {
-        let defaultOption
+        let defaultOption = []
+        let category = row.category.split(',')
         for (let i of multiSelectOptions) {
-            if (i.value === row.category) defaultOption = [i]
+            if (category.includes(i.value)) defaultOption.push(i)
         }
         return (<tr id={`${row.model_number}-row`} key={`${row.model_number}-row`}>
             <td>
@@ -183,6 +238,7 @@ function ModelPage(props) {
             </td>
             <td>
                 <Select
+                    isMulti
                     options={multiSelectOptions}
                     closeMenuOnSelect
                     styles={selectStyles}
@@ -231,6 +287,7 @@ function ModelPage(props) {
                             <td key={`new-image`}><input type='text' placeholder='https://res.cloudindary.com/' className='image' id={`new-image`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             <td key={`new-category`}>
                                 <Select
+                                    isMulti
                                     options={multiSelectOptions}
                                     closeMenuOnSelect
                                     styles={selectStyles}
@@ -256,49 +313,3 @@ const multiSelectOptions = [
     { value: 'Phone', label: 'Phone' },
     { value: 'MiFi', label: 'MiFi' }
 ]
-
-const selectStyles = {
-    control: (styles, { selectProps: { width } }) => ({
-        ...styles,
-        backgroundColor: '#1b1b1b67',
-        boxShadow: ' 0 0 50px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)',
-        borderRadius: '.50rem',
-        padding: '.5rem',
-        border: 'none',
-        width
-    }),
-    menu: (provided, state) => ({
-        ...provided,
-        width: '100%',
-    }),
-    noOptionsMessage: (styles) => ({
-        ...styles,
-        backgroundColor: '#1b1b1b'
-    }),
-    menuList: (styles) => ({
-        ...styles,
-        backgroundColor: '#1b1b1b'
-    }),
-    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-        return {
-            ...styles,
-            backgroundColor: '#1b1b1b',
-            color: 'white',
-            ':active': {
-                ...styles[':active'],
-                backgroundColor: localStorage.getItem('accentColor') || '#003994',
-            },
-            ':hover': {
-                ...styles[':hover'],
-                backgroundColor: localStorage.getItem('accentColor') || '#003994'
-            }
-        };
-    },
-    singleValue: (styles, { data }) => {
-        return {
-            ...styles,
-            color: 'white',
-            textAlign: 'left'
-        };
-    }
-}
