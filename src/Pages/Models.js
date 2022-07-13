@@ -147,7 +147,6 @@ function ModelPage(props) {
                     change: null,
                     value: null
                 }
-                console.log(e.map(m => m.value).join(','))
 
                 if (isSelect) { formData.change = 'category'; formData.value = e.map(m => m.value).join(',') }
                 // eslint-disable-next-line default-case

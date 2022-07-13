@@ -152,7 +152,7 @@ function PageTemplate(props) {
                 </div>
                 <div className='IconGroup isDropDown'>
                     <div>
-                        <i className='material-icons NotificationSelection' style={{ cursor: 'pointer', color: Notifications.unread.length || checkForImportantNotification() ? accent : '#fff' }} onClickCapture={() => { setDropDownOpened(1); handleReadingNotifications() }}>{checkForImportantNotification() ? 'notification_important' : Notifications.unread.length ? 'notifications_active' : 'notifications'}</i>
+                        <i className='material-icons NotificationSelection' style={{ cursor: 'pointer', color: Notifications.unread.length || checkForImportantNotification() ? accent : '#fff' }} onClickCapture={() => { setDropDownOpened(1); handleReadingNotifications() }}>{checkForImportantNotification() ? 'notification_important' : Notifications.unread.length ? 'notifications_active' : Notifications.read.length ? 'notifications' : 'notifications_none'}</i>
                         {DropDownOpened === 1 ? <div className='HeaderDropDown' style={{ right: '8rem' }}>
                             <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
                                 <span className='inlineText' style={{ borderBottom: '1px solid transparent' }}><h5>You have </h5><h5 style={{ color: accent }}>{Notifications.unread.length}</h5><h5> new notifications</h5></span>
