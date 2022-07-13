@@ -101,7 +101,7 @@ function App() {
     res = await UserService.verify(res.accessToken)
     if (res.isErrored) return console.log(res.err)
     else {
-      localStorage.setItem('isVerified', "yes")
+      localStorage.setItem('isVerified', true)
       setAuthed(true)
     }
   }

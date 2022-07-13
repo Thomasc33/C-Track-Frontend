@@ -75,7 +75,7 @@ function PageTemplate(props) {
             postLogoutRedirectUri: "/",
             mainWindowRedirectUri: "/"
         })
-        localStorage.setItem('isVerified', null)
+        localStorage.removeItem('isVerified')
     }
 
     const handleExpandLi = (e, cat) => {
