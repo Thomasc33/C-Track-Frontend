@@ -119,7 +119,7 @@ function PageTemplate(props) {
 
     // Renderers
     const renderNotification = (n) => {
-        return <div className='Notification' onClick={() => { if (n.url) window.open(n.url, '_blank') }} style={{ cursor: n.url ? 'pointer' : 'initial', backgroundColor: n.important ? '#e8533c' : n.color || accent }}>
+        return <div className='Notification' onClick={e => { if (e.target.classList && e.target.classList.length && e.target.classList.contains('menuContext')) return; if (n.url) window.open(n.url, '_blank') }} style={{ cursor: n.url ? 'pointer' : 'initial', backgroundColor: n.important ? '#e8533c' : n.color || accent }}>
             <div className='NotificationTitleRow'>
                 <span className='ProfileSection' style={{ cursor: 'inherit', paddingLeft: 0 }}>
                     {n.image ? <img src={n.image} alt={n.title} width='50' height='50' style={{ margin: 0, padding: 0 }} /> : undefined}
@@ -128,8 +128,8 @@ function PageTemplate(props) {
                 </span>
                 <div className='DateAndManagementGroup' style={{ padding: '.5rem' }}>
                     <div className='NotificationManagementRow'>
-                        <i className='material-icons menuContext' onClick={() => handleTogglePriority(n.id)}>priority_high</i>
-                        <i className='material-icons menuContext' onClick={() => handleNotificationClose(n.id)}>delete_outline</i>
+                        <i className='material-icons menuContext' onClick={e => { handleTogglePriority(n.id); e.preventDefault() }}>priority_high</i>
+                        <i className='material-icons menuContext' onClick={e => { handleNotificationClose(n.id); e.preventDefault() }}>delete_outline</i>
                     </div>
                     {n.date ? <h5 style={{ textAlign: 'right' }}>{timeago.format(new Date(n.date), 'en_US', { relativeDate: new Date().setHours(new Date().getHours() - 4) })}</h5> : undefined}
                 </div>
