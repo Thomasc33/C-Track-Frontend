@@ -504,7 +504,7 @@ function AssetPage(props) {
 
         // Check for duplicate asset
         let duplicate = false
-        for (let i of data.records) if (i.id == row.id) continue; else if (i.asset_id && asset === i.asset_id && i.job_code === row.job_code) duplicate = true
+        for (let i of data.records) if (i.id === row.id) continue; else if (i.asset_id && asset === i.asset_id && i.job_code === row.job_code) duplicate = true
 
         // Return the JSX
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`} >
@@ -698,7 +698,6 @@ function formatAMPM(date) {
     let ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
     hours = hours ? hours : 12;
-    minutes = minutes
     return hours + ':' + minutes + ' ' + ampm;
 }
 

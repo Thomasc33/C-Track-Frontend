@@ -18,10 +18,10 @@ function JobPage(props) {
     let APILink = `${settings.APIBase}/job`
     const [newJobCode, setNewJobCode] = useState('');
     const [newJobName, setNewJobName] = useState('');
-    const [inApi, setLoading] = useState(false)
+    const [, setLoading] = useState(false)
     const [newPrice, setNewPrice] = useState(0);
     const [newIsHourly, setNewIsHourly] = useState(false)
-    const [newIsAsset, setNewIsAsset] = useState(false)
+    const [newIsAsset, setNewIsAsset] = useState(true)
     const [newStatusOnly, setNewStatusOnly] = useState(false)
     const [newPromptCount, setNewPromptCount] = useState(false)
     const [newAppliesSelection, setNewAppliesSelection] = useState([])

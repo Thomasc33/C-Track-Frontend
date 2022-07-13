@@ -178,7 +178,7 @@ function HourlyPage(props) {
                 endTime: dateInfo.endTime,
                 total_hours,
                 notes: comment,
-                uid: props.location.state && props.location.state.uid || null,
+                uid: (props.location.state && props.location.state.uid) || null,
                 in_progress: dateInfo.in_progress || value
             }
             let token = await getTokenSilently()
@@ -204,12 +204,12 @@ function HourlyPage(props) {
                     change: null,
                     value: null,
                     total_hours: null,
-                    uid: props.location.state && props.location.state.uid || null
+                    uid: (props.location.state && props.location.state.uid) || null
                 }
 
                 //find change
                 if (target) {
-                    if (target == 'inProgress') {
+                    if (target === 'inProgress') {
                         formData.change = 'in_progress'
                         formData.value = times[id].in_progress ? '1' : '0'
                     } else {
@@ -279,7 +279,7 @@ function HourlyPage(props) {
 
     async function sendDelete(id, e) {
         let token = await getTokenSilently()
-        let res = await hourlyService.delete(id, getDate(date), token, props.location.state && props.location.state.uid || null)
+        let res = await hourlyService.delete(id, getDate(date), token, (props.location.state && props.location.state.uid) || null)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {

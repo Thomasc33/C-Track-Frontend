@@ -58,7 +58,7 @@ function HomePage(props) {
                             <br />
                             <p>Checking all discrepancies will send every extra notifications on top of the automtically scheduled checks at 11:45am and 4:45pm. Avoid sending too many notifications to users.</p>
                             <span style={{ margins: '1rem' }}>
-                                <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                                <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
                                     UserService.discrepancyCheckAll(t)
                                     onClose()
                                 }}
