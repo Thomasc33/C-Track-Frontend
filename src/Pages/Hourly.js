@@ -366,6 +366,7 @@ function HourlyPage(props) {
             if (data.records.length > Object.keys(times).length)
                 temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '8:30'
             else temp.new.startTime = '8:30'
+            temp.new.endTime = '17:00'
         }
         setTimes(temp)
         return < ></>
