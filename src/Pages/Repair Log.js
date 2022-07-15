@@ -39,6 +39,7 @@ function RepairLogPage(props) {
     // Effects
     useEffect(() => {
         getData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [date])
 
     async function getData() {

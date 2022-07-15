@@ -62,6 +62,7 @@ function HourlyPage(props) {
 
     useEffect(() => {
         if (data && data.records) parseTime()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
 
     async function updateData() {

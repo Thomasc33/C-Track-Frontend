@@ -34,6 +34,7 @@ function PageTemplate(props) {
         getNotifications()
         let int = setInterval(getNotifications, 5000)
         return () => clearInterval(int)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     useEffect(() => {
         let func = e => { if (!getClassChain(e.target).includes('isdropdown')) setDropDownOpened(0) }

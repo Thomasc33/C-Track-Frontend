@@ -40,6 +40,7 @@ const ModelSelect = props => {
             setModels(model)
         }
         getModels()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     return <div className='SelectContainer'><SelectSearch
         options={models}
