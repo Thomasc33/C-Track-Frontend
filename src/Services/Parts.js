@@ -52,5 +52,15 @@ export default {
         let res = await axios.delete(`${BaseApiUrl}/mgmt/part/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    watchPart: async (id, token) => {
+        let res = await axios.get(`${BaseApiUrl}/mgmt/part/watch/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    },
+    unwatchPart: async (id, token) => {
+        let res = await axios.delete(`${BaseApiUrl}/mgmt/part/watch/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }

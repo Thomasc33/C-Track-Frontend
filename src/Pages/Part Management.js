@@ -11,6 +11,8 @@ import PartService from '../Services/Parts'
 import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { confirmAlert } from 'react-confirm-alert';
 import Select from 'react-select';
+import Checkbox from 'react-custom-checkbox';
+import * as Icon from 'react-icons/fi';
 import '../css/PartManagement.css'
 
 function PartManagementPage(props) {
@@ -218,6 +220,13 @@ function PartManagementPage(props) {
         setPartsList(temp)
     }
 
+    const handleWatchToggle = async (id, e, row) => {
+        let t = await getTokenSilently()
+        if (e) await PartService.watchPart(id, t)
+        else await PartService.unwatchPart(id, t)
+        getPartList()
+    }
+
     // Renderers
     const renderModelList = row => {
         return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
@@ -260,6 +269,16 @@ function PartManagementPage(props) {
                 <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
+            <td>
+                <Checkbox id={`${row.id}-watched`}
+                    checked={row.watching}
+                    borderWidth='2px'
+                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
+                    size='30px'
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    onChange={e => handleWatchToggle(row.id, e, row)} />
+            </td>
         </tr>
     }
 
@@ -277,7 +296,7 @@ function PartManagementPage(props) {
                     {partsList ? <>
                         <table className='rows' style={{ position: 'relative' }}>
                             <thead>
-                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th><th>Alternate Models</th></tr>
+                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th><th>Alternate Models</th><th>Notify</th></tr>
                             </thead>
                             <tbody>
                                 {localStorage.getItem('newestOnTop') ? partsList.map(renderPartList) : undefined}
