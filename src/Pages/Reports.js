@@ -12,6 +12,7 @@ import axios from 'axios';
 import { CSVLink } from "react-csv";
 import ReportService from '../Services/Report'
 import writeXlsxFile from 'write-excel-file'
+import { formatAMPM } from './Asset';
 const settings = require('../settings.json')
 
 function ReportsPage(props) {
@@ -24,6 +25,7 @@ function ReportsPage(props) {
     const { instance, accounts } = useMsal()
     const [reportData, setReportData] = useState([])
     const [generatingReport, setGeneratingReport] = useState(false)
+    const [tsheetsData, setTsheetsData] = useState([])
     const reportRef = useRef(null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -67,16 +69,19 @@ function ReportsPage(props) {
         }).catch(er => { return { isErrored: true, error: er.response } })
         if (response.isErrored) return console.log(response.error)
         const data = await response.json();
-        let lineReq
+        setData(data)
+        setLoading(false)
+        let lineReq, tsheets = []
         if (onUser) {
             lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
+                .then(lr => lr.data)
                 .catch(er => { return { isErrored: true, error: er.response } })
             if (lineReq.isErrored) return console.log(response.error)
-            lineReq = lineReq.data
+            setLineChartData(lineReq)
+
+            tsheets = await ReportService.getTsheetsData(onUser, getDate(date), t)
+            if (tsheets.length) setTsheetsData(tsheets)
         }
-        setData(data)
-        setLineChartData(lineReq)
-        setLoading(false)
     }
 
     const handleDateChange = (e) => {
@@ -97,6 +102,7 @@ function ReportsPage(props) {
 
     const handleBackClick = () => {
         setData([])
+        setTsheetsData([])
         setOnUser(null)
         setLoading(true)
     }
@@ -201,6 +207,26 @@ function ReportsPage(props) {
         </div>
     }
 
+    function renderTsheetsRow(row) {
+        let price = 0, isHourly, hrlyGoal
+        if (row.job && row.job.price) { price = row.job.price; isHourly = row.job.is_hourly }
+        else if (row.altJob && row.altJob.price) { price = row.altJob.price; isHourly = row.altJob.is_hourly }
+
+        if (row.job && row.job.hourly_goal) hrlyGoal = row.job.hourly_goal
+        else if (row.altJob && row.altJob.hourly_goal) hrlyGoal = row.altJob.hourly_goal
+
+        return <div key={row.id} className='UserReport' style={{ cursor: 'default', flexWrap: 'wrap' }}>
+            <h1>{row.job ? row.job.job_name : row.customfields['1164048']}</h1>
+            <h1>${((isHourly ? row.hours : row.count) * price).toFixed(2)}</h1>
+            <div className='break' />
+            <h1>{formatAMPM(row.start)} ➝ {formatAMPM(row.end)}</h1>
+            <h1>{row.count || 0} in {row.hours} hours</h1>
+            {hrlyGoal && row.hours ?
+                <h1>{((row.count || 0) / row.hours).toFixed(2).replace(/[.,]0+$/g, '')} / {hrlyGoal} Goal</h1>
+                : undefined}
+        </div>
+    }
+
     function getTotal() {
         let tot = 0
         for (let i of data) if (i.dailydollars) tot += i.dailydollars
@@ -254,6 +280,12 @@ function ReportsPage(props) {
                         </div>
                         <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#00c6fc']} />
                         <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getGraphCSVData()}><Button variant='contained' color='primary' size='large' style={{ marginTop: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} >Download CSV</Button></CSVLink>
+                        {tsheetsData.length ?
+                            <>
+                                <hr style={{ width: '95%' }} />
+                                <h1>T-Sheets</h1>
+                                {tsheetsData.map(i => renderTsheetsRow(i))}
+                            </> : undefined}
                     </div>
                 </> : <>
                     <div className='UserReports'>
