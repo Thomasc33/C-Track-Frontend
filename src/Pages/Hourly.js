@@ -120,7 +120,7 @@ function HourlyPage(props) {
         setDate(document.getElementById('date_selector').value)
     }
 
-    const handleChange = async (id, e, target = false, value = undefined) => {
+    const handleChange = async (id, e, target = false, value = undefined, sendToAPI = true) => {
         if (e && isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         } else { //remove invalid from new job code input
@@ -141,6 +141,8 @@ function HourlyPage(props) {
                     console.log('Default Case hit for new')
                     return
             }
+
+            if (!sendToAPI) return
 
             // ----------------
             // Data validation
@@ -491,7 +493,7 @@ function HourlyPage(props) {
                                     filterOptions={fuzzySearch}
                                     className='job_list'
                                     autoComplete='on'
-                                    onChange={e => handleChange('new', e)}
+                                    onChange={e => handleChange('new', e, undefined, undefined, false)}
                                     menuPlacement='auto'
                                     id={`new-jobcode`}
                                     renderOption={(optionProps) => <button {...optionProps} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
