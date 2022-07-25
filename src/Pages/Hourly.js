@@ -19,7 +19,7 @@ const normalTimeRange = [6, 19]
 
 function HourlyPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user/${props.location.state.uid}/` : `${settings.APIBase}/hourly/user/`
+    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user?uid=${props.location.state.uid}&date=` : `${settings.APIBase}/hourly/user?date=`
     const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
@@ -81,7 +81,7 @@ function HourlyPage(props) {
 
     async function getFavorites() {
         let t = await getTokenSilently()
-        const response = await fetch(`${settings.APIBase}/job/favorites/hrly`, {
+        const response = await fetch(`${settings.APIBase}/job/favorites?type=hrly`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -96,7 +96,7 @@ function HourlyPage(props) {
 
     async function getJobCodes(ignoreState = false) {
         let t = await getTokenSilently()
-        const response = await fetch(`${settings.APIBase}/job/all/hrly`, {
+        const response = await fetch(`${settings.APIBase}/job/all/type?type=hrly`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',

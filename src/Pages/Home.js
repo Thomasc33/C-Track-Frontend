@@ -22,7 +22,7 @@ function HomePage(props) {
     useEffect(() => {
         async function getTasks() {
             let t = await getTokenSilently()
-            let d = await fetch(`${settings.graphUrl}/me/planner/tasks`, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
+            let d = await fetch(`${settings.graphUrl}/me/planner/tasks`, { headers: { 'Authorization': `Bearer ${t}` } })
                 .then(re => re.json())
                 .catch(er => console.warn(er.text()))
             setTasks(d.value)

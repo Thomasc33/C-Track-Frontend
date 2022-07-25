@@ -57,8 +57,8 @@ function ReportsPage(props) {
     async function sendReq(doSetLoading = true) {
         if (doSetLoading) setLoading(true)
         let t = await getTokenSilently()
-        let url = onUser ? `${settings.APIBase}/reports/user/${onUser}/${getDate(date)}` : `${settings.APIBase}/reports/users/daily/${getDate(date)}`
-        let graphUrl = onUser ? `${settings.APIBase}/reports/graph/user/${onUser}/${graphDate.from}/${graphDate.to}` : null
+        let url = onUser ? `${settings.APIBase}/reports/user?uid=${onUser}&date=${getDate(date)}` : `${settings.APIBase}/reports/users/daily?date=${getDate(date)}`
+        let graphUrl = onUser ? `${settings.APIBase}/reports/graph/user?uid=${onUser}&from=${graphDate.from}&to=${graphDate.to}` : null
         const response = await fetch(url, {
             mode: 'cors',
             headers: {

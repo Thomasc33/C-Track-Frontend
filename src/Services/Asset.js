@@ -19,7 +19,7 @@ export default {
         return res
     },
     fetch: async (id, token) => {
-        let res = await axios.get(`${BaseApiUrl}/asset/fetch/${id}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.get(`${BaseApiUrl}/asset/fetch?id=${id}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
@@ -82,7 +82,7 @@ export default {
         return res
     },
     alterDelete: async (column, token) => {
-        let res = await axios.delete(`${BaseApiUrl}/asset/alter/${column}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.delete(`${BaseApiUrl}/asset/alter?column=${column}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     }

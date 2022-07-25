@@ -66,7 +66,7 @@ function AssetsPage(props) {
     async function getAssetInfo() {
         let data = {}
         const token = await getTokenSilently()
-        let res = await axios.get(`${APILink}/get/${search}`, {
+        let res = await axios.get(`${APILink}/get?q=${search}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Access-Control-Allow-Origin': '*',
@@ -86,7 +86,7 @@ function AssetsPage(props) {
                 setHistory(res.data.resu[0].history)
                 setRepairHistory(res.data.resu[0].repairs)
                 data = { ...res.data.resu[0].info }
-                res = await axios.get(`${settings.APIBase}/model/get/${data.model_number}`, {
+                res = await axios.get(`${settings.APIBase}/model/get?q=${data.model_number}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Access-Control-Allow-Origin': '*',
@@ -114,7 +114,7 @@ function AssetsPage(props) {
                 } else {
                     assets.add(i.info.id)
                     let info = { history: i.history, type: i.type, repairs: i.repairs }
-                    res = await axios.get(`${settings.APIBase}/model/get/${i.info.model_number}`, {
+                    res = await axios.get(`${settings.APIBase}/model/get?q=${i.info.model_number}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Access-Control-Allow-Origin': '*',

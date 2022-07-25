@@ -44,22 +44,22 @@ export default {
         return res
     },
     deleteLog: async (id, token) => {
-        let res = await axios.delete(`${BaseApiUrl}/log/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.delete(`${BaseApiUrl}/log?id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     deletePart: async (id, token) => {
-        let res = await axios.delete(`${BaseApiUrl}/mgmt/part/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.delete(`${BaseApiUrl}/mgmt/part?id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     watchPart: async (id, token) => {
-        let res = await axios.get(`${BaseApiUrl}/mgmt/part/watch/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.get(`${BaseApiUrl}/mgmt/part/watch?id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
     unwatchPart: async (id, token) => {
-        let res = await axios.delete(`${BaseApiUrl}/mgmt/part/watch/${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.delete(`${BaseApiUrl}/mgmt/part/watch?id=${id}`, { headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     }

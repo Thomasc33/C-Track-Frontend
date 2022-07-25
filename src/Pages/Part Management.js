@@ -44,7 +44,7 @@ function PartManagementPage(props) {
     const getPartList = async () => {
         if (!selectedModel) return
         const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model/${selectedModel}`, {
+        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model?model=${selectedModel}`, {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         })
         if (res.isErrored) return console.log(res)
@@ -229,7 +229,7 @@ function PartManagementPage(props) {
 
     // Renderers
     const renderModelList = row => {
-        return <div className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
+        return <div key={row.model_number} className='ResultSection' onClick={() => { setSelectedModel(row.model_number) }} >
             <h2 style={{ width: '33.3%', textAlign: 'left' }}>{row.model_number}</h2>
             <h2 style={{ width: '33.4%' }}>{row.manufacturer}</h2>
             <h2 style={{ width: '33.3%', textAlign: 'right' }}>{row.part_count}</h2>
@@ -240,7 +240,7 @@ function PartManagementPage(props) {
         let defaultOptions = []
         if (row.alt_models) for (let i of multiSelectOptions)
             if (row.alt_models.includes(i.value)) defaultOptions.push(i)
-        return <tr>
+        return <tr key={row.id}>
             <td><input type='text' id='part' placeholder='New...' defaultValue={row.part_number} onBlur={e => handleTextInputChange(e, row.id)} /></td>
             <td><SelectSearch
                 options={getCommonParts()}

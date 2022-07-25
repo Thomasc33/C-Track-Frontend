@@ -47,7 +47,7 @@ function RepairLogPage(props) {
         setLoading(true)
         const token = await getTokenSilently()
         let d = new Date(date).toISOString().split('T')[0]
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/log/${d}`, {
+        let res = await axios.get(`${require('../settings.json').APIBase}/parts/log?date=${d}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Access-Control-Allow-Origin': '*',

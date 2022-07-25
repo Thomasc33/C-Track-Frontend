@@ -19,7 +19,7 @@ const settings = require('../settings.json')
 
 function AssetPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/asset/user/${props.location.state.uid}/` : `${settings.APIBase}/asset/user/`
+    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/asset/user?uid=${props.location.state.uid}&date=` : `${settings.APIBase}/asset/user?date=`
 
     const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
@@ -70,7 +70,7 @@ function AssetPage(props) {
 
     async function getFavorites() {
         let t = await getTokenSilently()
-        const response = await fetch(`${settings.APIBase}/job/favorites/asset`, {
+        const response = await fetch(`${settings.APIBase}/job/favorites?type=asset`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -85,7 +85,7 @@ function AssetPage(props) {
 
     async function getJobCodes(ignoreState = false) {
         let t = await getTokenSilently()
-        const response = await fetch(`${settings.APIBase}/job/all/asset`, {
+        const response = await fetch(`${settings.APIBase}/job/all/type?type=asset`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -588,7 +588,7 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
-            <div className='AssetArea' style={{ top: '14vh', height:'86vh' }}>
+            <div className='AssetArea' style={{ top: '14vh', height: '86vh' }}>
                 <table className='rows'>
                     <thead>
                         <tr>

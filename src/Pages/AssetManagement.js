@@ -127,7 +127,7 @@ function AssetManagement(props) {
     }
 
     function RenderRow(row) {
-        if (row !== 'new' && dontRender.includes(row.COLUMN_NAME)) return <></>
+        if (row !== 'new' && dontRender.includes(row.COLUMN_NAME)) return undefined
         return (<tr id={`${row.COLUMN_NAME || 'new'}-row`} key={`${row.COLUMN_NAME || 'new'}-row`}>
             <td>
                 {row === 'new' ?
