@@ -471,6 +471,13 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
+            {props.location.state && props.location.state.isReport ?
+                <div style={{ position: 'absolute', top: '2vh', width: '100vw', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p>Viewing {props.location.state.name}'s hourly tracking</p>
+                </div>
+                : undefined
+            }
+
             <div className='AssetArea' style={{ overflowX: 'scroll', top: '15vh', height: '85vh' }} >
                 <table className='rows'>
                     <thead>

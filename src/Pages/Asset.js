@@ -588,6 +588,13 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('showTimestamp', !showTimestamp); setShowTimestamp(!showTimestamp) }}>schedule</i>
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
+
+            {props.location.state && props.location.state.isReport ?
+                <div style={{ position: 'absolute', top: '2vh', width: '100vw', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p>Viewing {props.location.state.name}'s workbook</p>
+                </div>
+                : undefined
+            }
             <div className='AssetArea' style={{ top: '14vh', height: '86vh' }}>
                 <table className='rows'>
                     <thead>

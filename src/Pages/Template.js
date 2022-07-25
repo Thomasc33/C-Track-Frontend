@@ -65,7 +65,7 @@ function PageTemplate(props) {
     async function getNotifications() {
         let token = await getTokenSilently()
         let res = await UserService.getNotifications(token)
-        if (res.isErrored) console.log(res.error)
+        if (res.isErrored) if (res.error.message === 'An upgrade is available. Please refresh the page.') window.location.reload()
         else setNotifications(res.data)
     }
 

@@ -26,6 +26,7 @@ function ReportsPage(props) {
     const [reportData, setReportData] = useState([])
     const [generatingReport, setGeneratingReport] = useState(false)
     const [tsheetsData, setTsheetsData] = useState([])
+    const [userNames, setUserNames] = useState({}) // id: name
     const reportRef = useRef(null)
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -82,6 +83,9 @@ function ReportsPage(props) {
             tsheets = await ReportService.getTsheetsData(onUser, getDate(date), t)
             if (tsheets.length) setTsheetsData(tsheets)
         }
+        let names = { ...userNames }
+        if (data && data.length) for (let i of data) names[i.id] = i.name
+        setUserNames(names)
     }
 
     const handleDateChange = (e) => {
@@ -263,8 +267,8 @@ function ReportsPage(props) {
                 <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date }) }}>View Asset Tracker</Button>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date }) }}>View Hourly Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { props.history.push('/asset', { isReport: true, uid: onUser, date, name: userNames[onUser] }) }}>View Asset Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { props.history.push('/hourly', { isReport: true, uid: onUser, date, name: userNames[onUser] }) }}>View Hourly Tracker</Button>
             <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getCSVData()}><Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#003994' }} >Download CSV</Button></CSVLink>
         </div >
         <div className='AssetArea'>
