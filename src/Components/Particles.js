@@ -1,10 +1,13 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react'
 import Particles from 'react-tsparticles'
+import { loadFull } from "tsparticles";
 
 export default (props) => {
+    const particlesInit = async (main) => { await loadFull(main) }
     if (props.permissions && props.permissions.view_particles) return (
         <Particles
+            init={particlesInit}
             width='100vw'
             height='99.6vh'
             style={{ overflow: 'hidden', padding: '0', margin: '0' }}

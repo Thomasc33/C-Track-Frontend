@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -28,7 +28,8 @@ function RepairLogPage(props) {
     }
 
     // States
-    const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
+    const location = useLocation()
+    const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState([])
     const [supplementaryData, setSupplementaryData] = useState({})
@@ -61,7 +62,7 @@ function RepairLogPage(props) {
     }
 
     // Permission Check
-    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
 
     // Event Handlers
     const handleDateChange = () => setDate(document.getElementById('date_selector').value)
@@ -237,6 +238,7 @@ function RepairLogPage(props) {
                     {loadingCommonParts ? <CircularProgress /> : commonParts ? commonParts.length ?
                         <SelectSearch
                             options={getParts()}
+                            value={newRepair.part || null}
                             search
                             placeholder="Select a repair type"
                             filterOptions={fuzzySearch}

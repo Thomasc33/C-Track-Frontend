@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -32,44 +32,13 @@ function PartManagementPage(props) {
     }
 
     // Misc Functions
-    const getModelList = async () => {
-        const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
-        })
-        if (res.isErrored) return console.log(res)
-        setModelList(res.data || [])
-    }
-
-    const getPartList = async () => {
-        if (!selectedModel) return
-        const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model?model=${selectedModel}`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
-        })
-        if (res.isErrored) return console.log(res)
-        setCommonParts(res.data.common || [])
-        setPartsList(res.data.parts || [])
-    }
-
     const getCommonParts = () => {
         let ar = []
         for (let i of commonParts) ar.push({ name: i.part_type, value: i.part_type })
         return ar
     }
 
-    const getModels = async () => {
-        const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/model/all/numbers`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
-        })
-        if (res.isErrored) return console.log(res)
-        let opt = []
-        for (let i of res.data.models) {
-            opt.push({ value: i.model_number, label: i.model_number })
-        }
-        setMultiSelectOptions(opt)
-    }
+
 
     const selectStyles = {
         control: (styles, { selectProps: { width } }) => ({
@@ -132,22 +101,61 @@ function PartManagementPage(props) {
     const [newPart, setNewPart] = useState({})
     const [commonParts, setCommonParts] = useState([])
     const [multiSelectOptions, setMultiSelectOptions] = useState([])
+    const [updateModelList, setUpdateModelList] = useState(true)
 
     // useEffect(s)
-    useEffect(getModelList, []) // Gets all models with parts enabled
-    useEffect(getModels, []) // Gets all model numbers
-    useEffect(getPartList, [selectedModel])
+    useEffect(() => { // Gets all models with parts enabled
+        const getModelList = async () => {
+            const token = await getTokenSilently()
+            let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
+                headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+            })
+            if (res.isErrored) return console.log(res)
+            setModelList(res.data || [])
+        }
+        if (updateModelList) getModelList().then(() => setUpdateModelList(false))
+    }, [updateModelList])
+
+    useEffect(() => { // Gets all model numbers
+        const getModels = async () => {
+            const token = await getTokenSilently()
+            let res = await axios.get(`${require('../settings.json').APIBase}/model/all/numbers`, {
+                headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+            })
+            if (res.isErrored) return console.log(res)
+            let opt = []
+            for (let i of res.data.models) {
+                opt.push({ value: i.model_number, label: i.model_number })
+            }
+            setMultiSelectOptions(opt)
+        }
+        getModels()
+    }, [])
+
+    useEffect(() => {
+        const getPartList = async () => {
+            if (!selectedModel) return
+            const token = await getTokenSilently()
+            let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model?model=${selectedModel}`, {
+                headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+            })
+            if (res.isErrored) return console.log(res)
+            setCommonParts(res.data.common || [])
+            setPartsList(res.data.parts || [])
+        }
+        getPartList()
+    }, [selectedModel]) // Gets all parts for selected model
 
 
     // Permission Check
-    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
 
     // Event Handlers
     const handleModelAddButton = async () => {
         const token = await getTokenSilently()
         PartService.addModelList({ model: modelAddSelect }, token)
         setModelAddSelect(null)
-        getModelList()
+        setUpdateModelList(true)
     }
 
     const handleTextInputChange = async (e, id) => {
@@ -185,7 +193,6 @@ function PartManagementPage(props) {
         formData.model = selectedModel
         if (id === 'new') await PartService.newPart(formData, t)
         else await PartService.editPart(formData, t)
-        getPartList()
     }
 
     const numberValidatorEventListener = (e) => { e.target.value = e.target.value.replace(/[^.\d]/g, '') }
@@ -224,7 +231,6 @@ function PartManagementPage(props) {
         let t = await getTokenSilently()
         if (e) await PartService.watchPart(id, t)
         else await PartService.unwatchPart(id, t)
-        getPartList()
     }
 
     // Renderers
@@ -304,6 +310,7 @@ function PartManagementPage(props) {
                                     <td><input type='text' id='part' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
                                     <td><SelectSearch
                                         options={getCommonParts()}
+                                        value={newPart.type ? newPart.type : null}
                                         search
                                         placeholder="New..."
                                         filterOptions={fuzzySearch}

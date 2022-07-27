@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { useMsal } from "@azure/msal-react";
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import CookieConsent from 'react-cookie-consent-notification';
-import ParticlesElement from '../Components/Particles';
 import { ReactComponent as Logo } from '../MDcentricLogo.svg'
 import UserService from '../Services/User'
 import * as timeago from 'timeago.js';
 import Menu from '@mui/material/Menu';
+import { useNavigate } from 'react-router-dom';
 import '../css/Page-Template.css';
 
 function PageTemplate(props) {
     // Constants for User
     const { instance, accounts } = useMsal()
+    const nav = useNavigate()
     const permissions = props.permissions
     const isAdmin = props.isAdmin
     const accent = localStorage.getItem('accentColor') || '#00c6fc'
@@ -73,7 +74,7 @@ function PageTemplate(props) {
         let search = document.getElementById('search').value
         if (!search) return
         if (props.setSearch) props.setSearch(search)
-        props.history.push(`/search?q=${search}`)
+        nav(`/search?q=${search}`)
     }
 
     const handleKeyDown = e => {
@@ -155,7 +156,6 @@ function PageTemplate(props) {
 
     return (
         <div className="App">
-            <ParticlesElement {...props} color={accent} />
             <CookieConsent background={'#000'} color={'#fff'}>Like every other website, this site uses cookies :)</CookieConsent>
             {props.disableHeader ? undefined : <div className='Header'>
                 <div className="SearchBox" style={{ margin: '1rem' }}>
@@ -199,12 +199,12 @@ function PageTemplate(props) {
                 </div>
             </div>}
             <div className='SideBar'>
-                <span style={{ justifyContent: 'space-between', padding: '1vw', cursor: 'pointer' }} onClick={e => props.history.push('/')}>
+                <span style={{ justifyContent: 'space-between', padding: '1vw', cursor: 'pointer' }} onClick={e => nav('/')}>
                     <Logo />
                     {/* <i className='material-icons' style={{ cursor: 'pointer' }} onClickCapture={() => { localStorage.setItem('sideNavOpen', !sideNavOpen ? '1' : '0'); setSideNavOpen(!sideNavOpen) }}>{sideNavOpen ? 'format_align_right' : 'format_align_center'}</i> */}
                 </span>
                 <ul>
-                    <li onClickCapture={(e) => props.history.push('/')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/' }) }}>
+                    <li onClickCapture={(e) => nav('/')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/' }) }}>
                         <span>
                             <i className='material-icons' style={{ color: props.highLight === 'home' ? accent : 'white' }}>home</i>
                             <p style={{ color: props.highLight === "home" ? accent : 'white' }} >Home</p>
@@ -222,13 +222,13 @@ function PageTemplate(props) {
 
                             <ul className={`DropDown${SideBarExpanded.tracking ? ' Show' : ''}`} id='TrackingUL'>
                                 {isAdmin || (permissions && permissions.use_asset_tracker) ? <li>
-                                    <p style={{ color: props.highLight === "asset" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/asset')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/asset', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/asset' }) }}>Asset</p>
+                                    <p style={{ color: props.highLight === "asset" ? accent : 'white' }} onClickCapture={(e) => nav('/asset')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/asset', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/asset' }) }}>Asset</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.use_hourly_tracker) ? <li>
-                                    <p style={{ color: props.highLight === "hourly" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/hourly')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/hourly', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/hourly' }) }}>Hourly</p>
+                                    <p style={{ color: props.highLight === "hourly" ? accent : 'white' }} onClickCapture={(e) => nav('/hourly')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/hourly', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/hourly' }) }}>Hourly</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.use_repair_log) ? <li>
-                                    <p style={{ color: props.highLight === "repair_log" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/repair')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/repair', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/repair' }) }}>Repair</p>
+                                    <p style={{ color: props.highLight === "repair_log" ? accent : 'white' }} onClickCapture={(e) => nav('/repair')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/repair', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/repair' }) }}>Repair</p>
                                 </li> : <></>}
                             </ul>
                         </li>
@@ -245,13 +245,13 @@ function PageTemplate(props) {
 
                             <ul className={`DropDown${SideBarExpanded.reports ? ' Show' : ''}`} id='ReportUL'>
                                 {isAdmin || (permissions && permissions.view_reports) ? <li>
-                                    <p style={{ color: props.highLight === "reports" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/reports')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/reports', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/reports' }) }}>Users</p>
+                                    <p style={{ color: props.highLight === "reports" ? accent : 'white' }} onClickCapture={(e) => nav('/reports')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/reports', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/reports' }) }}>Users</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_assets) ? <li>
-                                    <p style={{ color: props.highLight === "assetpage" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/assets')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/assets', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/assets' }) }}>Assets</p>
+                                    <p style={{ color: props.highLight === "assetpage" ? accent : 'white' }} onClickCapture={(e) => nav('/assets')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/assets', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/assets' }) }}>Assets</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_models) ? <li>
-                                    <p style={{ color: props.highLight === "models" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/models')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/models', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/models' }) }}>Models</p>
+                                    <p style={{ color: props.highLight === "models" ? accent : 'white' }} onClickCapture={(e) => nav('/models')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/models', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/models' }) }}>Models</p>
                                 </li> : <></>}
                             </ul>
                         </li>
@@ -267,19 +267,19 @@ function PageTemplate(props) {
                             </span>
                             <ul className={`DropDown${SideBarExpanded.tools ? ' Show' : ''}`} id='ToolsUL'>
                                 {isAdmin || (permissions && permissions.use_importer) ? <li>
-                                    <p style={{ color: props.highLight === "importer" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/importer')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/importer', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/importer' }) }}>Importer</p>
+                                    <p style={{ color: props.highLight === "importer" ? accent : 'white' }} onClickCapture={(e) => nav('/importer')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/importer', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/importer' }) }}>Importer</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ? <li>
-                                    <p style={{ color: props.highLight === "jobs" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/jobs')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/jobs', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/jobs' }) }}>Job Codes</p>
+                                    <p style={{ color: props.highLight === "jobs" ? accent : 'white' }} onClickCapture={(e) => nav('/jobs')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/jobs', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/jobs' }) }}>Job Codes</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_users) ? <li>
-                                    <p style={{ color: props.highLight === "user" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/users')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/users', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/users' }) }}>Users</p>
+                                    <p style={{ color: props.highLight === "user" ? accent : 'white' }} onClickCapture={(e) => nav('/users')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/users', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/users' }) }}>Users</p>
                                 </li> : <></>}
                                 {isAdmin ? <li>
-                                    <p style={{ color: props.highLight === "admin" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/admin')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/admin', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/admin' }) }}>Admin</p>
+                                    <p style={{ color: props.highLight === "admin" ? accent : 'white' }} onClickCapture={(e) => nav('/admin')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/admin', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/admin' }) }}>Admin</p>
                                 </li> : <></>}
                                 {isAdmin ? <li>
-                                    <p style={{ color: props.highLight === "assetmanagement" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/adas')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/adas', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/adas' }) }}>Asset Info</p>
+                                    <p style={{ color: props.highLight === "assetmanagement" ? accent : 'white' }} onClickCapture={(e) => nav('/adas')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/adas', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/adas' }) }}>Asset Info</p>
                                 </li> : <></>}
                             </ul>
                         </li>
@@ -295,18 +295,18 @@ function PageTemplate(props) {
                             </span>
                             <ul className={`DropDown${SideBarExpanded.parts ? ' Show' : ''}`} id='PartsUL'>
                                 {isAdmin || (permissions && permissions.view_part_inventory) ? <li>
-                                    <p style={{ color: props.highLight === "part_inventory" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/inventory')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/inventory', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/inventory' }) }}>Inventory</p>
+                                    <p style={{ color: props.highLight === "part_inventory" ? accent : 'white' }} onClickCapture={(e) => nav('/inventory')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/inventory', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/inventory' }) }}>Inventory</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ? <li>
-                                    <p style={{ color: props.highLight === "part_management" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/parts')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/parts', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/parts' }) }}>Management</p>
+                                    <p style={{ color: props.highLight === "part_management" ? accent : 'white' }} onClickCapture={(e) => nav('/parts')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/parts', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/parts' }) }}>Management</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ? <li>
-                                    <p style={{ color: props.highLight === "part_types" ? accent : 'white' }} onClickCapture={(e) => props.history.push('/parttypes')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/parttypes', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/parttypes' }) }}>Types</p>
+                                    <p style={{ color: props.highLight === "part_types" ? accent : 'white' }} onClickCapture={(e) => nav('/parttypes')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/parttypes', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/parttypes' }) }}>Types</p>
                                 </li> : <></>}
                             </ul>
                         </li>
                         : undefined}
-                    <li onClickCapture={(e) => props.history.push('/guide')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/guide', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/guide' }) }} >
+                    <li onClickCapture={(e) => nav('/guide')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/guide', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/guide' }) }} >
                         <span>
                             <i style={{ color: props.highLight === "guide" ? accent : 'white' }} className='material-icons'>help</i>
                             <p style={{ color: props.highLight === "guide" ? accent : 'white' }} >guide</p>
@@ -325,7 +325,7 @@ function PageTemplate(props) {
                         : undefined
                 }>
                 <ul style={{ padding: '.5rem' }}>
-                    <li style={{ color: 'black', cursor: 'pointer', padding: '.5rem' }} onClick={() => { handleContextMenuClose(); props.history.push(contextMenu.link) }}>Open</li>
+                    <li style={{ color: 'black', cursor: 'pointer', padding: '.5rem' }} onClick={() => { handleContextMenuClose(); nav(contextMenu.link) }}>Open</li>
                     <li style={{ color: 'black', cursor: 'pointer', padding: '.5rem' }} onClick={() => { handleContextMenuClose(); window.open(contextMenu.link, '_blank') }}>Open In New Tab</li>
                 </ul>
             </Menu>

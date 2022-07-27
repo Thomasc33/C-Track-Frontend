@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -19,8 +19,9 @@ const normalTimeRange = [6, 19]
 
 function HourlyPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/hourly/user?uid=${props.location.state.uid}&date=` : `${settings.APIBase}/hourly/user?date=`
-    const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
+    const location = useLocation()
+    let APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/hourly/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/hourly/user?date=`
+    const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
@@ -114,7 +115,7 @@ function HourlyPage(props) {
         return data.job_codes
     }
 
-    if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Navigate to='/' />
 
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)
@@ -181,7 +182,7 @@ function HourlyPage(props) {
                 endTime: dateInfo.endTime,
                 total_hours,
                 notes: comment,
-                uid: (props.location.state && props.location.state.uid) || null,
+                uid: (location.state && location.state.uid) || null,
                 in_progress: dateInfo.in_progress || value
             }
             let token = await getTokenSilently()
@@ -207,7 +208,7 @@ function HourlyPage(props) {
                     change: null,
                     value: null,
                     total_hours: null,
-                    uid: (props.location.state && props.location.state.uid) || null
+                    uid: (location.state && location.state.uid) || null
                 }
 
                 //find change
@@ -282,7 +283,7 @@ function HourlyPage(props) {
 
     async function sendDelete(id, e) {
         let token = await getTokenSilently()
-        let res = await hourlyService.delete(id, getDate(date), token, (props.location.state && props.location.state.uid) || null)
+        let res = await hourlyService.delete(id, getDate(date), token, (location.state && location.state.uid) || null)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
@@ -471,9 +472,9 @@ function HourlyPage(props) {
                 <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
-            {props.location.state && props.location.state.isReport ?
+            {location.state && location.state.isReport ?
                 <div style={{ position: 'absolute', top: '2vh', width: '100vw', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <p>Viewing {props.location.state.name}'s hourly tracking</p>
+                    <p>Viewing {location.state.name}'s hourly tracking</p>
                 </div>
                 : undefined
             }
@@ -495,6 +496,7 @@ function HourlyPage(props) {
                             <td>
                                 <SelectSearch
                                     options={getJobArray()}
+                                    value={newJobCode || null}
                                     search
                                     placeholder="Job Code"
                                     filterOptions={fuzzySearch}

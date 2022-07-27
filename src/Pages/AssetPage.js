@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate, useNavigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -13,6 +13,7 @@ function AssetsPage(props) {
     const { instance, accounts } = useMsal()
     const [catalog, setCatalog] = useState([])
     const [job_codes, setJobCodes] = useState(null)
+    const nav = useNavigate()
 
     useEffect(() => {
         getJobCodes()
@@ -20,7 +21,7 @@ function AssetsPage(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
 
     async function getJobCodes() {
         let t = await getTokenSilently()
@@ -84,7 +85,7 @@ function AssetsPage(props) {
                     disableSelectionOnClick
                     hideFooterSelectedRowCount
                     autoPageSize
-                    onCellClick={(params) => { props.history.push(`/search?q=${params.id}`, { assetOnly: true }) }}
+                    onCellClick={(params) => nav(`/search?q=${params.id}`, { state: { assetOnly: true } })}
                     style={{ cursor: 'pointer' }}
                 />
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -23,7 +23,7 @@ function ModelPage(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    if (!props.permissions.view_models && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.view_models && !props.isAdmin) return <Navigate to='/' />
 
     const selectStyles = {
         control: (styles, { selectProps: { width } }) => ({
@@ -160,9 +160,10 @@ function ModelPage(props) {
                     case 'model_name':
                         formData.change = 'name'
                         formData.value = e.target.value
+                        break;
                 }
 
-                if (!formData.change || !formData.value) return e.target.classList.add('invalid')
+                if (!formData.change || (formData.change !== 'image' && !formData.value)) return e.target.classList.add('invalid')
 
                 let token = await getTokenSilently()
                 let res = await ModelService.edit(formData, token)

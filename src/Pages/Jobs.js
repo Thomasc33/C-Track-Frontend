@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -31,7 +31,7 @@ function JobPage(props) {
     const [newSnipeId, setNewSnipeId] = useState(null)
     const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
-    if (!props.permissions.view_jobcodes && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.view_jobcodes && !props.isAdmin) return <Navigate to='/' />
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }

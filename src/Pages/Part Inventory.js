@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -28,19 +28,21 @@ function PartInventoryPage(props) {
     const [selectedPart, setSelectedPart] = useState(null)
 
     // Effects
-    useEffect(getData, [])
+    useEffect(() => {
+        async function getData() {
+            const token = await getTokenSilently()
+            let res = await axios.get(`${require('../settings.json').APIBase}/parts/inventory`, {
+                headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+            })
+            if (res.isErrored) return console.log(res)
+            setData(res.data || [])
+        }
+        getData()
+    }, [])
 
-    async function getData() {
-        const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/inventory`, {
-            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
-        })
-        if (res.isErrored) return console.log(res)
-        setData(res.data || [])
-    }
 
     // Permission Check
-    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
 
     // Event Handlers
 

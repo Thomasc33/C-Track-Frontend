@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -24,6 +24,8 @@ const nameOverrides = {
 
 
 function AssetsPage(props) {
+    const nav = useNavigate()
+    const location = useLocation()
     let APILink = `${settings.APIBase}/asset`
     const { instance, accounts } = useMsal()
     const [asset, setAsset] = useState(null)
@@ -33,10 +35,11 @@ function AssetsPage(props) {
     const [jobCodes, setJobCodes] = useState(null)
     const [editName, setEditName] = useState(false)
     const [uid, setUid] = useState(null)
-    const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(props.location.search).get('q'))
+    const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(location.search).get('q'))
     const [modelSelect, setModelSelect] = useState(null)
     const [modelInfo, setModelInfo] = useState(null)
 
+    //TODO: Fix this (move functions to effect)
     useEffect(() => {
         if (!search) return
         setAsset(null)
@@ -45,7 +48,7 @@ function AssetsPage(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search])
 
-    if (!props.permissions.view_assets && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
 
     async function getJobCodes() {
         let t = await getTokenSilently()
@@ -345,7 +348,7 @@ function AssetsPage(props) {
     function renderModelsAssetsRow(row) {
         return (
             <tr key={row.id}>
-                <td style={{ cursor: 'pointer' }} onClick={e => { props.history.push(`/search?q=${row.id}`); setSearch(row.id) }}><p>{row.id}</p></td>
+                <td style={{ cursor: 'pointer' }} onClick={e => { nav(`/search?q=${row.id}`); setSearch(row.id) }}><p>{row.id}</p></td>
                 <td><p>{jobCodes[row.status]}</p></td>
                 <td><p>{row.company}</p></td>
                 <td><p>{row.locked ? 'Yes' : 'No'}</p></td>
@@ -364,7 +367,7 @@ function AssetsPage(props) {
         if (res.isErrored) return alert(`Error changing name: ${res.error.status}`)
         setEditName(false)
         setAsset({ ...asset, id: newName })
-        props.history.push(`/search?q=${newName}`)
+        nav(`/search?q=${newName}`)
     }
 
     function nextAsset() {

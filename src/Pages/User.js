@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import Select from 'react-select';
@@ -15,7 +15,7 @@ function UserPage(props) {
     let APILink = `${settings.APIBase}/user/`
     const { loading, data = [] } = useFetch(APILink.concat('all'), null)
 
-    if (!props.permissions.view_users && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.view_users && !props.isAdmin) return <Navigate to='/' />
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }

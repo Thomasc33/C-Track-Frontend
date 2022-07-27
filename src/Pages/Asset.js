@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate, useLocation } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
@@ -19,9 +19,10 @@ const settings = require('../settings.json')
 
 function AssetPage(props) {
     const { instance, accounts } = useMsal()
-    let APILink = props.location.state && props.location.state.isReport ? `${settings.APIBase}/reports/asset/user?uid=${props.location.state.uid}&date=` : `${settings.APIBase}/asset/user?date=`
+    const location = useLocation()
+    let APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/asset/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/asset/user?date=`
 
-    const [date, setDate] = useState(props.location.state ? props.location.state.date || Date.now() : Date.now())
+    const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
@@ -103,7 +104,7 @@ function AssetPage(props) {
         return data.job_codes
     }
 
-    if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Navigate to='/' />
 
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)
@@ -169,7 +170,7 @@ function AssetPage(props) {
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
-                uid: props.location.state && props.location.state.uid,
+                uid: location.state && location.state.uid,
                 multiple
             }
             let token = await getTokenSilently()
@@ -219,7 +220,7 @@ function AssetPage(props) {
                 let formData = {
                     id: i.id,
                     change: null,
-                    uid: props.location.state && props.location.state.uid
+                    uid: location.state && location.state.uid
                 }
                 if (!isNaN(parseInt(e))) {
                     formData.change = 'job'
@@ -378,13 +379,15 @@ function AssetPage(props) {
                         </span>
                     </div>
                 )
-            }
+            },
+            closeOnEscape: true,
+            closeOnClickOutside: true
         })
     }
 
     async function sendDelete(id, e) {
         let token = await getTokenSilently()
-        let res = await assetService.delete(id, getDate(date), token, props.location.state && props.location.state.uid)
+        let res = await assetService.delete(id, getDate(date), token, location.state && location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
@@ -399,10 +402,6 @@ function AssetPage(props) {
         if (res.isErrored) {
             alert('Failed to delete. Try again or see Thomas if it continues to fail')
             console.log(res.error)
-        }
-        else {
-            let row = document.getElementById(`${id}-row`)
-            if (row) row.remove()
         }
     }
 
@@ -589,9 +588,9 @@ function AssetPage(props) {
                 <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
-            {props.location.state && props.location.state.isReport ?
+            {location.state && location.state.isReport ?
                 <div style={{ position: 'absolute', top: '2vh', width: '100vw', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <p>Viewing {props.location.state.name}'s workbook</p>
+                    <p>Viewing {location.state.name}'s workbook</p>
                 </div>
                 : undefined
             }

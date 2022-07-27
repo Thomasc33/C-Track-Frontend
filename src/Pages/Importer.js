@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { DataGrid } from '@mui/x-data-grid';
 import { confirmAlert } from 'react-confirm-alert';
@@ -15,7 +15,7 @@ function ImporterPage(props) {
     const { instance, accounts } = useMsal()
     const [importerType, setImporterType] = useState(0)
     //0 = asset, 1 = model, 2 = legal hold
-    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -126,15 +126,7 @@ function ImporterPage(props) {
                     importerType === 1 ? 'Models' :
                         importerType === 2 ? 'Legal Hold' :
                             importerType === 3 ? 'Parts'
-                                : undefined}
-                    {() => {
-                        switch (importerType) {
-                            case 1: return 'Models';
-                            case 2: return 'Legal Hold';
-                            case 3: return 'Parts'
-                            default: return 'Assets';
-                        }
-                    }}</h1>
+                                : undefined}</h1>
                 <div style={{ display: 'inline-block', padding: '1rem' }}><h3 style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', fontFamily: 'Consolas, monaco, monospace' }}>
                     {importerType === 0 ? asset_columns.map(m => m.field).join(',') :
                         importerType === 1 ? model_columns.map(m => m.field).join(',') :

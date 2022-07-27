@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import PageTemplate from './Template'
 import { ChromePicker } from 'react-color'
+import { useNavigate } from 'react-router-dom';
 
 import '../css/Guide.css';
 
 function GuidePage(props) {
+    const nav = useNavigate()
     const [color, setColor] = useState(localStorage.getItem('accentColor') || '#00c6fc')
     const handleColorChange = c => {
         setColor(c.hex)
         localStorage.setItem('accentColor', c.hex)
     }
     const clickHandler = async () => {
-        let search = document.getElementById('search').value
+        let search = document.getElementById('guideSearch').value
         if (!search) return
         if (props.setSearch) props.setSearch(search)
-        props.history.push(`/search?q=${search}`)
+        nav(`/search?q=${search}`)
     }
 
     const handleKeyDown = e => {
@@ -34,9 +36,9 @@ function GuidePage(props) {
                 <p>The search bar allows for Asset ID's/IMEI's/Model Numbers to be searched to get more information about the device and the job code history of the asset, or to view assets under a specific model.</p>
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem 0' }}>
                     <div className="SearchBox" style={{ position: 'relative', maxWidth: '400px', left: 0 }}>
-                        <input className="searchInput" type="text" id='search' placeholder="Search" onKeyDown={handleKeyDown} />
+                        <input className="searchInput" type="text" id='guideSearch' placeholder="Search" onKeyDown={handleKeyDown} />
                         <button className="searchButton" onClick={clickHandler}>
-                            <i className="material-icons">search</i>
+                            <i className="material-icons" style={{ color: '#1B1B1B99' }}>search</i>
                         </button>
                     </div>
                 </div>

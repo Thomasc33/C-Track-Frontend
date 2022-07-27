@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import PageTemplate from './Template'
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
@@ -27,25 +27,30 @@ function PartCategoriesPage(props) {
 
     // States
     const [newData, setNewData] = useState({})
+    const [refreshData, setRefreshData] = useState(true)
     const [data, setData] = useState([])
 
     // useEffect
-    useEffect(getData, [])
-    async function getData() {
-        const token = await getTokenSilently()
-        let res = await axios.get(`${require('../settings.json').APIBase}/parts/common`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Access-Control-Allow-Origin': '*',
-                'X-Version': require('../backendVersion.json').version
-            }
-        })
-        if (res.isErrored) return console.log(res)
-        setData(res.data || [])
-    }
+    useEffect(() => {
+        async function getData() {
+            const token = await getTokenSilently()
+            let res = await axios.get(`${require('../settings.json').APIBase}/parts/common`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Version': require('../backendVersion.json').version
+                }
+            })
+            if (res.isErrored) return console.log(res)
+            setData(res.data || [])
+        }
+        if (refreshData) getData()
+        setRefreshData(false)
+    }, [refreshData])
+
 
     // Permission Check
-    if (!props.permissions.use_importer && !props.isAdmin) return <Redirect to='/' />
+    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
 
 
     // Event Handlers
@@ -71,7 +76,7 @@ function PartCategoriesPage(props) {
         if (id === 'new') res = PartService.newPartType(data, token)
         else res = PartService.editPartType(data, token)
         if (res.isErrored) return console.log(res)
-        getData()
+        setRefreshData(true)
         document.getElementById('new-type').value = ''
         setNewData({})
     }

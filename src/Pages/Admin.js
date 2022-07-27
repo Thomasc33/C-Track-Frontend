@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import UserService from '../Services/User'
@@ -16,7 +16,7 @@ function AdminPage(props) {
     let APILink = `${settings.APIBase}/user/`
     const { loading, data = [] } = useFetch(APILink.concat('all/admin'), null)
 
-    if (!props.isAdmin) return <Redirect to='/' />
+    if (!props.isAdmin) return <Navigate to='/' />
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }

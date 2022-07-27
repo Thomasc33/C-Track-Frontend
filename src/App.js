@@ -1,7 +1,7 @@
 /* eslint-disable no-unreachable */
 import React, { useState, useEffect } from 'react';
 import {
-  Switch,
+  Routes,
   Route,
 } from "react-router-dom";
 
@@ -34,7 +34,7 @@ import './App.css';
 import Particles from './Components/Particles';
 const settings = require('./settings.json')
 
-function App() {
+function App(props) {
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal()
   const [isAuthed, setAuthed] = useState(localStorage.getItem('isVerified'))
@@ -110,26 +110,29 @@ function App() {
   if (isAuthenticated && !isAuthed) validateUser()
 
   if (isAuthenticated && !loading) return (
-    <Switch>
-      <Route exact path="/asset" render={props => <AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/assets" render={props => <AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/models" render={props => <ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/hourly" render={props => <HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/admin" render={props => <AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/adas" render={props => <AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/importer" render={props => <ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/tools" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/reports" render={props => <ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/jobs" render={props => <JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/users" render={props => <UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/search" render={props => <SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/guide" render={props => <GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/repair" render={props => <RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/inventory" render={props => <PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/parts" render={props => <PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/parttypes" render={props => <PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      <Route exact path="/" render={props => <HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-    </Switch>
+    <>
+      <Particles {...props} permissions={permissions} color={localStorage.getItem('accentColor') || '#00c6fc'} />
+      <Routes>
+        <Route exact path="/asset" element={<AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/assets" element={<AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/models" element={<ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/hourly" element={<HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/admin" element={<AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/adas" element={<AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/importer" element={<ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/tools" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/reports" element={<ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/jobs" element={<JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/users" element={<UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/search" element={<SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/guide" element={<GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/repair" element={<RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/inventory" element={<PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/parts" element={<PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/parttypes" element={<PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+      </Routes>
+    </>
   )
   if (!isAuthenticated) return (
     <LoginPage />

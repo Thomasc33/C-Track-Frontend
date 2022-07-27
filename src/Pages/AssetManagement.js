@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Redirect } from 'react-router'
+import { Navigate } from 'react-router-dom'
 import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
 import { useMsal } from '@azure/msal-react';
@@ -26,7 +26,7 @@ function AssetManagement(props) {
     const { loading, data = [] } = useFetch(APILink.concat('asset/types'), null)
     const [updatedRows, setUpdatedRows] = useState({})
 
-    if (!props.isAdmin) return <Redirect to='/' />
+    if (!props.isAdmin) return <Navigate to='/' />
 
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
