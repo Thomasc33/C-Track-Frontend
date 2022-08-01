@@ -1,10 +1,9 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom'
-import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
+import { useMSAL } from '../Helpers/MSAL';
 import UserService from '../Services/User'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
+import PageTemplate from './Template'
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import '../css/Asset.css'
@@ -12,27 +11,18 @@ import '../css/Asset.css'
 const settings = require('../settings.json')
 
 function AdminPage(props) {
-    const { instance, accounts } = useMsal()
+    // States and MSAL
+    const { token } = useMSAL()
     let APILink = `${settings.APIBase}/user/`
+
+    // My old way of getting API data, basically just a wrapper for useEffect and fetch
     const { loading, data = [] } = useFetch(APILink.concat('all/admin'), null)
 
+    // Return to home page if the user cannot access this page
     if (!props.isAdmin) return <Navigate to='/' />
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
-
+    // Functions
     const handlePermissionChange = async (e, id, className) => {
-        let token = await getTokenSilently()
         let formData = { id, val: e ? 1 : 0 }
         let res
         switch (className) {
@@ -50,10 +40,8 @@ function AdminPage(props) {
         }
     }
 
-    /**
-     * Function to control rendering of data
-     * 
-     */
+
+    // Renderers
     function RenderRow(row) {
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
@@ -87,8 +75,8 @@ function AdminPage(props) {
     }
 
 
-    //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='admin' {...props} />
+    // Returns blank page if data is loading, otherwise show page
+    if (loading || !data || !token) return <PageTemplate highLight='admin' {...props} />
     else return (
         <>
             <div className='AssetArea'>

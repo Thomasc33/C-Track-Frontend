@@ -1,21 +1,35 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import PageTemplate from './Template'
 import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
+import { useMSAL } from '../Helpers/MSAL';
 import jobService from '../Services/Job'
-import { useMsal } from '@azure/msal-react';
+import PageTemplate from './Template'
 import Select from 'react-select';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/Asset.css'
 import '../css/Jobs.css'
+
 const settings = require('../settings.json')
 
 function JobPage(props) {
-    const { instance, accounts } = useMsal()
+    // Hooks and Constants
+    const { token, tokenLoading } = useMSAL()
     let APILink = `${settings.APIBase}/job`
+    const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
+    }
+
+    // States
     const [newJobCode, setNewJobCode] = useState('');
     const [newJobName, setNewJobName] = useState('');
     const [, setLoading] = useState(false)
@@ -29,76 +43,13 @@ function JobPage(props) {
     const [updated, setUpdated] = useState(0)
     const [newRestrictedComments, setNewRestrictedComments] = useState(null)
     const [newSnipeId, setNewSnipeId] = useState(null)
-    const { loading, data = [], setData } = useFetch(`${APILink}/full`, null)
 
+    // Return to home page if user can't view route
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Navigate to='/' />
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    // --- Functions --- //
 
-    const selectStyles = {
-        control: (styles, { selectProps: { width } }) => ({
-            ...styles,
-            backgroundColor: 'transparent',
-            width
-        }),
-        menu: (provided, state) => ({
-            ...provided,
-            width: state.selectProps.width,
-        }),
-        noOptionsMessage: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        menuList: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-            return {
-                ...styles,
-                backgroundColor: '#1b1b1b',
-                color: 'white',
-                ':active': {
-                    ...styles[':active'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994',
-                },
-                ':hover': {
-                    ...styles[':hover'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994'
-                }
-            };
-        },
-        multiValue: (styles, { data }) => {
-            return {
-                ...styles,
-                backgroundColor: localStorage.getItem('accentColor') || '#003994',
-            };
-        },
-        multiValueLabel: (styles, { data }) => ({
-            ...styles,
-            color: data.color,
-        }),
-        multiValueRemove: (styles, { data }) => ({
-            ...styles,
-            color: 'white',
-            ':hover': {
-                color: 'red',
-            },
-        }),
-
-    }
-
+    // Main function for handling changes
     const handleTextInputChange = async (id, e) => {
         if (!e.isHourly && !e.isSelect && !e.isAsset && !e.statusOnly && !e.promptCount) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
@@ -180,7 +131,6 @@ function JobPage(props) {
                 if (!formData.value && !e.isSelect) formData.value = e.target.value || null
 
                 //send to api
-                let token = await getTokenSilently()
                 let res = await jobService.edit(formData, token)
                 if (res.isErrored) {
                     console.error(res.error.response)
@@ -190,6 +140,7 @@ function JobPage(props) {
         }
     }
 
+    // Handles sending new data to API
     const sendNewToAPI = async () => {
         let formData = {
             job_code: newJobCode,
@@ -205,7 +156,6 @@ function JobPage(props) {
             snipe_id: newSnipeId
         }
         setLoading(true)
-        let token = await getTokenSilently()
         let res = await jobService.add(formData, token)
         if (res.isErrored) {
             setLoading(false)
@@ -233,23 +183,23 @@ function JobPage(props) {
         }
     }
 
+    // Handles changing of the "applies to" selection
     const selectionChange = async (id, e) => {
         if (id === 'new') setNewAppliesSelection(e)
         handleTextInputChange(id, { selection: e, isSelect: true })
     }
 
+    // Validates text inputed is number
     const numberValidatorEventListener = (e) => {
         e.target.value = e.target.value.replace(/[^.\d]/g, '')
     }
 
+    // Enter handler
     const handleKeyDown = async (id, e) => {
         if (e.key === 'Enter') handleTextInputChange(id, e)
     }
 
-    /**
-     * Function to control rendering of data
-     * 
-     */
+    // --- Renderer --- //
     function RenderRow(row) {
         let defaultOptions = []
         if (row.applies) for (let i of row.applies) if (multiSelectIndexer[i] !== null) defaultOptions.push(multiSelectOptions[multiSelectIndexer[i]])
@@ -372,8 +322,8 @@ function JobPage(props) {
     }
 
 
-    //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='jobs' {...props} />
+    // Returns blank page if data is loading
+    if (loading || tokenLoading || !data) return <PageTemplate highLight='jobs' {...props} />
     else return (
         <>
             <div className='AssetArea' style={{ top: '8vh', height: '92vh' }}>

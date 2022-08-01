@@ -1,35 +1,38 @@
+// Imports
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
+import { useMSAL } from '../Helpers/MSAL';
 import { DataGrid } from '@mui/x-data-grid';
+import axios from 'axios';
+import PageTemplate from './Template'
 import settings from '../settings.json'
 import '../css/Assets.css'
-import axios from 'axios';
 
 function AssetsPage(props) {
+    // States, Hooks, and MSAL
     let APILink = `${settings.APIBase}/asset`
-    const { instance, accounts } = useMsal()
+    const { token, tokenLoading } = useMSAL()
     const [catalog, setCatalog] = useState([])
     const [job_codes, setJobCodes] = useState(null)
     const nav = useNavigate()
 
-    useEffect(() => {
+    // Effects
+    useEffect(() => { // Gets job codes and catalog of assets
         getJobCodes()
         getCatalog()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // Returns to home page if user can't access this page
     if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
 
+    // --- Functions --- //
     async function getJobCodes() {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/full`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -38,8 +41,8 @@ function AssetsPage(props) {
         for (let i of data.job_codes) { jc[i.id] = i.job_name }
         setJobCodes(jc)
     }
+
     async function getCatalog() {
-        const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
             offset: 0,
             limit: null,
@@ -54,18 +57,8 @@ function AssetsPage(props) {
         if (res.isErrored) return console.log(res)
         setCatalog(res.data.records)
     }
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+
+    // Constant for the columns of the data grid
     const columns = [
         { field: 'id', headerName: 'Asset Tag', width: 250 },
         { field: 'status', headerName: 'Status', width: 350, valueGetter: params => job_codes[params.value] || params.value },
@@ -73,6 +66,8 @@ function AssetsPage(props) {
         { field: 'notes', headerName: 'Notes', width: 800 }
     ]
 
+    // Renders the page
+    if (tokenLoading) return <PageTemplate highLight='assetpage' {...props} />
     return (
         <>
             <PageTemplate highLight='assetpage' {...props} />

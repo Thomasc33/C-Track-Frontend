@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useMSAL } from '../Helpers/MSAL';
 import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
 import axios from 'axios'
 import Select from 'react-select';
 import PartService from '../Services/Parts'
@@ -11,19 +10,7 @@ import '../css/Jobs.css'
 
 function PartCategoriesPage(props) {
     // MSAL stuff
-    const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    const { token } = useMSAL()
 
     // States
     const [newData, setNewData] = useState({})
@@ -32,8 +19,8 @@ function PartCategoriesPage(props) {
 
     // useEffect
     useEffect(() => {
+        if (!token) return
         async function getData() {
-            const token = await getTokenSilently()
             let res = await axios.get(`${require('../settings.json').APIBase}/parts/common`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -46,7 +33,8 @@ function PartCategoriesPage(props) {
         }
         if (refreshData) getData()
         setRefreshData(false)
-    }, [refreshData])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refreshData, token])
 
 
     // Permission Check
@@ -71,7 +59,6 @@ function PartCategoriesPage(props) {
 
     // Misc Functions
     const sendData = async (data, id) => {
-        const token = await getTokenSilently()
         let res
         if (id === 'new') res = PartService.newPartType(data, token)
         else res = PartService.editPartType(data, token)

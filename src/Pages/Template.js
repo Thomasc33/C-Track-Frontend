@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
+import { useMSAL } from '../Helpers/MSAL';
 import { useMsal } from "@azure/msal-react";
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import CookieConsent from 'react-cookie-consent-notification';
-import { ReactComponent as Logo } from '../MDcentricLogo.svg'
-import UserService from '../Services/User'
-import * as timeago from 'timeago.js';
-import Menu from '@mui/material/Menu';
 import { useNavigate } from 'react-router-dom';
+import { ReactComponent as Logo } from '../MDcentricLogo.svg'
+import CookieConsent from 'react-cookie-consent-notification';
+import UserService from '../Services/User'
+import Menu from '@mui/material/Menu';
+import * as timeago from 'timeago.js';
 import '../css/Page-Template.css';
 
 function PageTemplate(props) {
     // Constants for User
     const { instance, accounts } = useMsal()
+    const { token } = useMSAL()
     const nav = useNavigate()
     const permissions = props.permissions
     const isAdmin = props.isAdmin
@@ -32,11 +33,12 @@ function PageTemplate(props) {
     // React Effects
 
     useEffect(() => {
+        if (!token) return
         getNotifications()
         let int = setInterval(getNotifications, 5000)
         return () => clearInterval(int)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [token])
     useEffect(() => {
         let func = e => { if (!getClassChain(e.target).includes('isdropdown')) setDropDownOpened(0) }
         window.addEventListener('mousedown', func)
@@ -49,22 +51,8 @@ function PageTemplate(props) {
         return () => window.removeEventListener('contextmenu', func)
     }, [contextMenu])
 
-    // Functions
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
 
     async function getNotifications() {
-        let token = await getTokenSilently()
         let res = await UserService.getNotifications(token)
         if (res.isErrored) if (res.error.message === 'An upgrade is available. Please refresh the page.') window.location.reload()
         else setNotifications(res.data)
@@ -103,28 +91,24 @@ function PageTemplate(props) {
     }
 
     const handleTogglePriority = async (id) => {
-        let t = await getTokenSilently()
-        await UserService.flagNotificationImportant({ id }, t)
+        await UserService.flagNotificationImportant({ id }, token)
         getNotifications()
     }
 
     const handleNotificationClose = async (id) => {
-        let t = await getTokenSilently()
-        await UserService.closeNotification({ id }, t)
+        await UserService.closeNotification({ id }, token)
         getNotifications()
     }
 
     const handleReadingNotifications = async () => {
         if (!Notifications.unread.length) return
-        let t = await getTokenSilently()
         let ids = Notifications.unread.map(n => n.id)
-        UserService.readNotifications({ ids }, t)
+        UserService.readNotifications({ ids }, token)
     }
 
     const handleDeleteAllNotifications = async () => {
         if (!Notifications.unread.length && !Notifications.read.length) return
-        let t = await getTokenSilently()
-        await UserService.deleteAllNotifications(t)
+        await UserService.deleteAllNotifications(token)
         getNotifications()
     }
 

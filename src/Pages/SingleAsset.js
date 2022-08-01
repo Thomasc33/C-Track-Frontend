@@ -1,22 +1,29 @@
+// Imports
 import React, { useEffect, useState } from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useMSAL } from '../Helpers/MSAL';
+import { Button } from '@material-ui/core';
+import { getDate } from './Asset';
 import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json'
 import AssetService from '../Services/Asset'
-import { Button } from '@material-ui/core';
 import Checkbox from 'react-custom-checkbox';
-import * as Icon from 'react-icons/fi';
 import axios from 'axios';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
 import ModelSelect from '../Components/ModelSelect';
+import * as Icon from 'react-icons/fi';
 import '../css/SingleAsset.css'
-import { getDate } from './Asset';
 
+// Global Constants
+
+// Fields to not render
 const dontRender = ['id', 'image', 'status']
+
+// Fields that are not editable
 const notEditable = []
+
+// Fields to rename {fieldname: 'displayname'}
 const nameOverrides = {
     icc_id: 'ICCID',
     hold_type: 'On Hold'
@@ -24,10 +31,13 @@ const nameOverrides = {
 
 
 function AssetsPage(props) {
+    // Hooks and Constants
     const nav = useNavigate()
     const location = useLocation()
     let APILink = `${settings.APIBase}/asset`
-    const { instance, accounts } = useMsal()
+    const { token } = useMSAL()
+
+    // States
     const [asset, setAsset] = useState(null)
     const [assetHistory, setHistory] = useState([])
     const [repairHistory, setRepairHistory] = useState([])
@@ -39,7 +49,7 @@ function AssetsPage(props) {
     const [modelSelect, setModelSelect] = useState(null)
     const [modelInfo, setModelInfo] = useState(null)
 
-    //TODO: Fix this (move functions to effect)
+    // Effects
     useEffect(() => {
         if (!search) return
         setAsset(null)
@@ -48,15 +58,16 @@ function AssetsPage(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search])
 
+    // Return to Home page if user can't access this page
     if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
 
+    // --- Functions --- //
     async function getJobCodes() {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/full`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -68,7 +79,6 @@ function AssetsPage(props) {
 
     async function getAssetInfo() {
         let data = {}
-        const token = await getTokenSilently()
         let res = await axios.get(`${APILink}/get?q=${search}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -133,19 +143,8 @@ function AssetsPage(props) {
         }
     }
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
 
+    // Main Function for editing rows
     const handleTextInputChange = async (row, e) => {
         if (notEditable.includes(row) || !(props.permissions.edit_assets || props.isAdmin) || modelInfo) return
         if (e.target && e.target.value === asset[row]) return
@@ -156,49 +155,91 @@ function AssetsPage(props) {
             value: e.target ? e.target.value : e
         }
         if (!formData.value) formData.value = ''
-
-        let token = await getTokenSilently()
         let res = await AssetService.singleEdit(formData, token)
         if (res.isErrored) { e.target.classList.add('invalid'); console.warn(res.error) }
         if (row === 'model_number') getAssetInfo()
     }
 
+    // Handles toggling watching/unwatching an asset
     const handleWatchUnWatch = async e => {
-        const token = await getTokenSilently()
         const FormData = { id: asset.id }
         if (e) await AssetService.watch(FormData, token)
         else await AssetService.unwatch(FormData, token)
     }
 
+    // Handles toggling lock on an asset
     const handleLocking = async e => {
-        const token = await getTokenSilently()
         const FormData = { id: asset.id }
         if (e) await AssetService.lock(FormData, token)
         else await AssetService.unlock(FormData, token)
     }
 
+    // Handles toggling hold on an asset
     const handleUnhold = async e => {
-        const token = await getTokenSilently()
         const FormData = { id: asset.id }
         await AssetService.unHold(FormData, token)
     }
 
+    // Handles adding a new asset
     const handleAssetAdding = async () => {
         if (!modelSelect) return
 
         let FormData = { model_id: modelSelect, asset_id: search }
-        const t = await getTokenSilently()
-        let res = await AssetService.create(FormData, t)
+        let res = await AssetService.create(FormData, token)
         if (res.isErrored) {
             alert(`Model not added: ${res.error.message}`)
             console.warn(res.error)
         } else { let s = search; setSearch(null); setSearch(s) }
     }
 
+    // Enter event listener
     const handleKeyDown = (row, e) => {
         if (e.code === 'Enter') handleTextInputChange(row, e)
     }
 
+    // Handles renaming an asset
+    async function changeAssetName(e, oldName) {
+        if (!props.permissions.edit_models && !props.isAdmin) return console.log('missing perms')
+        let newName = document.getElementById('newNameInput').value
+        if (!newName) return
+        let res = await AssetService.rename({ oldName, newName }, token)
+        if (res.isErrored) return alert(`Error changing name: ${res.error.status}`)
+        setEditName(false)
+        setAsset({ ...asset, id: newName })
+        nav(`/search?q=${newName}`)
+    }
+
+    // Handles cycling through the results
+    function nextAsset() {
+        let j
+        for (let i in results) { // Get current index and add 1/reset to 0
+            if (results[i].type === 'model') {
+                if (modelInfo && results[i].data.model_number === modelInfo.info.model_number) {
+                    if (`${i}` === `${results.length - 1}`) j = 0;
+                    else j = parseInt(i) + 1
+                }
+            } else {
+                if (asset && results[i].data.id === asset.id) {
+                    if (`${i}` === `${results.length - 1}`) j = 0;
+                    else j = parseInt(i) + 1
+                }
+            }
+        }
+        if (isNaN(j)) return alert("Error going to next")
+        if (results[j].type === 'model') {
+            setHistory([])
+            setRepairHistory([])
+            setAsset(null)
+            setModelInfo({ type: 'model', info: results[j].data, assets: results[j].assets })
+        } else {
+            setModelInfo(null)
+            setHistory(results[j].history)
+            setRepairHistory(results[j].repairs)
+            setAsset(results[j].data)
+        }
+    }
+
+    // --- Render --- //
     function renderResultsRow(row) {
         return <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
             onClick={() => { if (row.type === 'model') { setModelInfo({ type: 'model', info: row.data, assets: row.assets }) } else { setAsset(row.data); setHistory(row.history); setRepairHistory(row.repairs) } }}>
@@ -355,48 +396,6 @@ function AssetsPage(props) {
                 <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
             </tr>
         )
-    }
-
-    async function changeAssetName(e, oldName) {
-        if (!props.permissions.edit_models && !props.isAdmin) return console.log('missing perms')
-        let newName = document.getElementById('newNameInput').value
-        if (!newName) return
-        let token = await getTokenSilently()
-        if (!token) return
-        let res = await AssetService.rename({ oldName, newName }, token)
-        if (res.isErrored) return alert(`Error changing name: ${res.error.status}`)
-        setEditName(false)
-        setAsset({ ...asset, id: newName })
-        nav(`/search?q=${newName}`)
-    }
-
-    function nextAsset() {
-        let j
-        for (let i in results) { // Get current index and add 1/reset to 0
-            if (results[i].type === 'model') {
-                if (modelInfo && results[i].data.model_number === modelInfo.info.model_number) {
-                    if (`${i}` === `${results.length - 1}`) j = 0;
-                    else j = parseInt(i) + 1
-                }
-            } else {
-                if (asset && results[i].data.id === asset.id) {
-                    if (`${i}` === `${results.length - 1}`) j = 0;
-                    else j = parseInt(i) + 1
-                }
-            }
-        }
-        if (isNaN(j)) return alert("Error going to next")
-        if (results[j].type === 'model') {
-            setHistory([])
-            setRepairHistory([])
-            setAsset(null)
-            setModelInfo({ type: 'model', info: results[j].data, assets: results[j].assets })
-        } else {
-            setModelInfo(null)
-            setHistory(results[j].history)
-            setRepairHistory(results[j].repairs)
-            setAsset(results[j].data)
-        }
     }
 
     return (

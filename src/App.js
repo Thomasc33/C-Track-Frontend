@@ -35,18 +35,18 @@ import Particles from './Components/Particles';
 const settings = require('./settings.json')
 
 function App(props) {
+  // States and hooks
   const isAuthenticated = useIsAuthenticated();
   const { instance, accounts } = useMsal()
   const [isAuthed, setAuthed] = useState(localStorage.getItem('isVerified'))
   const [{ permissions, isAdmin, loading }, setState] = useState({
     permissions: null,
     isAdmin: null,
-    loading: true,
+    loading: true
   })
-  const setLoginStatus = (perm, admin) => setState({ permissions: perm, isAdmin: admin, loading: false })
-  // const [tsheetsBearer, setTsheetsBearer] = useState(null)
 
 
+  // Effects
   useEffect(() => {
     async function getTokenSilently() {
       const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
@@ -72,19 +72,21 @@ function App(props) {
       });
       const data = await response.json();
       if (data.message === 'An upgrade is available. Please refresh the page.') alert(data.message)
-      setLoginStatus(data.permissions, data.isAdmin ? true : false,)
-
-      //Get TSheets token
-      // let ts = await TSheetsService.getToken(t)
-      // if (!ts.isErrored) {
-      //   setTsheetsBearer(ts.token)
-      // }
+      setLoginStatus(data.permissions, data.isAdmin ? true : false)
     }
+
+    // If user is authenticated, get the user's permissions and admin status
     if (isAuthenticated) loadPermissions()
   }, [isAuthenticated, accounts, instance])
 
+  // --- Functions --- //
+
+  // Updates the state with user permissions, admin status, and set loading to false
+  const setLoginStatus = (perm, admin) => setState({ permissions: perm, isAdmin: admin, loading: false })
+
+  // Gets user's microsoft bearer token and verifies it with C-Track backend.
   async function validateUser() {
-    //Get token
+    // Get token
     const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
     let res = await instance.acquireTokenSilent(SilentRequest)
       .catch(async er => {
@@ -97,18 +99,21 @@ function App(props) {
       })
     if (res.isErrored) return console.log(res.err)
 
-    //Check to see if user exists
+    // Check to see if user exists
     res = await UserService.verify(res.accessToken)
+    // If user exists, it wont error
     if (res.isErrored) return console.log(res.err)
     else {
+      // Set locastorage to verified, and update Authed state
       localStorage.setItem('isVerified', true)
       setAuthed(true)
     }
   }
 
-
+  // If user isn't authenticated, validate them
   if (isAuthenticated && !isAuthed) validateUser()
 
+  // If user is authenticated, and data is still loading, give the Routes
   if (isAuthenticated && !loading) return (
     <>
       <Particles {...props} permissions={permissions} color={localStorage.getItem('accentColor') || '#00c6fc'} />
@@ -134,9 +139,13 @@ function App(props) {
       </Routes>
     </>
   )
+  
+  // If user isn't authenticated, redirect to login page
   if (!isAuthenticated) return (
     <LoginPage />
   )
+
+  // If user is authenticated, but data is still loading, give the loading screen (blank particle screen)
   else return (
     <Particles color={localStorage.getItem('accentColor') || '#00c6fc'} />
   )

@@ -1,50 +1,44 @@
+// Imports
 import React, { useState, useEffect, useRef } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom'
 import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import '../css/Reports.css'
-import CircularProgress from '@mui/material/CircularProgress';
+import { useMSAL } from '../Helpers/MSAL';
+import { formatAMPM } from './Asset';
+import { CSVLink } from "react-csv";
 import { Button } from '@material-ui/core';
 import { LineChart } from 'react-chartkick'
-import 'chartkick/chart.js'
 import axios from 'axios';
-import { CSVLink } from "react-csv";
+import CircularProgress from '@mui/material/CircularProgress';
 import ReportService from '../Services/Report'
 import writeXlsxFile from 'write-excel-file'
-import { formatAMPM } from './Asset';
+import 'chartkick/chart.js'
+import '../css/Reports.css'
+
 const settings = require('../settings.json')
 
 function ReportsPage(props) {
+    // Hooks 
+    const { token, tokenLoading } = useMSAL()
+    const reportRef = useRef(null)
+    const nav = useNavigate()
+
+    // States
     const [date, setDate] = useState(Date.now())
     const [data, setData] = useState([])
     const [graphDate, setGraphDate] = useState({ from: getDateSubtractMonth(date), to: getDate(date) })
     const [loading, setLoading] = useState(true)
     const [lineChartData, setLineChartData] = useState({})
     const [onUser, setOnUser] = useState(null)
-    const { instance, accounts } = useMsal()
     const [reportData, setReportData] = useState([])
     const [generatingReport, setGeneratingReport] = useState(false)
     const [tsheetsData, setTsheetsData] = useState([])
     const [userNames, setUserNames] = useState({}) // id: name
-    const reportRef = useRef(null)
-    const nav = useNavigate()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
 
+
+    // Effects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { sendReq() }, [onUser, graphDate, date])
-    useEffect(() => {
+    useEffect(() => { if (token) sendReq() }, [onUser, graphDate, date, token]) // Updates data when user, graph dates, or date changes
+    useEffect(() => { // Programmatic workaround to download CSV data when clicked (i think)
         if (reportRef && reportRef && reportRef.current && reportRef.current.link) {
             setTimeout(() => {
                 reportRef.current.link.click()
@@ -53,18 +47,19 @@ function ReportsPage(props) {
         }
     }, [reportData]);
 
-
+    // Returns to home page if user can't access this route
     if (!props.permissions.view_reports && !props.isAdmin) return <Navigate to='/' />
 
+    // --- Functions --- //
+    // Sends request to get data
     async function sendReq(doSetLoading = true) {
         if (doSetLoading) setLoading(true)
-        let t = await getTokenSilently()
         let url = onUser ? `${settings.APIBase}/reports/user?uid=${onUser}&date=${getDate(date)}` : `${settings.APIBase}/reports/users/daily?date=${getDate(date)}`
         let graphUrl = onUser ? `${settings.APIBase}/reports/graph/user?uid=${onUser}&from=${graphDate.from}&to=${graphDate.to}` : null
         const response = await fetch(url, {
             mode: 'cors',
             headers: {
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'Access-Control-Allow-Origin': '*',
                 'X-Version': require('../backendVersion.json').version
             }
@@ -75,13 +70,13 @@ function ReportsPage(props) {
         setLoading(false)
         let lineReq, tsheets = []
         if (onUser) {
-            lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
+            lineReq = await axios.get(graphUrl, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
                 .then(lr => lr.data)
                 .catch(er => { return { isErrored: true, error: er.response } })
             if (lineReq.isErrored) return console.log(response.error)
             setLineChartData(lineReq)
 
-            tsheets = await ReportService.getTsheetsData(onUser, getDate(date), t)
+            tsheets = await ReportService.getTsheetsData(onUser, getDate(date), token)
             if (tsheets.length) setTsheetsData(tsheets)
         }
         let names = { ...userNames }
@@ -137,8 +132,7 @@ function ReportsPage(props) {
 
     const getAssetSummary = async (e, timeframe, to) => {
         if (timeframe === to) to = undefined
-        let t = await getTokenSilently()
-        let d = await ReportService.generateAssetSummary(t, timeframe, to)
+        let d = await ReportService.generateAssetSummary(token, timeframe, to)
         if (d.isErrored) {
             alert(d.error)
         } else {
@@ -152,8 +146,7 @@ function ReportsPage(props) {
 
     const getHourlySummary = async (e, timeframe, to) => {
         if (timeframe === to) to = undefined
-        let t = await getTokenSilently()
-        let d = await ReportService.generateHourlySummary(t, timeframe, to)
+        let d = await ReportService.generateHourlySummary(token, timeframe, to)
         if (d.isErrored) {
             alert(d.error)
         } else {
@@ -166,8 +159,7 @@ function ReportsPage(props) {
     }
 
     const getJobSummary = async (type) => {
-        let t = await getTokenSilently()
-        let d = await ReportService.getJobCodeSummary(t, type)
+        let d = await ReportService.getJobCodeSummary(token, type)
         if (d.isErrored) {
             alert(d.error)
         } else {
@@ -183,8 +175,7 @@ function ReportsPage(props) {
 
     const getExcelReport = async (e, to = new Date().toISOString().split('T')[0], from = null) => {
         setGeneratingReport(true)
-        let t = await getTokenSilently()
-        let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${t}`, 'X-Version': require('../backendVersion.json').version } })
+        let res = await axios.get(`${settings.APIBase}/reports/excel?to=${to}${from ? `&from=${from}` : ''}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
             .then(d => d.data)
             .catch(e => { console.warn(e.response); return { isErrored: true, error: e.response.data } })
         if (!res.isErrored)
@@ -204,6 +195,13 @@ function ReportsPage(props) {
         return csvData
     }
 
+    const getTotal = () => {
+        let tot = 0
+        for (let i of data) if (i.dailydollars) tot += i.dailydollars
+        return tot
+    }
+
+    // --- Renderers --- //
     function renderUserRow(row) {
         let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#003994'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#003994', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#003994'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
@@ -232,12 +230,6 @@ function ReportsPage(props) {
         </div>
     }
 
-    function getTotal() {
-        let tot = 0
-        for (let i of data) if (i.dailydollars) tot += i.dailydollars
-        return tot
-    }
-
     function renderSingleUserRow(k, v) {
         let accent = localStorage.getItem('accentColor') || '#003994'
         return (
@@ -248,7 +240,8 @@ function ReportsPage(props) {
             </div >)
     }
 
-    if (loading) return (<>
+    // Render circular progress bar if still loading
+    if (loading || tokenLoading) return (<>
         <div className='AssetArea'>
             <div className='UserReports'>
                 <CircularProgress size='10rem' />
@@ -260,6 +253,7 @@ function ReportsPage(props) {
         <PageTemplate highLight='reports' disableHeader {...props} />
     </>
     )
+    // Base JSX for the page
     return (<>
         <div className='TopNav'>
             <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => handleBackClick()}>Back</Button>

@@ -1,46 +1,46 @@
+// Imports
 import React, { useState } from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate } from 'react-router-dom'
-import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API';
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import Asset from '../Services/Asset';
+import { useMSAL } from '../Helpers/MSAL';
 import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
+import Asset from '../Services/Asset';
+import PageTemplate from './Template'
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 import '../css/Asset.css'
 
 const settings = require('../settings.json')
 
+// --- Global Constants --- //
+
+// dontRender is a list of fields that won't show on this page due to being required for the site to function
 const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type']
+// dataTypes is a list of different datatypes accepted by SQL Server and would actually be used
 const dataTypes = [{ name: 'varchar(50)', value: 'varchar(50)' }, { name: 'varchar(255)', value: 'varchar(255)' }, { name: 'varchar(15)', value: 'varchar(15)' },
 { name: 'text', value: 'text' }, { name: 'tinyint', value: 'tinyint' }, { name: 'int(11)', value: 'int(11)' },
 { name: 'int', value: 'int' }, { name: 'decimal(13,4)', value: 'decimal(13,4)' }, { name: 'date', value: 'date' },
 { name: 'time', value: 'time' }, { name: 'datetime', value: 'datetime' }]
 
 function AssetManagement(props) {
-    const { instance, accounts } = useMsal()
+    // MSAL, Constants, and Hooks
+    const { token, tokenLoading } = useMSAL()
     let APILink = `${settings.APIBase}/`
+
+    // useEffect and fetch wrapper for API data
     const { loading, data = [] } = useFetch(APILink.concat('asset/types'), null)
+
+    // States
     const [updatedRows, setUpdatedRows] = useState({})
 
+    // Return to home page if the user cannot access this page
     if (!props.isAdmin) return <Navigate to='/' />
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    // --- Functions --- //
 
+    // Handles the changing of a field
     const handleChange = async (column, e, type) => {
         if (!type) return
 
@@ -73,33 +73,34 @@ function AssetManagement(props) {
         setUpdatedRows(c)
     }
 
+    // Handles the deletion of a row
     const handleDelete = async (column, e) => {
-        let token = await getTokenSilently()
         let r = await Asset.alterDelete(column, token)
         if (r.isErrored) alert(`Errored:\n${r.error}`)
         else alert('Success, refresh page to confirm changes took effect')
     }
 
+    // Handles the saving of a row after creation/modification
     const handleSave = async (column, e) => {
         if (!updatedRows[column]) return console.log(`save attempted with nothing in udpated rows, ${column}, ${updatedRows}`)
-        let token = await getTokenSilently()
         let r = await Asset.alter(updatedRows[column], token)
         if (r.isErrored) alert(`Errored:\n${r.error}`)
         else alert('Success, refresh page to confirm changes took effect')
     }
 
+    // Handles adding a new column
     const handleNew = async (e) => {
         if (!updatedRows.new || !updatedRows.new.COLUMN_NAME || !updatedRows.new.DATA_TYPE || ![true, false].includes(updatedRows.new.IS_NULLABLE)) {
             console.log(updatedRows)
             alert('Missing information for the new data')
             return
         }
-        let token = await getTokenSilently()
         let r = await Asset.alterNew(updatedRows.new, token)
         if (r.isErrored) alert(`Errored:\n${r.error}`)
         else alert('Success, refresh page to confirm changes took effect')
     }
 
+    // Handles confirmation of saving or deleting a column
     const confirm = async (column, e, type) => {
         return confirmAlert({
             customUI: ({ onClose }) => {
@@ -126,6 +127,7 @@ function AssetManagement(props) {
         })
     }
 
+    // Rendering function for each column of the database
     function RenderRow(row) {
         if (row !== 'new' && dontRender.includes(row.COLUMN_NAME)) return undefined
         return (<tr id={`${row.COLUMN_NAME || 'new'}-row`} key={`${row.COLUMN_NAME || 'new'}-row`}>
@@ -170,9 +172,8 @@ function AssetManagement(props) {
         </tr >)
     }
 
-
-    //returns blank page if data is loading
-    if (loading || !data) return <PageTemplate highLight='assetmanagement' {...props} />
+    // Returns blank page if data is loading
+    if (loading || !data || tokenLoading) return <PageTemplate highLight='assetmanagement' {...props} />
     else return (
         <>
             <div className='AssetArea'>

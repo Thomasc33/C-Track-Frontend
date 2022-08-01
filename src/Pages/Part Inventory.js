@@ -1,26 +1,14 @@
+// Imports
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import axios from 'axios'
 import { Button } from '@material-ui/core';
+import { useMSAL } from '../Helpers/MSAL';
+import PageTemplate from './Template'
+import axios from 'axios'
 
 function PartInventoryPage(props) {
     // MSAL stuff
-    const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    const { token } = useMSAL()
 
     // States
     const [data, setData] = useState([])
@@ -30,15 +18,15 @@ function PartInventoryPage(props) {
     // Effects
     useEffect(() => {
         async function getData() {
-            const token = await getTokenSilently()
             let res = await axios.get(`${require('../settings.json').APIBase}/parts/inventory`, {
                 headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
             })
             if (res.isErrored) return console.log(res)
             setData(res.data || [])
         }
-        getData()
-    }, [])
+        if (token) getData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token])
 
 
     // Permission Check
@@ -131,6 +119,7 @@ function PartInventoryPage(props) {
     }
 
     // Base JSX
+
     return (
         <>
             <div className='PartManagementArea'>

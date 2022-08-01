@@ -3,11 +3,15 @@ import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import '../css/ModelSelect.css'
+
 const settings = require('../settings.json')
 
 const ModelSelect = props => {
+    // Hooks and States
     const { instance, accounts } = useMsal()
     const [models, setModels] = useState([])
+
+    // MSAL function
     async function getTokenSilently() {
         const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
         let res = await instance.acquireTokenSilent(SilentRequest)
@@ -20,6 +24,8 @@ const ModelSelect = props => {
             })
         return res.accessToken
     }
+
+    // Effects
     useEffect(() => {
         async function getModels() {
             if (models.length > 0) return
@@ -42,6 +48,8 @@ const ModelSelect = props => {
         getModels()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    // Return Select Search Component
     return <div className='SelectContainer'><SelectSearch
         options={models}
         search

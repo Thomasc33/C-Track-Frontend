@@ -1,50 +1,46 @@
+// Imports
 import React from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate, useLocation } from 'react-router-dom';
-import PageTemplate from './Template'
 import { useState, useEffect } from 'react';
 import { useFetch } from '../Helpers/API';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
-import hourlyService from '../Services/Hourly'
-import User from '../Services/User';
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import TimeKeeper from 'react-timekeeper';
+import { useMSAL } from '../Helpers/MSAL';
 import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
-import '../css/Hourly.css';
+import PageTemplate from './Template'
+import hourlyService from '../Services/Hourly'
+import User from '../Services/User';
+import TimeKeeper from 'react-timekeeper';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
+import '../css/Hourly.css';
+
+// Global Constants
 const settings = require('../settings.json')
-const normalTimeRange = [6, 19]
+const normalTimeRange = [6, 19] // Gives warnings when going before 6AM or after 7PM
 
 function HourlyPage(props) {
-    const { instance, accounts } = useMsal()
+    // Hooks and Constants
     const location = useLocation()
-    let APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/hourly/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/hourly/user?date=`
+    const { token, tokenLoading } = useMSAL()
+    const APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/hourly/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/hourly/user?date=`
+
+
+    // States
     const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
     const [newJobCode, setNewJobCode] = useState(0);
     const [newComment, setNewComment] = useState('');
-    const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [times, setTimes] = useState({})
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    // --- Effects --- //
+    // useEffect and Fetch Wrapper
+    const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
 
-    useEffect(() => {
+    useEffect(() => { // Gets and sorts job codes
         async function sort() {
             let jc = getJobCodes(true)
             let fav = getFavorites()
@@ -57,17 +53,20 @@ function HourlyPage(props) {
 
             setJobCodes(j)
         }
-        sort()
+        if (token) sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [token])
 
-    useEffect(() => {
+    useEffect(() => { // Calls parseTime every time the data changes
         if (data && data.records) parseTime()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
 
+    // Returns to home page if user can't use route
+    if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Navigate to='/' />
+
+    // --- Functions --- //
     async function updateData() {
-        let token = await getTokenSilently()
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
             headers: {
@@ -81,12 +80,11 @@ function HourlyPage(props) {
     }
 
     async function getFavorites() {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/favorites?type=hrly`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -96,12 +94,11 @@ function HourlyPage(props) {
     }
 
     async function getJobCodes(ignoreState = false) {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/all/type?type=hrly`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -115,12 +112,11 @@ function HourlyPage(props) {
         return data.job_codes
     }
 
-    if (!props.permissions.use_hourly_tracker && !props.isAdmin) return <Navigate to='/' />
-
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)
     }
 
+    // Handles the changing of any data on the page (new or old)
     const handleChange = async (id, e, target = false, value = undefined, sendToAPI = true) => {
         if (e && isNaN(parseInt(e))) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
@@ -185,7 +181,7 @@ function HourlyPage(props) {
                 uid: (location.state && location.state.uid) || null,
                 in_progress: dateInfo.in_progress || value
             }
-            let token = await getTokenSilently()
+
             let res = await hourlyService.add(formData, token)
             if (res.isErrored) {
                 alert('Failed to add hourly row')
@@ -237,7 +233,6 @@ function HourlyPage(props) {
                     }
                 }
                 if (!formData.change) return console.log('exited on change because no formData.change')
-                let token = await getTokenSilently()
                 let res = await hourlyService.edit(formData, token)
                 if (res.isErrored) {
                     if (target) {
@@ -249,10 +244,12 @@ function HourlyPage(props) {
         }
     }
 
+    // Glorified enter listerner
     const handleKeyDown = async (id, e) => {
         if (e.key === 'Enter') handleChange(id, e)
     }
 
+    // Handles the prompt for confirming deletion
     const handleDelete = (id, e, row) => {
         let jc = 'unknown'
         for (let i of jobCodes) if (i.id === row.job_code) jc = i.job_name
@@ -281,8 +278,8 @@ function HourlyPage(props) {
         })
     }
 
+    // Sends the delete request to the api
     async function sendDelete(id, e) {
-        let token = await getTokenSilently()
         let res = await hourlyService.delete(id, getDate(date), token, (location.state && location.state.uid) || null)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
@@ -305,17 +302,16 @@ function HourlyPage(props) {
         }
     }
 
+    // Handles adding and removing favorite hourly job codes
     const handleFavorite = async (job_code) => {
         let data = { type: 'hrly', isRemove: 0, job_id: `${job_code}` }
         if (favorites.includes(`${job_code}`)) data.isRemove = 1
-
-        let token = await getTokenSilently()
         let q = await User.updateFavorites(data, token)
         if (q.isErrored) return alert('Failed to update favorites')
-
         getFavorites()
     }
 
+    // Converts job array to {name, value} object array for use in react-select-search
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
@@ -325,6 +321,7 @@ function HourlyPage(props) {
         return ar
     }
 
+    // Handles the changing of the react-timekeeper element
     const handleTimeSelectChange = async (id, isStart, e) => {
         let target = document.getElementById(`${id}-${isStart ? 'Start' : 'End'}`)
         if (target && target.classList && target.classList.contains('invalid')) target.classList.remove('invalid')
@@ -359,6 +356,7 @@ function HourlyPage(props) {
         }
     }
 
+    // Called every time data is updated. Converts the start and end time to usable data for react-timekeeper
     const parseTime = () => {
         let temp = { ...times }
         for (let row of data.records) {
@@ -376,6 +374,7 @@ function HourlyPage(props) {
         return < ></>
     }
 
+    // Handles the change of the current check box
     const handleCurrentChange = async (id, e) => {
         if (id === 'new') {
             let temp = { ...times }
@@ -391,9 +390,7 @@ function HourlyPage(props) {
         }
     }
 
-    /**
-     * Function to control rendering of data
-     */
+    // --- Renderers --- //
     function RenderRow(row) {
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`} style={{ verticalAlign: 'top' }}>
             <td>
@@ -457,8 +454,8 @@ function HourlyPage(props) {
         </tr >)
     }
 
-    //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='hourly' {...props} />
+    // Returns blank page if data is loading
+    if (loading || tokenLoading || !data || !jobCodes) return <PageTemplate highLight='hourly' {...props} />
     else return (
         <>
             {data.records.length > Object.keys(times).length ? parseTime() : <></>}

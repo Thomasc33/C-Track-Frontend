@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate } from 'react-router-dom';
-import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import ModelSelect from '../Components/ModelSelect'
+import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
+import { useMSAL } from '../Helpers/MSAL';
+import PageTemplate from './Template'
+import ModelSelect from '../Components/ModelSelect'
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import PartService from '../Services/Parts'
-import SelectSearch, { fuzzySearch } from 'react-select-search';
-import { confirmAlert } from 'react-confirm-alert';
 import Select from 'react-select';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
@@ -17,19 +16,7 @@ import '../css/PartManagement.css'
 
 function PartManagementPage(props) {
     // MSAL stuff
-    const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    const { token } = useMSAL()
 
     // Misc Functions
     const getCommonParts = () => {
@@ -38,59 +25,15 @@ function PartManagementPage(props) {
         return ar
     }
 
-
-
+    // Constant for multi-select styles
     const selectStyles = {
-        control: (styles, { selectProps: { width } }) => ({
-            ...styles,
-            backgroundColor: 'transparent',
-            width
-        }),
-        menu: (provided, state) => ({
-            ...provided,
-            width: state.selectProps.width,
-        }),
-        noOptionsMessage: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        menuList: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-            return {
-                ...styles,
-                backgroundColor: '#1b1b1b',
-                color: 'white',
-                ':active': {
-                    ...styles[':active'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994',
-                },
-                ':hover': {
-                    ...styles[':hover'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994'
-                }
-            };
-        },
-        multiValue: (styles, { data }) => {
-            return {
-                ...styles,
-                backgroundColor: localStorage.getItem('accentColor') || '#003994',
-            };
-        },
-        multiValueLabel: (styles, { data }) => ({
-            ...styles,
-            color: data.color,
-        }),
-        multiValueRemove: (styles, { data }) => ({
-            ...styles,
-            color: 'white',
-            ':hover': {
-                color: 'red',
-            },
-        }),
-
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }), option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
 
     // States
@@ -106,19 +49,18 @@ function PartManagementPage(props) {
     // useEffect(s)
     useEffect(() => { // Gets all models with parts enabled
         const getModelList = async () => {
-            const token = await getTokenSilently()
             let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt`, {
                 headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
             })
             if (res.isErrored) return console.log(res)
             setModelList(res.data || [])
         }
-        if (updateModelList) getModelList().then(() => setUpdateModelList(false))
-    }, [updateModelList])
+        if (token && updateModelList) getModelList().then(() => setUpdateModelList(false))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [updateModelList, token])
 
     useEffect(() => { // Gets all model numbers
         const getModels = async () => {
-            const token = await getTokenSilently()
             let res = await axios.get(`${require('../settings.json').APIBase}/model/all/numbers`, {
                 headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
             })
@@ -129,13 +71,13 @@ function PartManagementPage(props) {
             }
             setMultiSelectOptions(opt)
         }
-        getModels()
-    }, [])
+        if (token) getModels()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token])
 
-    useEffect(() => {
+    useEffect(() => {// Gets all parts for selected model
         const getPartList = async () => {
             if (!selectedModel) return
-            const token = await getTokenSilently()
             let res = await axios.get(`${require('../settings.json').APIBase}/parts/mgmt/model?model=${selectedModel}`, {
                 headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
             })
@@ -143,8 +85,9 @@ function PartManagementPage(props) {
             setCommonParts(res.data.common || [])
             setPartsList(res.data.parts || [])
         }
-        getPartList()
-    }, [selectedModel]) // Gets all parts for selected model
+        if (token) getPartList()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedModel, token])
 
 
     // Permission Check
@@ -152,7 +95,6 @@ function PartManagementPage(props) {
 
     // Event Handlers
     const handleModelAddButton = async () => {
-        const token = await getTokenSilently()
         PartService.addModelList({ model: modelAddSelect }, token)
         setModelAddSelect(null)
         setUpdateModelList(true)
@@ -189,10 +131,9 @@ function PartManagementPage(props) {
     }
 
     const handleChange = async (id, formData) => {
-        let t = await getTokenSilently()
         formData.model = selectedModel
-        if (id === 'new') await PartService.newPart(formData, t)
-        else await PartService.editPart(formData, t)
+        if (id === 'new') await PartService.newPart(formData, token)
+        else await PartService.editPart(formData, token)
     }
 
     const numberValidatorEventListener = (e) => { e.target.value = e.target.value.replace(/[^.\d]/g, '') }
@@ -221,16 +162,14 @@ function PartManagementPage(props) {
     }
 
     const sendDelete = async (id, e, row) => {
-        let t = await getTokenSilently()
-        await PartService.deletePart(id, t)
+        await PartService.deletePart(id, token)
         let temp = [...partsList].filter(p => !(p.id === id && p.part_number === row.part_number))
         setPartsList(temp)
     }
 
     const handleWatchToggle = async (id, e, row) => {
-        let t = await getTokenSilently()
-        if (e) await PartService.watchPart(id, t)
-        else await PartService.unwatchPart(id, t)
+        if (e) await PartService.watchPart(id, token)
+        else await PartService.unwatchPart(id, token)
     }
 
     // Renderers

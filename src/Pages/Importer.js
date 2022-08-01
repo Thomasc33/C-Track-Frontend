@@ -1,33 +1,30 @@
+// Imports
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import PageTemplate from './Template'
 import { DataGrid } from '@mui/x-data-grid';
 import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
+import { useMSAL } from '../Helpers/MSAL';
+import PageTemplate from './Template'
 import CSVReader from 'react-csv-reader';
-import '../css/Importer.css';
 import axios from 'axios';
+import '../css/Importer.css';
+
 const settings = require('../settings.json')
 
 function ImporterPage(props) {
-    const { instance, accounts } = useMsal()
+    // Hooks and States
+    const { token, tokenLoading } = useMSAL()
     const [importerType, setImporterType] = useState(0)
-    //0 = asset, 1 = model, 2 = legal hold
+
+    //0 = asset, 1 = model, 2 = legal hold, 3 = parts
+
+    // Return to home page if the user can't use this route
     if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+
+    // --- Functions --- //
+
+    // Parses the CSV text entry then prompts
     const handleButtonClick = async e => {
         let text = document.getElementById('csv-text').value
         if (!text) return
@@ -41,6 +38,8 @@ function ImporterPage(props) {
         }
         confirm(csv)
     }
+
+    // Handles CSV upload parsing, then prompts
     const handleData = (data, fileInfo) => {
         let csv = []
         if (importerType === 0) for (let i of data) csv.push({ id: i[0], model_number: i[1] })
@@ -50,6 +49,7 @@ function ImporterPage(props) {
         confirm(csv)
     }
 
+    // Handles confirming the CSV data
     const confirm = (data) => {
         confirmAlert({
             customUI: ({ onClose }) => {
@@ -86,9 +86,9 @@ function ImporterPage(props) {
         })
     }
 
+    // Called by confirm function to send the data to the server in chunks
     const sendData = async data => {
         let d = [...data]
-        let token = await getTokenSilently()
         let failed = []
         while (d.length > 0) {
             if (d.length <= 500) {
@@ -119,6 +119,9 @@ function ImporterPage(props) {
             else alert(`Some assets failed to import:${failed.map(m => { return `${m.id}: ${m.reason}` }).join('\n')}`)
         else alert('Successfully Imported')
     }
+
+    // Render
+    if (tokenLoading) return <PageTemplate highLight='importer' {...props} />
     return (
         <>
             <div className='ImporterArea'>
@@ -187,6 +190,7 @@ function ImporterPage(props) {
 
 export default ImporterPage
 
+// --- Fields for each importer type --- //
 const asset_columns = [
     { field: 'id', headerName: 'Asset Tag', width: 400, editable: true },
     { field: 'model_number', headerName: 'Model', width: 400, editable: true },

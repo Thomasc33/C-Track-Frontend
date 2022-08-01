@@ -1,27 +1,31 @@
+// Imports
 import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import PageTemplate from './Template'
-import { useFetch } from '../Helpers/API';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useMSAL } from '../Helpers/MSAL';
+import { Button } from '@material-ui/core';
+import { useFetch } from '../Helpers/API';
+import { confirmAlert } from 'react-confirm-alert';
+import { Slider } from '@mui/material';
+import PageTemplate from './Template'
 import assetService from '../Services/Asset'
 import User from '../Services/User';
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import { Button } from '@material-ui/core';
 import ModelSelect from '../Components/ModelSelect';
 import Checkbox from 'react-custom-checkbox';
-import * as Icon from 'react-icons/fi';
-import { confirmAlert } from 'react-confirm-alert';
 import Select from 'react-select';
+import * as Icon from 'react-icons/fi';
 import '../css/Asset.css'
-import { Slider } from '@mui/material';
+
 const settings = require('../settings.json')
 
 function AssetPage(props) {
-    const { instance, accounts } = useMsal()
+    // Constants/Hooks
+    const { token } = useMSAL()
     const location = useLocation()
-    let APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/asset/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/asset/user?date=`
+    const noAssetJobCounts = {}
+    const APILink = location.state && location.state.isReport ? `${settings.APIBase}/reports/asset/user?uid=${location.state.uid}&date=` : `${settings.APIBase}/asset/user?date=`
 
+    // States
     const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
@@ -30,28 +34,17 @@ function AssetPage(props) {
     const [newAssetTag, setNewAssetTag] = useState('');
     const [newComment, setNewComment] = useState('');
     const [missingAssetId, setMissingAssetId] = useState(null)
-    const noAssetJobCounts = {}
-    const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
     const [modelSelect, setModelSelect] = useState(null)
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
     const [showTimestamp, setShowTimestamp] = useState(localStorage.getItem('showTimestamp') === 'true' || false)
     const [selected, setSelected] = useState([])
-    const [multipleSelectCount, setMultipleSelectCount] = useState(1)
+    const [multipleSelectCount,] = useState(1)
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    // Wrapper for useEffect
+    const { loading, data = [], setData } = useFetch(APILink.concat(getDate(date)), null)
 
-    useEffect(() => {
+    // Effects
+    useEffect(() => { // Gets and sorts job codes
         async function sort() {
             let jc = getJobCodes(true)
             let fav = getFavorites()
@@ -65,17 +58,33 @@ function AssetPage(props) {
 
             setJobCodes(j)
         }
-        sort()
+        if (token) sort()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [token])
 
+    // Return to home page if user can't access this route
+    if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Navigate to='/' />
+
+
+    // Styling for react-select for multi select
+    const selectStyles = {
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
+    }
+
+    // --- Start Functions --- //
     async function getFavorites() {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/favorites?type=asset`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -85,12 +94,11 @@ function AssetPage(props) {
     }
 
     async function getJobCodes(ignoreState = false) {
-        let t = await getTokenSilently()
         const response = await fetch(`${settings.APIBase}/job/all/type?type=asset`, {
             mode: 'cors',
             headers: {
                 'Access-Control-Allow-Origin': '*',
-                'Authorization': `Bearer ${t}`,
+                'Authorization': `Bearer ${token}`,
                 'X-Version': require('../backendVersion.json').version
             }
         });
@@ -103,8 +111,6 @@ function AssetPage(props) {
         setIndexJobCodes(te)
         return data.job_codes
     }
-
-    if (!props.permissions.use_asset_tracker && !props.isAdmin) return <Navigate to='/' />
 
     const handleDateChange = () => {
         setDate(document.getElementById('date_selector').value)
@@ -173,7 +179,6 @@ function AssetPage(props) {
                 uid: location.state && location.state.uid,
                 multiple
             }
-            let token = await getTokenSilently()
             let res = await assetService.add(formData, token)
             if (res.isErrored) {
                 console.log(res.error.message)
@@ -250,7 +255,6 @@ function AssetPage(props) {
                 if (!formData.value && !fromSelect) formData.value = e.target.value
 
                 //send to api
-                let token = await getTokenSilently()
                 let res = await assetService.edit(formData, token)
                 if (res.isErrored) {
                     if (res.error.message === 'Job code doesnt apply to model type') {
@@ -278,7 +282,7 @@ function AssetPage(props) {
         }
     }
 
-    // {count: int, split: {restrictedcomment: int}}
+    // Handles the prompt for adding multiple lines at once using the "prompt_count" field in the job code
     const promptForMultiple = async jobId => {
         return new Promise(async res => {
             let restrictedComments = getRestrictedComments(jobId, true) || []
@@ -333,6 +337,7 @@ function AssetPage(props) {
         })
     }
 
+    // Handles adding a new asset to the database if the inputed model wasn't found
     const handleAssetAdding = async () => {
         // Get model
         if (!modelSelect) return
@@ -342,8 +347,7 @@ function AssetPage(props) {
         if (!asset) { console.log('Asset missing from asset adding function'); return }
 
         let FormData = { model_id: modelSelect, asset_id: asset }
-        const t = await getTokenSilently()
-        let res = await assetService.create(FormData, t)
+        let res = await assetService.create(FormData, token)
         if (res.isErrored) {
             console.log(res.error)
         } else document.getElementById('missingAssetBox').classList.remove('Show')
@@ -351,10 +355,12 @@ function AssetPage(props) {
         if (missingAssetId.id && missingAssetId.e) handleTextInputChange(missingAssetId.id, missingAssetId.e).then(() => { setMissingAssetId(null) })
     }
 
+    // Enter button listener
     const handleKeyDown = async (id, e) => {
         if (e.key === 'Enter') handleTextInputChange(id, e, true)
     }
 
+    // Handles the confirmation of the deletion of an asset
     const handleDelete = (id, e, row) => {
         let jc = 'unknown'
         for (let i of jobCodes) if (i.id === row.job_code) jc = i.job_name
@@ -385,8 +391,8 @@ function AssetPage(props) {
         })
     }
 
+    // Used by handleDelete, sends the delete request to the API
     async function sendDelete(id, e) {
-        let token = await getTokenSilently()
         let res = await assetService.delete(id, getDate(date), token, location.state && location.state.uid)
         const response = await fetch(APILink.concat(getDate(date)), {
             mode: 'cors',
@@ -405,17 +411,18 @@ function AssetPage(props) {
         }
     }
 
+    // Handles adding/removing a job code from favorites
     const handleFavorite = async (job_code) => {
         let data = { type: 'asset', isRemove: 0, job_id: `${job_code}` }
         if (favorites.includes(`${job_code}`)) data.isRemove = 1
 
-        let token = await getTokenSilently()
         let q = await User.updateFavorites(data, token)
         if (q.isErrored) return alert('Failed to update favorites')
 
         getFavorites()
     }
 
+    // Gets an array of {name, value} for job codes to use in react-select-search
     const getJobArray = () => {
         let ar = []
         for (let i of jobCodes) {
@@ -425,6 +432,7 @@ function AssetPage(props) {
         return ar
     }
 
+    // Handles the copying logic of asset id's to clipboard
     const copySelected = () => {
         let s = ''
         if (selected.length === data.records.length) s = data.records.map(m => m.asset_id).join('\n')
@@ -442,17 +450,7 @@ function AssetPage(props) {
         })
     }
 
-    const selectStyles = {
-        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
-        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
-        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
-        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
-        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
-    }
-
+    // Gets the restricted comments for a job code
     const getRestrictedComments = (jobId, array = false) => {
         let job
         for (let i of jobCodes) if (i.id === jobId) job = i
@@ -462,6 +460,7 @@ function AssetPage(props) {
         return job.restricted_comments.split(',').map(m => { return { value: m, label: m } })
     }
 
+    // Check if a job code should prompt a count
     const jobPromptsCount = jobId => {
         let job
         for (let i of jobCodes) if (i.id === jobId) job = i
@@ -469,14 +468,13 @@ function AssetPage(props) {
         if (job.prompt_count) return true
         return false
     }
+    // --- End functions --- //
 
+    // Gets the restricted comments of the job code in the new line
     let newJobRestrictedComments
     if (newJobCode) newJobRestrictedComments = getRestrictedComments(newJobCode)
 
-    /**
-     * Function to control rendering of data
-     * 
-     */
+    // Renderer of each asset row
     function RenderRow(row) {
         // Get asset id
         let asset = row.asset_id
@@ -571,8 +569,8 @@ function AssetPage(props) {
         </tr >)
     }
 
-    //returns blank page if data is loading
-    if (loading || !data || !jobCodes) return <PageTemplate highLight='asset' {...props} />
+    // Returns blank page if data is loading
+    if (loading || !data || !jobCodes || !token) return <PageTemplate highLight='asset' {...props} />
     else return (
         <>
             <div style={{ position: 'absolute', top: '8vh', left: '13vw', display: 'inline-flex', alignItems: 'center' }}>
@@ -677,27 +675,42 @@ function AssetPage(props) {
 export default AssetPage
 
 /**
- * 
+ * Gets YYYY-MM-DD format of a date object
  * @param {Date} date 
- * @returns 
+ * @returns {String}
  */
 function getDate(date) {
     date = new Date(date)
     return date.toISOString().split('T')[0]
 }
 
+/**
+ * Gets YYYY-MM-DD format of the next day of a date object
+ * @param {Date} date 
+ * @returns {String}
+ */
 function addDay(date) {
     date = new Date(date)
     date.setTime(date.getTime() + 86400000)
     return date.toISOString().split('T')[0]
 }
 
+/**
+ * Gets YYYY-MM-DD format of the previous day of a date object
+ * @param {Date} date 
+ * @returns {String}
+ */
 function removeDay(date) {
     date = new Date(date)
     date.setTime(date.getTime() - 86400000)
     return date.toISOString().split('T')[0]
 }
 
+/**
+ * Gets HH:MM A/PM format of a ISO String
+ * @param {String} date 
+ * @returns {String}
+ */
 function formatAMPM(date) {
     let hours = date.substring(11, 13)
     let minutes = date.substring(14, 16)

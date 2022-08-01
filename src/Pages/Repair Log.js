@@ -1,31 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate, useLocation } from 'react-router-dom';
-import PageTemplate from './Template'
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
+import { useMSAL } from '../Helpers/MSAL';
 import { getDate, addDay, removeDay, formatAMPM } from './Asset'
 import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
 import { CircularProgress } from '@mui/material';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
+import PageTemplate from './Template'
 import PartsService from '../Services/Parts';
 import axios from 'axios';
 
 function RepairLogPage(props) {
     // MSAL stuff
-    const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
+    const { token } = useMSAL()
 
     // States
     const location = useLocation()
@@ -39,14 +26,13 @@ function RepairLogPage(props) {
 
     // Effects
     useEffect(() => {
-        getData()
+        if (token) getData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [date])
+    }, [date, token])
 
     async function getData() {
         setData([])
         setLoading(true)
-        const token = await getTokenSilently()
         let d = new Date(date).toISOString().split('T')[0]
         let res = await axios.get(`${require('../settings.json').APIBase}/parts/log?date=${d}`, {
             headers: {
@@ -68,7 +54,6 @@ function RepairLogPage(props) {
     const handleDateChange = () => setDate(document.getElementById('date_selector').value)
 
     const handleDelete = async (id, e, row) => {
-        const t = await getTokenSilently()
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
@@ -80,7 +65,7 @@ function RepairLogPage(props) {
                         <h3>Part Number: {supplementaryData[row.part_id].part_number}</h3>
                         <span style={{ margins: '1rem' }}>
                             <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
-                                PartsService.deleteLog(id, t)
+                                PartsService.deleteLog(id, token)
                                     .then(getData())
                                 onClose()
                             }}
@@ -107,8 +92,7 @@ function RepairLogPage(props) {
         // Stop if the asset is ''
         if (!asset) return setLoadingCommonParts(false)
         // Get all parts types for the asset
-        let t = await getTokenSilently()
-        let res = await PartsService.getCommonParts(asset, t)
+        let res = await PartsService.getCommonParts(asset, token)
         if (res.isErrored) setCommonParts([])
         else setCommonParts(res.data)
         // Remove loading animation
@@ -130,8 +114,7 @@ function RepairLogPage(props) {
         if (typeof date !== 'number') form.date = date
 
         // Get list of all parts under given asset and repair type
-        let t = await getTokenSilently()
-        let res1 = await PartsService.attemptSubmitLog(newRepair, t)
+        let res1 = await PartsService.attemptSubmitLog(newRepair, token)
         if (res1.isErrored) return alert(res1.error.message)
 
         // If an array is returned, prompt user for which one to use
@@ -142,7 +125,7 @@ function RepairLogPage(props) {
 
             form = { part: selection, asset: newRepair.asset }
             if (typeof date !== 'number') form.date = date
-            let res2 = await PartsService.submitLog(form, t)
+            let res2 = await PartsService.submitLog(form, token)
             if (res2.isErrored) return console.log('res2 errored, ending method early')
         }
 

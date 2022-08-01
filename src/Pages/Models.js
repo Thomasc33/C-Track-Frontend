@@ -1,85 +1,48 @@
+// Imports
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useMSAL } from '../Helpers/MSAL';
 import PageTemplate from './Template';
-import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json';
 import ModelService from '../Services/Model';
 import Select from 'react-select';
+import axios from 'axios';
 import '../css/Asset.css'
 import '../css/Models.css'
-import axios from 'axios';
 
 function ModelPage(props) {
+    // Constant, States, and Hooks
     let APILink = `${settings.APIBase}/model`
-    const { instance, accounts } = useMsal()
+    const { token, tokenLoading } = useMSAL()
     const [catalog, setCatalog] = useState([])
     const [pageNumber, setPageNumber] = useState(1)
     const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
 
-    useEffect(() => {
+    // Effects
+    useEffect(() => { // Gets catalog of models
         getCatalog()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // Returns to home page if user can't access this page
     if (!props.permissions.view_models && !props.isAdmin) return <Navigate to='/' />
 
+    // Styling for the select box
     const selectStyles = {
-        control: (styles, { selectProps: { width } }) => ({
-            ...styles,
-            backgroundColor: 'transparent',
-            width
-        }),
-        menu: (provided, state) => ({
-            ...provided,
-            width: state.selectProps.width,
-        }),
-        noOptionsMessage: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        menuList: (styles) => ({
-            ...styles,
-            backgroundColor: '#1b1b1b'
-        }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-            return {
-                ...styles,
-                backgroundColor: '#1b1b1b',
-                color: 'white',
-                ':active': {
-                    ...styles[':active'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994',
-                },
-                ':hover': {
-                    ...styles[':hover'],
-                    backgroundColor: localStorage.getItem('accentColor') || '#003994'
-                }
-            };
-        },
-        multiValue: (styles, { data }) => {
-            return {
-                ...styles,
-                backgroundColor: localStorage.getItem('accentColor') || '#003994',
-            };
-        },
-        multiValueLabel: (styles, { data }) => ({
-            ...styles,
-            color: data.color,
-        }),
-        multiValueRemove: (styles, { data }) => ({
-            ...styles,
-            color: 'white',
-            ':hover': {
-                color: 'red',
-            },
-        }),
-
+        control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
+        menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
+        noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
+        multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
 
+    // --- Functions --- //
+    // Gets the catalog of models. Offset used if pagination is used (it is)
     async function getCatalog(offset = 0) {
-        const token = await getTokenSilently()
         let res = await axios.post(`${APILink}/catalog`, {
             offset,
             limit: 50,
@@ -95,19 +58,7 @@ function ModelPage(props) {
         setCatalog(res.data.records)
     }
 
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
-
+    // Main handler for changes
     const handleTextInputChange = async (id, e, isSelect = false) => {
         if (!isSelect && e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         if (id === 'new') {
@@ -124,7 +75,6 @@ function ModelPage(props) {
 
             //send to api
             let formData = z
-            let token = await getTokenSilently()
             let res = await ModelService.add(formData, token)
             if (res.isErrored) {
                 document.getElementById('new-model_number').classList.add('invalid')
@@ -165,7 +115,6 @@ function ModelPage(props) {
 
                 if (!formData.change || (formData.change !== 'image' && !formData.value)) return e.target.classList.add('invalid')
 
-                let token = await getTokenSilently()
                 let res = await ModelService.edit(formData, token)
                 if (res.isErrored) {
                     console.log(res.error)
@@ -175,14 +124,17 @@ function ModelPage(props) {
         }
     }
 
+    // Enter Listner
     const handleKeyDown = async (id, e) => {
         if (e.key === 'Enter') handleTextInputChange(id, e)
     }
 
+    // Handles the change of the multi-select box
     const handleSelectChange = async (e, id) => {
         handleTextInputChange(id, e, true)
     }
 
+    // Handles changing page and updating catalog
     const handlePageChange = async (e) => {
         if (e.target.id === 'next') {
             setCatalog([])
@@ -196,6 +148,7 @@ function ModelPage(props) {
         }
     }
 
+    // --- Render --- //
     function RenderRow(row) {
         let defaultOption = []
         let category = row.category.split(',')
@@ -251,6 +204,7 @@ function ModelPage(props) {
         </tr >)
     }
 
+    if(tokenLoading) return <PageTemplate highLight='models' {...props}/>
     return (
         <>
             <PageTemplate highLight='models' {...props} />
@@ -306,6 +260,7 @@ function ModelPage(props) {
 
 export default ModelPage
 
+// Constants for options usable by the select component
 const multiSelectOptions = [
     { value: 'IGEL', label: 'IGEL' },
     { value: 'Thick', label: 'Thick' },

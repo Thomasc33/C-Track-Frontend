@@ -1,17 +1,24 @@
+// Imports
 import React, { useState } from 'react';
 import PageTemplate from './Template'
 import { ChromePicker } from 'react-color'
 import { useNavigate } from 'react-router-dom';
-
 import '../css/Guide.css';
 
 function GuidePage(props) {
+    // Hook for programmatic navigation
     const nav = useNavigate()
+
+    // State for color picker
     const [color, setColor] = useState(localStorage.getItem('accentColor') || '#00c6fc')
+
+    // Functional handling of changing the color picker
     const handleColorChange = c => {
         setColor(c.hex)
         localStorage.setItem('accentColor', c.hex)
     }
+
+    // Handles the redirection to search page from the demonstration search bar
     const clickHandler = async () => {
         let search = document.getElementById('guideSearch').value
         if (!search) return
@@ -19,9 +26,12 @@ function GuidePage(props) {
         nav(`/search?q=${search}`)
     }
 
+    // Enter key listener for search bar
     const handleKeyDown = e => {
         if (e.key === 'Enter') clickHandler()
     }
+
+    // Render the guide page
     return (
         <>
             <PageTemplate highLight='guide' {...props} />

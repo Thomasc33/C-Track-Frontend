@@ -1,54 +1,44 @@
 /* eslint-disable array-callback-return */
+// Imports
 import React, { useState, useEffect } from 'react';
-import PageTemplate from './Template'
 import { useFetch } from '../Helpers/API'
-import UserService from '../Services/User'
+import { useMSAL } from '../Helpers/MSAL';
 import { useMsal } from '@azure/msal-react';
-import { InteractionRequiredAuthError } from '@azure/msal-common';
-import CircularProgress from '@mui/material/CircularProgress';
 import { Button } from '@material-ui/core';
-import '../css/Home.css'
 import { confirmAlert } from 'react-confirm-alert';
+import UserService from '../Services/User'
+import CircularProgress from '@mui/material/CircularProgress';
+import PageTemplate from './Template'
+import '../css/Home.css'
+
 const settings = require('../settings.json')
 
 function HomePage(props) {
-    //Get data, and update every 2 seconds
-    let APILink = `${settings.APIBase}/home/user`
+    // States, Constants, and MSAL
+    const APILink = `${settings.APIBase}/home/user`
     const { loading, data = [] } = useFetch(APILink, 0)
-    const { instance, accounts } = useMsal()
+    const { token, tokenLoading } = useMSAL()
+    const { accounts } = useMsal()
     const [isGettingDiscrepancy, setIsGettingDiscrepancy] = useState(false)
     const [tasks, setTasks] = useState([])
 
-    useEffect(() => {
+    // --- Effects --- //
+    useEffect(() => { // Gets the tasks from Microsoft Planner
         async function getTasks() {
-            let t = await getTokenSilently()
-            let d = await fetch(`${settings.graphUrl}/me/planner/tasks`, { headers: { 'Authorization': `Bearer ${t}` } })
+            let d = await fetch(`${settings.graphUrl}/me/planner/tasks`, { headers: { 'Authorization': `Bearer ${token}` } })
                 .then(re => re.json())
                 .catch(er => console.warn(er.text()))
             setTasks(d.value)
         }
-        getTasks()
+        if (token) getTasks()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [token])
 
-    async function getTokenSilently() {
-        const SilentRequest = {
-            scopes: ['User.Read', 'Tasks.Read'],
-            account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: true
-        }
-        let res = await instance.acquireTokenSilent(SilentRequest)
-            .catch(async er => {
-                if (er instanceof InteractionRequiredAuthError) {
-                    return await instance.acquireTokenPopup(SilentRequest)
-                } else {
-                    console.log('Unable to get token')
-                }
-            })
-        return res.accessToken
-    }
 
+    // --- Functions --- //
+
+    // Prompts for confirmation before checking all discrepancies if all was chosen, otherwise just checks the user
     const handleDiscrepancyCheck = async (all = false) => {
-        let t = await getTokenSilently()
         if (all) {
             confirmAlert({
                 customUI: ({ onClose }) => {
@@ -59,7 +49,7 @@ function HomePage(props) {
                             <p>Checking all discrepancies will send every extra notifications on top of the automtically scheduled checks at 11:45am and 4:45pm. Avoid sending too many notifications to users.</p>
                             <span style={{ margins: '1rem' }}>
                                 <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
-                                    UserService.discrepancyCheckAll(t)
+                                    UserService.discrepancyCheckAll(token)
                                     onClose()
                                 }}
                                 >Confirm</Button>
@@ -73,17 +63,14 @@ function HomePage(props) {
             })
         } else {
             setIsGettingDiscrepancy(true)
-            let res = await UserService.discrepancyCheck(t)
+            let res = await UserService.discrepancyCheck(token)
             if (!res.error) alert(`${res.data.count} Discrepancies Found`)
             else alert(`Error when checking discrepancies. Report this to Thomas C`)
             setIsGettingDiscrepancy(false)
         }
     }
 
-    /**
-     * Function to control rendering of data
-     * 
-     */
+    // --- Render --- //
     function renderStatsData(k, v) {
         if (k === 'Daily Dollars' && (!props.permissions || !props.permissions.view_reports) && !props.isAdmin) return <></>
         return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#003994'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#003994', '#1b1b1b', .9)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#003994' : '#1b1b1b67' }}>
@@ -105,9 +92,8 @@ function HomePage(props) {
         </div >
     }
 
-    //returns blank page if data is loading
-    if (loading) return <PageTemplate highLight='home' {...props} />
-
+    // Returns blank page if data is loading
+    if (loading || tokenLoading) return <PageTemplate highLight='home' {...props} />
     else return (
         <div>
             <div className='AssetArea'>
@@ -135,6 +121,13 @@ function HomePage(props) {
 
 export default HomePage
 
+/**
+ * Averages R,G, and B values of two colors
+ * @param {String} colorA 
+ * @param {String} colorB 
+ * @param {Number} amount Blend amount
+ * @returns 
+ */
 function blendColors(colorA, colorB, amount) {
     const [rA, gA, bA] = colorA.match(/\w\w/g).map((c) => parseInt(c, 16));
     const [rB, gB, bB] = colorB.match(/\w\w/g).map((c) => parseInt(c, 16));
