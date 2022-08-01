@@ -4,7 +4,6 @@ import { loginRequest } from "../authConfig";
 import { useMsal } from '@azure/msal-react';
 import ParticlesElement from '../Components/Particles'
 import CookieConsent from 'react-cookie-consent-notification';
-import '../css/Login.css'
 
 function LoginPage(props) {
     // Hook

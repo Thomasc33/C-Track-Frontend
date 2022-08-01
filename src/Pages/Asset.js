@@ -7,14 +7,12 @@ import { Button } from '@material-ui/core';
 import { useFetch } from '../Helpers/API';
 import { confirmAlert } from 'react-confirm-alert';
 import { Slider } from '@mui/material';
-import PageTemplate from './Template'
 import assetService from '../Services/Asset'
 import User from '../Services/User';
 import ModelSelect from '../Components/ModelSelect';
 import Checkbox from 'react-custom-checkbox';
 import Select from 'react-select';
 import * as Icon from 'react-icons/fi';
-import '../css/Asset.css'
 
 const settings = require('../settings.json')
 
@@ -570,7 +568,7 @@ function AssetPage(props) {
     }
 
     // Returns blank page if data is loading
-    if (loading || !data || !jobCodes || !token) return <PageTemplate highLight='asset' {...props} />
+    if (loading || !data || !jobCodes || !token) return <></>
     else return (
         <>
             <div style={{ position: 'absolute', top: '8vh', left: '13vw', display: 'inline-flex', alignItems: 'center' }}>
@@ -656,7 +654,6 @@ function AssetPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='asset' {...props} />
             <div id='missingAssetBox' className='AddAssetPrompt'>
                 <h1 style={{ textDecoration: 'underline', marginLeft: '3rem', marginRight: '3rem' }}>Asset Does Not Exist:</h1>
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>

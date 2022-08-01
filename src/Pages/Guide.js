@@ -1,9 +1,7 @@
 // Imports
 import React, { useState } from 'react';
-import PageTemplate from './Template'
 import { ChromePicker } from 'react-color'
 import { useNavigate } from 'react-router-dom';
-import '../css/Guide.css';
 
 function GuidePage(props) {
     // Hook for programmatic navigation
@@ -34,7 +32,6 @@ function GuidePage(props) {
     // Render the guide page
     return (
         <>
-            <PageTemplate highLight='guide' {...props} />
             <div className='GuidePage'><div className='GuideContainer'>
                 <h1>Changing Accent Color</h1>
                 <p>Choose a color below. You may have to refresh for it to take full effect</p>

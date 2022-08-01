@@ -3,10 +3,8 @@ import { Navigate } from 'react-router-dom'
 import { useFetch } from '../Helpers/API';
 import { useMSAL } from '../Helpers/MSAL';
 import UserService from '../Services/User'
-import PageTemplate from './Template'
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import '../css/Asset.css'
 
 const settings = require('../settings.json')
 
@@ -76,7 +74,7 @@ function AdminPage(props) {
 
 
     // Returns blank page if data is loading, otherwise show page
-    if (loading || !data || !token) return <PageTemplate highLight='admin' {...props} />
+    if (loading || !data || !token) return <></>
     else return (
         <>
             <div className='AssetArea'>
@@ -93,7 +91,6 @@ function AdminPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='admin' {...props} />
         </>
     )
 }

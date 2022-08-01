@@ -7,13 +7,11 @@ import { useFetch } from '../Helpers/API';
 import { useMSAL } from '../Helpers/MSAL';
 import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
-import PageTemplate from './Template'
 import hourlyService from '../Services/Hourly'
 import User from '../Services/User';
 import TimeKeeper from 'react-timekeeper';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import '../css/Hourly.css';
 
 // Global Constants
 const settings = require('../settings.json')
@@ -455,7 +453,7 @@ function HourlyPage(props) {
     }
 
     // Returns blank page if data is loading
-    if (loading || tokenLoading || !data || !jobCodes) return <PageTemplate highLight='hourly' {...props} />
+    if (loading || tokenLoading || !data || !jobCodes) return <></>
     else return (
         <>
             {data.records.length > Object.keys(times).length ? parseTime() : <></>}
@@ -551,7 +549,6 @@ function HourlyPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='hourly' {...props} />
         </>
     )
 }

@@ -5,10 +5,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
 import { useMSAL } from '../Helpers/MSAL';
-import PageTemplate from './Template'
 import CSVReader from 'react-csv-reader';
 import axios from 'axios';
-import '../css/Importer.css';
 
 const settings = require('../settings.json')
 
@@ -121,7 +119,7 @@ function ImporterPage(props) {
     }
 
     // Render
-    if (tokenLoading) return <PageTemplate highLight='importer' {...props} />
+    if (tokenLoading) return <></>
     return (
         <>
             <div className='ImporterArea'>
@@ -183,7 +181,6 @@ function ImporterPage(props) {
                 <br />
                 <br />
             </div>
-            <PageTemplate highLight='importer' {...props} />
         </>
     )
 }

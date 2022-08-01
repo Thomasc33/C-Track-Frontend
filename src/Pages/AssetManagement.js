@@ -7,10 +7,8 @@ import { useMSAL } from '../Helpers/MSAL';
 import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
 import Asset from '../Services/Asset';
-import PageTemplate from './Template'
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import '../css/Asset.css'
 
 const settings = require('../settings.json')
 
@@ -173,7 +171,7 @@ function AssetManagement(props) {
     }
 
     // Returns blank page if data is loading
-    if (loading || !data || tokenLoading) return <PageTemplate highLight='assetmanagement' {...props} />
+    if (loading || !data || tokenLoading) return <></>
     else return (
         <>
             <div className='AssetArea'>
@@ -193,7 +191,6 @@ function AssetManagement(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='assetmanagement' {...props} />
         </>
     )
 }

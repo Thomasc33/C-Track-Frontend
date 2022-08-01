@@ -3,10 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { useFetch } from '../Helpers/API';
 import { useMSAL } from '../Helpers/MSAL';
 import Select from 'react-select';
-import PageTemplate from './Template'
 import UserService from '../Services/User'
-import '../css/Asset.css'
-import '../css/User.css'
 
 const settings = require('../settings.json')
 
@@ -98,7 +95,7 @@ function UserPage(props) {
 
 
     // Returns blank page if data is loading
-    if (loading || tokenLoading || !data) return <PageTemplate highLight='user' {...props} />
+    if (loading || tokenLoading || !data) return <></>
     else return (
         <>
             <div className='AssetArea'>
@@ -116,7 +113,6 @@ function UserPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='user' {...props} />
         </>
     )
 }

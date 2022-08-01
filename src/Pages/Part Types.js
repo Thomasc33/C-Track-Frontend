@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
-import PageTemplate from './Template'
 import axios from 'axios'
 import Select from 'react-select';
 import PartService from '../Services/Parts'
-import '../css/Asset.css'
-import '../css/Jobs.css'
 
 function PartCategoriesPage(props) {
     // MSAL stuff
@@ -123,7 +120,6 @@ function PartCategoriesPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='part_types' {...props} />
         </>
     )
 }

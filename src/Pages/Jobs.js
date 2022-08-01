@@ -4,12 +4,9 @@ import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
 import { useMSAL } from '../Helpers/MSAL';
 import jobService from '../Services/Job'
-import PageTemplate from './Template'
 import Select from 'react-select';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import '../css/Asset.css'
-import '../css/Jobs.css'
 
 const settings = require('../settings.json')
 
@@ -323,7 +320,7 @@ function JobPage(props) {
 
 
     // Returns blank page if data is loading
-    if (loading || tokenLoading || !data) return <PageTemplate highLight='jobs' {...props} />
+    if (loading || tokenLoading || !data) return <></>
     else return (
         <>
             <div className='AssetArea' style={{ top: '8vh', height: '92vh' }}>
@@ -407,7 +404,6 @@ function JobPage(props) {
                     </tbody>
                 </table>
             </div>
-            <PageTemplate highLight='jobs' {...props} />
         </>
     )
 }

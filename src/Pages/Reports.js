@@ -1,7 +1,6 @@
 // Imports
 import React, { useState, useEffect, useRef } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom'
-import PageTemplate from './Template'
 import { useMSAL } from '../Helpers/MSAL';
 import { formatAMPM } from './Asset';
 import { CSVLink } from "react-csv";
@@ -12,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ReportService from '../Services/Report'
 import writeXlsxFile from 'write-excel-file'
 import 'chartkick/chart.js'
-import '../css/Reports.css'
 
 const settings = require('../settings.json')
 
@@ -250,7 +248,6 @@ function ReportsPage(props) {
                 <CircularProgress size='10rem' />
             </div>
         </div>
-        <PageTemplate highLight='reports' disableHeader {...props} />
     </>
     )
     // Base JSX for the page
@@ -348,8 +345,6 @@ function ReportsPage(props) {
                 </>
             }
         </div>
-
-        <PageTemplate highLight='reports' disableHeader {...props} />
     </>)
 }
 

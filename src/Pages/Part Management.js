@@ -4,7 +4,6 @@ import { Navigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import { Button } from '@material-ui/core';
 import { useMSAL } from '../Helpers/MSAL';
-import PageTemplate from './Template'
 import ModelSelect from '../Components/ModelSelect'
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
@@ -12,7 +11,6 @@ import PartService from '../Services/Parts'
 import Select from 'react-select';
 import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
-import '../css/PartManagement.css'
 
 function PartManagementPage(props) {
     // MSAL stuff
@@ -293,7 +291,8 @@ function PartManagementPage(props) {
                     <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
                 </>
             }
-        </div><PageTemplate highLight='part_management' {...props} /></>
+        </div>
+        </>
     )
 }
 

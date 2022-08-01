@@ -1,37 +1,58 @@
 /* eslint-disable no-unreachable */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import {
   Routes,
   Route,
 } from "react-router-dom";
 
-// Import the Pages
-import AdminPage from './Pages/Admin';
-import AssetManagement from './Pages/AssetManagement'
-import AssetPage from './Pages/Asset';
-import AssetsPage from './Pages/AssetPage';
-import HomePage from './Pages/Home';
-import HourlyPage from './Pages/Hourly';
-import ImporterPage from './Pages/Importer'
-import JobPage from './Pages/Jobs';
-import LoginPage from './Pages/Login';
-import ModelPage from './Pages/Models';
-import ReportsPage from './Pages/Reports';
-import SingleAssetPage from './Pages/SingleAsset';
-import UserPage from './Pages/User';
-import GuidePage from './Pages/Guide';
-import PartCategoriesPage from './Pages/Part Types'
-import PartInventoryPage from './Pages/Part Inventory'
-import PartManagementPage from './Pages/Part Management'
-import RepairLogPage from './Pages/Repair Log'
-
 // Import Libraries
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
-// import TSheetsService from './Services/TSheets'
-import './App.css';
+import PageTemplate from './Components/Template';
 import Particles from './Components/Particles';
+
+// Import CSS files in main since lazy loading breaks styling otherwise
+import './App.css';
+import './css/Asset.css';
+import './css/Assets.css';
+import './css/Guide.css';
+import './css/Home.css';
+import './css/Hourly.css';
+import './css/Importer.css';
+import './css/Jobs.css';
+import './css/Login.css';
+import './css/Models.css';
+import './css/ModelSelect.css';
+import './css/Page-Template.css';
+import './css/PartManagement.css';
+import './css/Reports.css';
+import './css/SingleAsset.css';
+import './css/User.css';
+
+
+// Import the Pages
+// Using lazy loading to avoid loading the pages until they are needed
+const AdminPage = lazy(() => import('./Pages/Admin'));
+const AssetManagement = lazy(() => import('./Pages/AssetManagement'));
+const AssetPage = lazy(() => import('./Pages/Asset'));
+const AssetsPage = lazy(() => import('./Pages/AssetPage'));
+const HomePage = lazy(() => import('./Pages/Home'));
+const HourlyPage = lazy(() => import('./Pages/Hourly'));
+const ImporterPage = lazy(() => import('./Pages/Importer'));
+const JobPage = lazy(() => import('./Pages/Jobs'));
+const LoginPage = lazy(() => import('./Pages/Login'));
+const ModelPage = lazy(() => import('./Pages/Models'));
+const ReportsPage = lazy(() => import('./Pages/Reports'));
+const SingleAssetPage = lazy(() => import('./Pages/SingleAsset'));
+const UserPage = lazy(() => import('./Pages/User'));
+const GuidePage = lazy(() => import('./Pages/Guide'));
+const PartCategoriesPage = lazy(() => import('./Pages/Part Types'));
+const PartInventoryPage = lazy(() => import('./Pages/Part Inventory'));
+const PartManagementPage = lazy(() => import('./Pages/Part Management'));
+const RepairLogPage = lazy(() => import('./Pages/Repair Log'));
+
+// Import App Settings
 const settings = require('./settings.json')
 
 function App(props) {
@@ -117,29 +138,32 @@ function App(props) {
   if (isAuthenticated && !loading) return (
     <>
       <Particles {...props} permissions={permissions} color={localStorage.getItem('accentColor') || '#00c6fc'} />
-      <Routes>
-        <Route exact path="/asset" element={<AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/assets" element={<AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/models" element={<ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/hourly" element={<HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/admin" element={<AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/adas" element={<AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/importer" element={<ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/tools" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/reports" element={<ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/jobs" element={<JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/users" element={<UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/search" element={<SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/guide" element={<GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/repair" element={<RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/inventory" element={<PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/parts" element={<PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/parttypes" element={<PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-        <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
-      </Routes>
+      <PageTemplate {...props} permissions={permissions} isAdmin={isAdmin} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route exact path="/asset" element={<AssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/assets" element={<AssetsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/models" element={<ModelPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/hourly" element={<HourlyPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/admin" element={<AdminPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/adas" element={<AssetManagement {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/importer" element={<ImporterPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/tools" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/reports" element={<ReportsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/jobs" element={<JobPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/users" element={<UserPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/search" element={<SingleAssetPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/guide" element={<GuidePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/repair" element={<RepairLogPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/inventory" element={<PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/parts" element={<PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/parttypes" element={<PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+        </Routes>
+      </Suspense>
     </>
   )
-  
+
   // If user isn't authenticated, redirect to login page
   if (!isAuthenticated) return (
     <LoginPage />

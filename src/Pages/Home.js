@@ -8,8 +8,6 @@ import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
 import UserService from '../Services/User'
 import CircularProgress from '@mui/material/CircularProgress';
-import PageTemplate from './Template'
-import '../css/Home.css'
 
 const settings = require('../settings.json')
 
@@ -93,7 +91,7 @@ function HomePage(props) {
     }
 
     // Returns blank page if data is loading
-    if (loading || tokenLoading) return <PageTemplate highLight='home' {...props} />
+    if (loading || tokenLoading) return <></>
     else return (
         <div>
             <div className='AssetArea'>
@@ -114,7 +112,6 @@ function HomePage(props) {
                     {Object.keys(data).map(m => renderStatsData(m, data[m]))}
                 </div>
             </div>
-            <PageTemplate highLight='home' {...props} />
         </div>
     )
 }

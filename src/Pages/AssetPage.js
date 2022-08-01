@@ -4,9 +4,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
-import PageTemplate from './Template'
 import settings from '../settings.json'
-import '../css/Assets.css'
 
 function AssetsPage(props) {
     // States, Hooks, and MSAL
@@ -67,15 +65,14 @@ function AssetsPage(props) {
     ]
 
     // Renders the page
-    if (tokenLoading) return <PageTemplate highLight='assetpage' {...props} />
+    if (tokenLoading || !catalog.length) return <></>
     return (
         <>
-            <PageTemplate highLight='assetpage' {...props} />
             <div className='AssetGridArea'>
                 <DataGrid
                     className='Grid'
                     columns={columns}
-                    loading={catalog.length < 1}
+                    loading={!catalog.length}
                     rows={catalog}
                     disableSelectionOnClick
                     hideFooterSelectedRowCount

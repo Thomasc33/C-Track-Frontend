@@ -2,14 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
-import PageTemplate from './Template';
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json';
 import ModelService from '../Services/Model';
 import Select from 'react-select';
 import axios from 'axios';
-import '../css/Asset.css'
-import '../css/Models.css'
 
 function ModelPage(props) {
     // Constant, States, and Hooks
@@ -204,10 +201,9 @@ function ModelPage(props) {
         </tr >)
     }
 
-    if(tokenLoading) return <PageTemplate highLight='models' {...props}/>
+    if(tokenLoading) return <></>
     return (
         <>
-            <PageTemplate highLight='models' {...props} />
             <div className='PageNavigation'>
                 <i className='material-icons PageArrow'
                     style={pageNumber === 1 ? { color: 'gray' } : {}}

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import { useMSAL } from '../Helpers/MSAL';
-import PageTemplate from './Template'
 import axios from 'axios'
 
 function PartInventoryPage(props) {
@@ -125,7 +124,6 @@ function PartInventoryPage(props) {
             <div className='PartManagementArea'>
                 {selectedModel ? selectedPart ? RenderPart() : RenderModel() : RenderHome()}
             </div>
-            <PageTemplate highLight='part_inventory' {...props} />
         </>
     )
 }

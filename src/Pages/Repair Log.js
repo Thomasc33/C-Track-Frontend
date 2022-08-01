@@ -6,7 +6,6 @@ import { getDate, addDay, removeDay, formatAMPM } from './Asset'
 import { Button } from '@material-ui/core';
 import { confirmAlert } from 'react-confirm-alert';
 import { CircularProgress } from '@mui/material';
-import PageTemplate from './Template'
 import PartsService from '../Services/Parts';
 import axios from 'axios';
 
@@ -249,7 +248,6 @@ function RepairLogPage(props) {
                 {loading ? <CircularProgress /> : undefined}
                 {data.map(m => RenderRow(m))}
             </div>
-            <PageTemplate highLight='repair_log' {...props} />
         </>
     )
 }

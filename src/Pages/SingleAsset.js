@@ -5,7 +5,6 @@ import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import { Button } from '@material-ui/core';
 import { getDate } from './Asset';
-import PageTemplate from './Template'
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json'
 import AssetService from '../Services/Asset'
@@ -13,7 +12,6 @@ import Checkbox from 'react-custom-checkbox';
 import axios from 'axios';
 import ModelSelect from '../Components/ModelSelect';
 import * as Icon from 'react-icons/fi';
-import '../css/SingleAsset.css'
 
 // Global Constants
 
@@ -400,7 +398,6 @@ function AssetsPage(props) {
 
     return (
         <>
-            <PageTemplate highLight='singleasset' {...props} setSearch={setSearch} />
             <div className='AssetArea'>
                 {!search ? <h1>No search term provided</h1> :
                     modelInfo ?
