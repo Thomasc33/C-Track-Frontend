@@ -77,7 +77,10 @@ function AssetsPage(props) {
                     disableSelectionOnClick
                     hideFooterSelectedRowCount
                     autoPageSize
-                    onCellClick={(params) => nav(`/search?q=${params.id}`, { state: { assetOnly: true } })}
+                    onCellClick={(params, e) =>
+                        e.ctrlKey ? window.open(`/search?q=${params.id}&ao=1`, '_blank')
+                            : nav(`/search?q=${params.id}`, { state: { assetOnly: true } })
+                    }
                     style={{ cursor: 'pointer' }}
                 />
             </div>

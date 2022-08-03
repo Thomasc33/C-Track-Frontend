@@ -46,15 +46,23 @@ function AssetsPage(props) {
     const [search, setSearch] = useState(props.searchTerm || new URLSearchParams(location.search).get('q'))
     const [modelSelect, setModelSelect] = useState(null)
     const [modelInfo, setModelInfo] = useState(null)
+    const [onlyAsset, setOnlyAsset] = useState(!!new URLSearchParams(location.search).get('ao'))
 
     // Effects
     useEffect(() => {
         if (!search) return
         setAsset(null)
+        setHistory([])
+        setRepairHistory([])
+        setResults([])
+        setOnlyAsset(false)
         getJobCodes()
         getAssetInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search])
+    useEffect(() => { // Update the search when the url changes
+        setSearch(new URLSearchParams(location.search).get('q'))
+    }, [location])
 
     // Return to Home page if user can't access this page
     if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
@@ -88,7 +96,7 @@ function AssetsPage(props) {
         if (res.isErrored) return console.log(res)
         if (res.data.resu.notFound) return setAsset(res.data.resu) // Not found
         setUid(res.data.uid)
-        if (res.data.resu.length === 1 || props.assetOnly) { //1 result found
+        if (res.data.resu.length === 1 || onlyAsset) { //1 result found
             if (res.data.resu[0].type === 'model') { // if the only result is a model
                 setModelInfo({
                     ...res.data.resu[0]
@@ -239,7 +247,7 @@ function AssetsPage(props) {
 
     // --- Render --- //
     function renderResultsRow(row) {
-        return <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
+        return <div key={row.data.id} style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', borderRadius: '1rem', background: '#1b1b1b67', padding: '1rem', margin: '1rem', cursor: 'pointer' }}
             onClick={() => { if (row.type === 'model') { setModelInfo({ type: 'model', info: row.data, assets: row.assets }) } else { setAsset(row.data); setHistory(row.history); setRepairHistory(row.repairs) } }}>
             {row.type === 'asset' || row.type === 'tracker' ?
                 <>

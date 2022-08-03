@@ -33,7 +33,6 @@ function PageTemplate(props) {
     const [Notifications, setNotifications] = useState({ unread: [], read: [] })
     const [DropDownOpened, setDropDownOpened] = useState(0) //0=none, 1=notification, 2=profile
     const [{ hideSearch, disableHeader, highlight }, setRouteConfig] = useState({ hideSearch: false, disableHeader: false, highlight: null })
-    // const [sideNavOpen, setSideNavOpen] = useState(localStorage.getItem('sideNavOpen') === '1' || false)
 
     // Other Hooks
     const location = useLocation()
@@ -58,17 +57,11 @@ function PageTemplate(props) {
         return () => window.removeEventListener('contextmenu', func)
     }, [contextMenu])
     useEffect(() => { // Update Route Config
-        // Check for no header routes
-        if (noHeaderRoutes.includes(location.pathname)) { if (!disableHeader) setRouteConfig({ hideSearch: hideSearch, disableHeader: true }) }
-        else if (disableHeader) setRouteConfig({ hideSearch: hideSearch, disableHeader: false })
-
-        // Check for no search routes
-        if (noSearchRoutes.includes(location.pathname)) { if (!hideSearch) setRouteConfig({ hideSearch: true, disableHeader: disableHeader }) }
-        else if (hideSearch) setRouteConfig({ hideSearch: false, disableHeader: disableHeader })
-
-        // Update highlight
-        if (highlight !== location.pathname.substring(1)) setRouteConfig({ hideSearch: hideSearch, disableHeader: disableHeader, highlight: location.pathname.substring(1) })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        setRouteConfig({
+            hideSearch: noSearchRoutes.includes(location.pathname),
+            disableHeader: noHeaderRoutes.includes(location.pathname),
+            highlight: location.pathname === '/' ? 'home' : location.pathname.substring(1)
+        })
     }, [location])
 
 

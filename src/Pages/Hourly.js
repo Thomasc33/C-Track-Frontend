@@ -26,13 +26,13 @@ function HourlyPage(props) {
 
     // States
     const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
+    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
-    const [newJobCode, setNewJobCode] = useState(0);
-    const [newComment, setNewComment] = useState('');
     const [times, setTimes] = useState({})
-    const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
+    const [newRecord, setNewRecord] = useState({ newJobCode: 0, newComment: '' })
+
 
     // --- Effects --- //
     // useEffect and Fetch Wrapper
@@ -123,14 +123,14 @@ function HourlyPage(props) {
         }
         if (id === 'new') {
             let dateString = new Date(date).toISOString().split('T')[0]
-            let job_code = newJobCode;
-            if (!isNaN(parseInt(e))) { setNewJobCode(parseInt(e)); job_code = parseInt(e) }
+            let job_code = newRecord.newJobCode;
+            if (!isNaN(parseInt(e))) { setNewRecord({ ...newRecord, newJobCode: parseInt(e) }); job_code = parseInt(e) }
             let dateInfo = times.new
-            let comment = newComment;
+            let comment = newRecord.newComment;
             if (e && e.target) switch (e.target.id) {
                 case 'new-notes':
                     comment = e.target.value
-                    await setNewComment(e.target.value)
+                    setNewRecord({ ...newRecord, newComment: comment })
                     break;
                 default:
                     console.log('Default Case hit for new')
@@ -186,7 +186,7 @@ function HourlyPage(props) {
             } else {
                 updateData()
                 document.getElementById('new-notes').value = ''
-                setNewComment('')
+                setNewRecord({ newJobCode: newRecord.newJobCode, newComment: '' })
                 let temp = { ...times }
                 temp.new.startTime = temp.new.endTime
                 temp.new.endTime = '17:00'
@@ -293,10 +293,6 @@ function HourlyPage(props) {
         if (res.isErrored) {
             alert('Failed to delete. Try again or see Thomas if it continues to fail')
             console.log(res.error)
-        }
-        else {
-            let row = document.getElementById(`${id}-row`)
-            if (row) row.remove()
         }
     }
 
@@ -491,7 +487,7 @@ function HourlyPage(props) {
                             <td>
                                 <SelectSearch
                                     options={getJobArray()}
-                                    value={newJobCode || null}
+                                    value={newRecord.newJobCode || null}
                                     search
                                     placeholder="Job Code"
                                     filterOptions={fuzzySearch}

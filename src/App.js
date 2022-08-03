@@ -54,6 +54,7 @@ const RepairLogPage = lazy(() => import('./Pages/Repair Log'));
 
 // Import App Settings
 const settings = require('./settings.json')
+require('./backendVersion.json') // Load this so no single lazy split will claim it when they all use it
 
 function App(props) {
   // States and hooks

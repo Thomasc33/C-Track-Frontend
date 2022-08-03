@@ -28,9 +28,7 @@ function AssetPage(props) {
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
-    const [newJobCode, setNewJobCode] = useState(0);
-    const [newAssetTag, setNewAssetTag] = useState('');
-    const [newComment, setNewComment] = useState('');
+    const [newJob, setNewJob] = useState({ newJobCode: 0, newAssetTag: '', newComment: '' })
     const [missingAssetId, setMissingAssetId] = useState(null)
     const [modelSelect, setModelSelect] = useState(null)
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
@@ -117,8 +115,8 @@ function AssetPage(props) {
     const handleTextInputChange = async (id, e, fromEnter = false, fromSelect = false) => {
         // Prevent non asset codes from adding an extra at the end
         if (id === 'new' && !fromEnter && (e.target && e.target.id && e.target.id.includes('assetid'))) {
-            if (!newJobCode) return
-            for (let i of jobCodes) if (newJobCode === i.id) { if (!i.requires_asset) return; break }
+            if (!newJob.newJobCode) return
+            for (let i of jobCodes) if (newJob.newJobCode === i.id) { if (!i.requires_asset) return; break }
         }
         if (isNaN(parseInt(e)) && !fromSelect) { //checks to make sure e is real, not an int from select
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
@@ -128,19 +126,19 @@ function AssetPage(props) {
         }
         if (id === 'new') {
             let dateString = new Date(date).toISOString().split('T')[0]
-            let job_code = newJobCode;
-            let asset = newAssetTag;
-            let comment = newComment;
-            if (!isNaN(parseInt(e))) { setNewJobCode(parseInt(e)); job_code = parseInt(e) }
-            else if (fromSelect) { comment = e.map(m => m.value).join(','); setNewComment(comment) }
+            let job_code = newJob.newJobCode;
+            let asset = newJob.newAssetTag;
+            let comment = newJob.newComment;
+            if (!isNaN(parseInt(e))) { setNewJob({ ...newJob, newJobCode: parseInt(e) }); job_code = parseInt(e) }
+            else if (fromSelect) { comment = e.map(m => m.value).join(','); setNewJob({ ...newJob, newComment: comment }) }
             else switch (e.target.id) {
                 case 'new-notes':
                     comment = e.target.value
-                    setNewComment(e.target.value)
+                    setNewJob({ ...newJob, newComment: comment })
                     break;
                 case 'new-assetid':
                     asset = e.target.value
-                    setNewAssetTag(e.target.value)
+                    setNewJob({ ...newJob, newAssetTag: asset })
                     break;
                 default:
                     console.log('Default Case hit for new in new asset')
@@ -213,9 +211,8 @@ function AssetPage(props) {
                 if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
                 if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
                 if (new_job && new_job.classList.contains('invalid')) new_job.classList.remove('invalid')
+                setNewJob({ newJobCode: 0, newAssetTag: '', newComment: '' })
                 setData(d);
-                setNewComment('')
-                setNewAssetTag('')
             }
         } else for (let i of data.records) {
             if (id === i.id) {
@@ -470,7 +467,7 @@ function AssetPage(props) {
 
     // Gets the restricted comments of the job code in the new line
     let newJobRestrictedComments
-    if (newJobCode) newJobRestrictedComments = getRestrictedComments(newJobCode)
+    if (newJob.newJobCode) newJobRestrictedComments = getRestrictedComments(newJob.newJobCode)
 
     // Renderer of each asset row
     function RenderRow(row) {
@@ -617,7 +614,7 @@ function AssetPage(props) {
                                     options={getJobArray()}
                                     search
                                     placeholder="Job Code"
-                                    value={newJobCode ? newJobCode : null}
+                                    value={newJob.newJobCode ? newJob.newJobCode : null}
                                     filterOptions={fuzzySearch}
                                     className='job_list'
                                     autoComplete='on'

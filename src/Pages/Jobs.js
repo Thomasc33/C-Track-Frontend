@@ -9,6 +9,19 @@ import Checkbox from 'react-custom-checkbox';
 import * as Icon from 'react-icons/fi';
 
 const settings = require('../settings.json')
+const initialNewJobState = {
+    code: '',
+    name: '',
+    price: 0,
+    isHourly: false,
+    isAsset: true,
+    isStatusOnly: false,
+    doesPromptCount: false,
+    applies: [],
+    hourlyGoal: null,
+    restrictedComments: null,
+    snipeId: null
+}
 
 function JobPage(props) {
     // Hooks and Constants
@@ -27,19 +40,9 @@ function JobPage(props) {
     }
 
     // States
-    const [newJobCode, setNewJobCode] = useState('');
-    const [newJobName, setNewJobName] = useState('');
+    const [newJob, setNewJob] = useState(initialNewJobState)
     const [, setLoading] = useState(false)
-    const [newPrice, setNewPrice] = useState(0);
-    const [newIsHourly, setNewIsHourly] = useState(false)
-    const [newIsAsset, setNewIsAsset] = useState(true)
-    const [newStatusOnly, setNewStatusOnly] = useState(false)
-    const [newPromptCount, setNewPromptCount] = useState(false)
-    const [newAppliesSelection, setNewAppliesSelection] = useState([])
-    const [newHourlyGoal, setNewHourlyGoal] = useState(null)
     const [updated, setUpdated] = useState(0)
-    const [newRestrictedComments, setNewRestrictedComments] = useState(null)
-    const [newSnipeId, setNewSnipeId] = useState(null)
 
     // Return to home page if user can't view route
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Navigate to='/' />
@@ -52,17 +55,18 @@ function JobPage(props) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
-            if (e.isHourly) setNewIsHourly(e.selection)
-            else if (e.isAsset) setNewIsAsset(e.selection)
-            else if (e.statusOnly) setNewStatusOnly(e.selection)
-            else if (e.promptCount) setNewPromptCount(e.selection)
-            else switch (e.target.id) {
-                case 'new-price': setNewPrice(e.target.value); break;
-                case 'new-hourly_goal': setNewHourlyGoal(e.target.value); break;
-                case 'new-jobname': setNewJobName(e.target.value); break;
-                case 'new-jobcode': setNewJobCode(e.target.value); break;
-                case 'new-comments': setNewRestrictedComments(e.target.value); break
-                case 'new-snipe_id': setNewSnipeId(e.target.value); break;
+            console.log(e)
+            if (e.isHourly) setNewJob({ ...newJob, isHourly: e.selection })
+            else if (e.isAsset) setNewJob({ ...newJob, isAsset: e.selection })
+            else if (e.statusOnly) setNewJob({ ...newJob, isStatusOnly: e.selection })
+            else if (e.promptCount) setNewJob({ ...newJob, doesPromptCount: e.selection })
+            else if (!e.isSelect && e.target) switch (e.target.id) {
+                case 'new-price': setNewJob({ ...newJob, price: e.target.value }); break;
+                case 'new-hourly_goal': setNewJob({ ...newJob, hourlyGoal: e.target.value }); break;
+                case 'new-jobname': setNewJob({ ...newJob, name: e.target.value }); break;
+                case 'new-jobcode': setNewJob({ ...newJob, code: e.target.value }); break;
+                case 'new-comments': setNewJob({ ...newJob, restrictedComments: e.target.value }); break
+                case 'new-snipe_id': setNewJob({ ...newJob, snipeId: e.target.value }); break;
                 default: console.log('Default Case hit for new in jobs'); return
             }
         } else for (let i of data.job_codes) {
@@ -140,17 +144,17 @@ function JobPage(props) {
     // Handles sending new data to API
     const sendNewToAPI = async () => {
         let formData = {
-            job_code: newJobCode,
-            job_name: newJobName,
-            price: newPrice,
-            isHourly: newIsHourly,
-            applies: newAppliesSelection.map(m => m.value).join(','),
-            isAsset: newIsAsset,
-            hourly_goal: newHourlyGoal,
-            statusOnly: newStatusOnly,
-            restricted_comments: newRestrictedComments,
-            promptCount: newPromptCount,
-            snipe_id: newSnipeId
+            job_code: newJob.code,
+            job_name: newJob.name,
+            price: newJob.price,
+            isHourly: newJob.isHourly,
+            applies: newJob.applies.map(m => m.value).join(','),
+            isAsset: newJob.isAsset,
+            hourly_goal: newJob.hourlyGoal,
+            statusOnly: newJob.isStatusOnly,
+            restricted_comments: newJob.restrictedComments,
+            promptCount: newJob.doesPromptCount,
+            snipe_id: newJob.snipeId
         }
         setLoading(true)
         let res = await jobService.add(formData, token)
@@ -163,9 +167,7 @@ function JobPage(props) {
             if (document.getElementById('new-jobcode')) document.getElementById('new-jobcode').value = ''
             if (document.getElementById('new-jobname')) document.getElementById('new-jobname').value = ''
             if (document.getElementById('new-price')) document.getElementById('new-price').value = ''
-            setNewPrice(0)
-            setNewJobName('')
-            setNewJobCode('')
+            setNewJob(initialNewJobState)
             const response = await fetch(`${APILink}/all`, {
                 mode: 'cors',
                 headers: {
@@ -182,7 +184,7 @@ function JobPage(props) {
 
     // Handles changing of the "applies to" selection
     const selectionChange = async (id, e) => {
-        if (id === 'new') setNewAppliesSelection(e)
+        if (id === 'new') setNewJob({ ...newJob, applies: e })
         handleTextInputChange(id, { selection: e, isSelect: true })
     }
 
@@ -343,15 +345,15 @@ function JobPage(props) {
                     <tbody>
                         <tr>
                             <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                {newJobCode && newJobName && newPrice ? <i className="material-icons delete-icon" onClick={e => sendNewToAPI()}>save</i> : undefined}
+                                {newJob.code && newJob.name && newJob.price ? <i className="material-icons delete-icon" onClick={e => sendNewToAPI()}>save</i> : undefined}
                                 <input type='text' placeholder='T-Seets Name' className='job_code' id={`new-jobcode`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
                             </td>
                             <td><input type='text' placeholder='Proper Name' className='job_name' id={`new-jobname`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>
                             {props.permissions.view_reports || props.isAdmin ?
                                 <td><input type='number' placeholder='0' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }} step='0.01'></input></td>
                                 : undefined}
-                            <td><Checkbox id={`new-isHourly`} checked={newIsHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
-                            {!newIsHourly ? <>
+                            <td><Checkbox id={`new-isHourly`} checked={newJob.isHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                            {!newJob.isHourly ? <>
                                 <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
                                 <td>
                                     <input type='number'
