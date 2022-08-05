@@ -211,7 +211,7 @@ function AssetPage(props) {
                 if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
                 if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
                 if (new_job && new_job.classList.contains('invalid')) new_job.classList.remove('invalid')
-                setNewJob({ newJobCode: 0, newAssetTag: '', newComment: '' })
+                setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '' })
                 setData(d);
             }
         } else for (let i of data.records) {

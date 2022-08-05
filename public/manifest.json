@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "C-Track",
+  "name": "An internal tracker for MDCentric's Gentiva account",
   "icons": [
     {
       "src": "favicon.ico",
