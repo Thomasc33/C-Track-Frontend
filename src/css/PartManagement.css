@@ -9,10 +9,10 @@
     font-family: 'Montserrat', sans-serif;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: center;
     overflow: scroll;
-    max-height: 88.5vh;
+    height: 88.5vh;
+    align-content: flex-start;
 }
 
 .PartManagementArea * {

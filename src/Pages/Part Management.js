@@ -43,6 +43,7 @@ function PartManagementPage(props) {
     const [commonParts, setCommonParts] = useState([])
     const [multiSelectOptions, setMultiSelectOptions] = useState([])
     const [updateModelList, setUpdateModelList] = useState(true)
+    const [updatePartList, setUpdatePartList] = useState(true)
 
     // useEffect(s)
     useEffect(() => { // Gets all models with parts enabled
@@ -82,10 +83,14 @@ function PartManagementPage(props) {
             if (res.isErrored) return console.log(res)
             setCommonParts(res.data.common || [])
             setPartsList(res.data.parts || [])
+            setUpdatePartList(false)
         }
-        if (token) getPartList()
+        if (token && updatePartList) getPartList()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedModel, token])
+    }, [selectedModel, token, updatePartList])
+
+    // Reset the block on updating part list when a new model is selected
+    useEffect(() => { setUpdatePartList(true); if (!selectedModel) setUpdateModelList(true) }, [selectedModel])
 
 
     // Permission Check
@@ -105,33 +110,34 @@ function PartManagementPage(props) {
             let newP = { ...newPart }
             newP[field] = e.target.value
             setNewPart(newP)
-            if (newP.part && newP.type && newP.m_stock) handleChange(id, newP)
         } else handleChange(id, { change: e.target.id, value: e.target.value, id })
     }
 
     const handleSelectChange = async (id, e) => {
-        if (id === 'new') {
-            let newP = { ...newPart }
-            newP.type = e
-            setNewPart(newP)
-            if (newP.part && newP.type && newP.m_stock) handleChange(id, newP)
-        } else handleChange(id, { change: 'type', value: e, id })
-
+        if (id === 'new') setNewPart({ ...newPart, type: e })
+        else handleChange(id, { change: 'type', value: e, id })
     }
 
     const handleMultiSelectChange = async (id, e) => {
         let models = e.map(m => m.value).join(',')
-        if (id === 'new') {
-            let t = { ...newPart }
-            t.alt_models = models
-            setNewPart(t)
-        } else handleChange(id, { change: 'alt_models', value: models, id })
+        if (id === 'new') setNewPart({ ...newPart, alt_models: models })
+        else handleChange(id, { change: 'alt_models', value: models, id })
     }
 
     const handleChange = async (id, formData) => {
         formData.model = selectedModel
-        if (id === 'new') await PartService.newPart(formData, token)
-        else await PartService.editPart(formData, token)
+        await PartService.editPart(formData, token)
+        setUpdatePartList(true)
+    }
+
+    const handleSaveButton = async () => {
+        await PartService.newPart({ ...newPart, model: selectedModel }, token)
+        setUpdatePartList(true)
+        try {
+            document.getElementsByClassName('NS_new_part')[0].value = ''
+            document.getElementsByClassName('NS_new_image')[0].value = ''
+            setNewPart({ ...newPart, part: undefined, image: undefined })
+        } catch (er) { console.warn(er) }
     }
 
     const numberValidatorEventListener = (e) => { e.target.value = e.target.value.replace(/[^.\d]/g, '') }
@@ -209,8 +215,7 @@ function PartManagementPage(props) {
                     onChange={e => handleMultiSelectChange(row.id, e)}
                     menuPlacement='auto'
                 />
-                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
-                    delete_outline</i>
+                <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>delete_outline</i>
             </td>
             <td>
                 <Checkbox id={`${row.id}-watched`}
@@ -233,7 +238,7 @@ function PartManagementPage(props) {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
                         <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
                         <h1>Parts for {selectedModel}</h1>
-                        <div></div>
+                        <div />
                     </div>
                     <hr />
                     {partsList ? <>
@@ -244,7 +249,7 @@ function PartManagementPage(props) {
                             <tbody>
                                 {localStorage.getItem('newestOnTop') ? partsList.map(renderPartList) : undefined}
                                 <tr>
-                                    <td><input type='text' id='part' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
+                                    <td><input type='text' className='NS_new_part' id='part' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
                                     <td><SelectSearch
                                         options={getCommonParts()}
                                         value={newPart.type ? newPart.type : null}
@@ -257,17 +262,21 @@ function PartManagementPage(props) {
                                         menuPlacement='auto'
                                         id='type' /></td>
                                     <td><input type='number' id='m_stock' placeholder='0' onBlur={e => { numberValidatorEventListener(e); handleTextInputChange(e, 'new') }} /></td>
-                                    <td><input type='text' id='image' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
-                                    <td><Select
-                                        options={multiSelectOptions}
-                                        isMulti
-                                        width='20vw'
-                                        closeMenuOnSelect={false}
-                                        styles={selectStyles}
-                                        isSearchable
-                                        onChange={e => handleMultiSelectChange('new', e)}
-                                        menuPlacement='auto'
-                                    /></td>
+                                    <td><input type='text' className='NS_new_image' id='image' placeholder='New...' onBlur={e => handleTextInputChange(e, 'new')} /></td>
+                                    <td style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Select
+                                            options={multiSelectOptions}
+                                            isMulti
+                                            width='20vw'
+                                            closeMenuOnSelect={false}
+                                            styles={selectStyles}
+                                            isSearchable
+                                            onChange={e => handleMultiSelectChange('new', e)}
+                                            menuPlacement='auto'
+                                        />
+                                        {newPart.part && newPart.type && newPart.m_stock ?
+                                            <i className="material-icons delete-icon" onClickCapture={handleSaveButton}>save</i> : undefined}
+                                    </td>
                                 </tr>
                                 {localStorage.getItem('newestOnTop') ? undefined : partsList.map(renderPartList)}
                             </tbody>
