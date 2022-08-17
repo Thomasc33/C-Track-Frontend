@@ -354,7 +354,7 @@ function AssetsPage(props) {
                 {props.permissions.edit_models || props.isAdmin ? <div>
                     <hr />
                     <h2>Add it?</h2>
-                    <ModelSelect setModelSelect={setModelSelect} />
+                    <ModelSelect setModelSelect={setModelSelect} modelSelect={modelSelect} />
                     <br />
                     <Button variant='contained' color='primary' size='large' style={{ padding: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { handleAssetAdding() }}>Add</Button>
                 </div>

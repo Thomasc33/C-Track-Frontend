@@ -172,8 +172,12 @@ td {
     animation: shake .3s;
 }
 
-.Show {
+.ShowAssetAddingPrompt {
     display: flex;
+}
+
+.ShowAssetAddingPrompt input {
+    width: 100%;
 }
 
 .confirm-alert input {

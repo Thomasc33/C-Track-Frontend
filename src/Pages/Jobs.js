@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -43,6 +43,26 @@ function JobPage(props) {
     const [newJob, setNewJob] = useState(initialNewJobState)
     const [, setLoading] = useState(false)
     const [updated, setUpdated] = useState(0)
+    const [doUpdate, setDoUpdate] = useState(false)
+
+    // Effects
+    useEffect(() => {
+        async function getData() {
+            const response = await fetch(`${APILink}/all`, {
+                mode: 'cors',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Version': require('../backendVersion.json').version
+                }
+            });
+            const d = await response.json();
+            setData(d);
+            setDoUpdate(false)
+        }
+        if (doUpdate) getData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [doUpdate])
 
     // Return to home page if user can't view route
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Navigate to='/' />
@@ -137,6 +157,9 @@ function JobPage(props) {
                     console.error(res.error.response)
                     if (!e.isHourly && !e.isSelect && !e.isAsset && e.target) e.target.classList.add('invalid')
                 }
+
+                // Update data
+                setDoUpdate(true)
             }
         }
     }

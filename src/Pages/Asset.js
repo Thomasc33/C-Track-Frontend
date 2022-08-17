@@ -190,7 +190,7 @@ function AssetPage(props) {
                     if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
                     try {
                         if (res.error.message.includes('Asset id not found')) {
-                            document.getElementById('missingAssetBox').classList.add('Show')
+                            document.getElementById('missingAssetBox').classList.add('ShowAssetAddingPrompt')
                             document.getElementById('missingAssetId').innerText = `${asset}`
                             setMissingAssetId({ id: 'new', e })
                         }
@@ -265,7 +265,7 @@ function AssetPage(props) {
                         e.target.classList.add('invalid')
                         try {
                             if (e.target.className.includes('asset_id') && res.error.data.message.includes('Asset id not found')) {
-                                document.getElementById('missingAssetBox').classList.add('Show')
+                                document.getElementById('missingAssetBox').classList.add('ShowAssetAddingPrompt')
                                 document.getElementById('missingAssetId').innerText = `${e.target.value}`
                                 setMissingAssetId({ id, e })
                             }
@@ -345,7 +345,7 @@ function AssetPage(props) {
         let res = await assetService.create(FormData, token)
         if (res.isErrored) {
             console.log(res.error)
-        } else document.getElementById('missingAssetBox').classList.remove('Show')
+        } else document.getElementById('missingAssetBox').classList.remove('ShowAssetAddingPrompt')
 
         if (missingAssetId.id && missingAssetId.e) handleTextInputChange(missingAssetId.id, missingAssetId.e).then(() => { setMissingAssetId(null) })
     }
@@ -654,11 +654,11 @@ function AssetPage(props) {
             <div id='missingAssetBox' className='AddAssetPrompt'>
                 <h1 style={{ textDecoration: 'underline', marginLeft: '3rem', marginRight: '3rem' }}>Asset Does Not Exist:</h1>
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
-                {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} /> : <></>}
+                {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} modelSelect={modelSelect} /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
                     {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
                     <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => {
-                        document.getElementById('missingAssetBox').classList.remove('Show')
+                        document.getElementById('missingAssetBox').classList.remove('ShowAssetAddingPrompt')
                     }}>Back</Button>
                 </div>
             </div>

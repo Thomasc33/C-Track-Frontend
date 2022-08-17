@@ -52,6 +52,7 @@ const ModelSelect = props => {
     // Return Select Search Component
     return <div className='SelectContainer'><SelectSearch
         options={models}
+        value={props.modelSelect ? props.modelSelect : null}
         search
         placeholder="Model Number"
         filterOptions={fuzzySearch}
