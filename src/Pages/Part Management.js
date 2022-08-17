@@ -119,7 +119,7 @@ function PartManagementPage(props) {
     }
 
     const handleMultiSelectChange = async (id, e) => {
-        let models = e.map(m => m.value).join(',')
+        let models = [selectedModel, ...e.map(m => m.value)]
         if (id === 'new') setNewPart({ ...newPart, alt_models: models })
         else handleChange(id, { change: 'alt_models', value: models, id })
     }
@@ -131,7 +131,7 @@ function PartManagementPage(props) {
     }
 
     const handleSaveButton = async () => {
-        await PartService.newPart({ ...newPart, model: selectedModel }, token)
+        await PartService.newPart({ alt_models: [selectedModel], ...newPart }, token)
         setUpdatePartList(true)
         try {
             document.getElementsByClassName('NS_new_part')[0].value = ''
@@ -187,8 +187,8 @@ function PartManagementPage(props) {
 
     const renderPartList = row => {
         let defaultOptions = []
-        if (row.alt_models) for (let i of multiSelectOptions)
-            if (row.alt_models.includes(i.value)) defaultOptions.push(i)
+        if (row.models) for (let i of multiSelectOptions)
+            if (row.models.includes(i.value) && i.value !== selectedModel) defaultOptions.push(i)
         return <tr key={row.id}>
             <td><input type='text' id='part' placeholder='New...' defaultValue={row.part_number} onBlur={e => handleTextInputChange(e, row.id)} /></td>
             <td><SelectSearch
@@ -244,7 +244,7 @@ function PartManagementPage(props) {
                     {partsList ? <>
                         <table className='rows' style={{ position: 'relative' }}>
                             <thead>
-                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th><th>Alternate Models</th><th>Notify</th></tr>
+                                <tr><th>Part Number</th><th>Common Type</th><th>Minimum Stock</th><th>Image</th><th>Models</th><th>Notify</th></tr>
                             </thead>
                             <tbody>
                                 {localStorage.getItem('newestOnTop') ? partsList.map(renderPartList) : undefined}
