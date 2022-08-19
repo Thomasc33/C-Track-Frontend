@@ -21,7 +21,7 @@ function PartInventoryPage(props) {
                 headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
             })
             if (res.isErrored) return console.log(res)
-            setData(res.data || [])
+            if (res.data) setData(res.data.filter(part => !!part.model))
         }
         if (token) getData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -49,7 +49,7 @@ function PartInventoryPage(props) {
 
     function RenderModel() {
         let selectedInfo
-        for (let i of data) if (i.model.model_number === selectedModel) { selectedInfo = i; break }
+        for (let i of data) if (i.model && i.model.model_number === selectedModel) { selectedInfo = i; break }
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedModel(null) }}>Back</Button>
@@ -68,7 +68,7 @@ function PartInventoryPage(props) {
 
     function RenderPart() {
         let selectedInfo
-        for (let i of data) if (i.model.model_number === selectedModel) { selectedInfo = i; break }
+        for (let i of data) if (i.model && i.model.model_number === selectedModel) { selectedInfo = i; break }
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#003994' }} onClick={() => { setSelectedPart(null) }}>Back</Button>
