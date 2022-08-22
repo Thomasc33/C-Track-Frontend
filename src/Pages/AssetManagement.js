@@ -15,7 +15,7 @@ const settings = require('../settings.json')
 // --- Global Constants --- //
 
 // dontRender is a list of fields that won't show on this page due to being required for the site to function
-const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type']
+const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type', 'location']
 // dataTypes is a list of different datatypes accepted by SQL Server and would actually be used
 const dataTypes = [{ name: 'varchar(50)', value: 'varchar(50)' }, { name: 'varchar(255)', value: 'varchar(255)' }, { name: 'varchar(15)', value: 'varchar(15)' },
 { name: 'text', value: 'text' }, { name: 'tinyint', value: 'tinyint' }, { name: 'int(11)', value: 'int(11)' },
@@ -140,13 +140,12 @@ function AssetManagement(props) {
                 <SelectSearch
                     options={dataTypes}
                     search
-                    placeholder="Job Code"
+                    placeholder="Data Type"
                     value={row.CHARACTER_MAXIMUM_LENGTH ? row.DATA_TYPE !== 'text' ? `${row.DATA_TYPE}(${row.CHARACTER_MAXIMUM_LENGTH})` : row.DATA_TYPE : row.DATA_TYPE}
-                    filterOptions={fuzzySearch}
                     className='job_list'
+                    filterOptions={fuzzySearch}
                     autoComplete='on'
                     onChange={e => handleChange(row.COLUMN_NAME || 'new', e, 'datatype')}
-                    id={`${row.COLUMN_NAME}-jobcode`}
                 />
             </td>
             <td>

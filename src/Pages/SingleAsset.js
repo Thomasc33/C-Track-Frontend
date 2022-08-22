@@ -16,10 +16,13 @@ import * as Icon from 'react-icons/fi';
 // Global Constants
 
 // Fields to not render
-const dontRender = ['id', 'image', 'status']
+const dontRender = ['id', 'image']
 
 // Fields that are not editable
-const notEditable = []
+const notEditable = ['status']
+
+// Render First
+const priorityRender = new Set(['status', 'model_number', 'location'])
 
 // Fields to rename {fieldname: 'displayname'}
 const nameOverrides = {
@@ -270,7 +273,7 @@ function AssetsPage(props) {
         if (modelInfo) val = modelInfo.info[row]
         else switch (row) {
             case 'status':
-                val = jobCodes[asset[row]] || asset[row]
+                val = jobCodes[asset[row]] ? titleCase(jobCodes[asset[row]]) : asset[row]
                 break;
             default:
                 val = asset[row]
@@ -396,7 +399,7 @@ function AssetsPage(props) {
         return (
             <tr key={row.id}>
                 <td style={{ cursor: 'pointer' }} onClick={e => { nav(`/search?q=${row.id}`); setSearch(row.id) }}><p>{row.id}</p></td>
-                <td><p>{jobCodes[row.status]}</p></td>
+                <td><p>{jobCodes[row.status] ? titleCase(jobCodes[row.status]) : row.status}</p></td>
                 <td><p>{row.company}</p></td>
                 <td><p>{row.locked ? 'Yes' : 'No'}</p></td>
                 <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
@@ -474,7 +477,9 @@ function AssetsPage(props) {
                                     <hr />
                                     <div style={{ display: 'flex' }}>
                                         <table style={{ width: asset.image ? '60%' : '100%' }}><tbody>
-                                            {Object.keys(asset).map(m => { if (!dontRender.includes(m)) return renderRow(m); else return <></> })}
+                                            {Object.keys(asset).map(m => { if (priorityRender.has(m) && !dontRender.includes(m)) return renderRow(m); else return <></> })}
+                                            <hr />
+                                            {Object.keys(asset).map(m => { if (!priorityRender.has(m) && !dontRender.includes(m)) return renderRow(m); else return <></> })}
                                         </tbody></table>
                                         {asset.image ? <img style={{ width: '40%', height: 'auto', objectFit: 'contain' }} src={asset.image} alt='Asset' /> : <></>}
                                     </div>

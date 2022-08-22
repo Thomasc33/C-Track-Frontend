@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useFetch } from '../Helpers/API';
@@ -18,6 +19,7 @@ const initialNewJobState = {
     isStatusOnly: false,
     doesPromptCount: false,
     applies: [],
+    usageRuleGroup: null,
     hourlyGoal: null,
     restrictedComments: null,
     snipeId: null
@@ -48,7 +50,7 @@ function JobPage(props) {
     // Effects
     useEffect(() => {
         async function getData() {
-            const response = await fetch(`${APILink}/all`, {
+            const response = await fetch(`${APILink}/full`, {
                 mode: 'cors',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -75,7 +77,6 @@ function JobPage(props) {
             if (e.target.classList.contains('invalid')) e.target.classList.remove('invalid')
         }
         if (id === 'new') {
-            console.log(e)
             if (e.isHourly) setNewJob({ ...newJob, isHourly: e.selection })
             else if (e.isAsset) setNewJob({ ...newJob, isAsset: e.selection })
             else if (e.statusOnly) setNewJob({ ...newJob, isStatusOnly: e.selection })
@@ -106,8 +107,13 @@ function JobPage(props) {
                     formData.change = 'isAsset'
                     formData.value = e.selection.toString()
                 } else if (e.isSelect) {
-                    formData.change = 'applies'
-                    formData.value = e.selection.map(m => m.value).join(',')
+                    if (e.isUsage) {
+                        formData.change = 'usageRule'
+                        formData.value = e.selection
+                    } else {
+                        formData.change = 'applies'
+                        formData.value = e.selection.map(m => m.value).join(',')
+                    }
                     // eslint-disable-next-line default-case
                 } else if (e.statusOnly) {
                     formData.change = 'statusOnly'
@@ -177,7 +183,8 @@ function JobPage(props) {
             statusOnly: newJob.isStatusOnly,
             restricted_comments: newJob.restrictedComments,
             promptCount: newJob.doesPromptCount,
-            snipe_id: newJob.snipeId
+            snipe_id: newJob.snipeId,
+            usageRuleGroup: newJob.usageRuleGroup
         }
         setLoading(true)
         let res = await jobService.add(formData, token)
@@ -208,7 +215,13 @@ function JobPage(props) {
     // Handles changing of the "applies to" selection
     const selectionChange = async (id, e) => {
         if (id === 'new') setNewJob({ ...newJob, applies: e })
-        handleTextInputChange(id, { selection: e, isSelect: true })
+        else handleTextInputChange(id, { selection: e, isSelect: true })
+    }
+
+    const handeUsageRulesChange = async (id, e) => {
+        console.log(e)
+        if (id === 'new') setNewJob({ ...newJob, usageRuleGroup: e })
+        else handleTextInputChange(id, { selection: e, isSelect: true, isUsage: true })
     }
 
     // Validates text inputed is number
@@ -297,7 +310,19 @@ function JobPage(props) {
                             isSearchable
                             width='20vw'
                             onChange={e => selectionChange(row.id, e)} />
-                    </td></> : <><td /><td /><td /></>}
+                    </td>
+                    <td>
+                        <SelectSearch
+                            options={usageRulesOptions}
+                            search
+                            placeholder="Group"
+                            value={row.usage_rule_group && row.usage_rule_group !== 'remove' ? row.usage_rule_group : undefined}
+                            className='job_list'
+                            filterOptions={fuzzySearch}
+                            autoComplete='on'
+                            onChange={e => handeUsageRulesChange(row.id, e)} />
+                    </td>
+                </> : <><td /><td /><td /><td /></>}
             <td>
                 <Checkbox id={`${row.id}-statusOnly`}
                     checked={row.status_only}
@@ -359,6 +384,7 @@ function JobPage(props) {
                             <th style={{ width: '25vw', padding: '1rem' }}>Asset</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Hrly Target</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Applies To</th>
+                            <th style={{ width: '25vw', padding: '1rem' }}>Usage Rules</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Not Usable</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Prompt Count</th>
                             <th style={{ width: '25vw', padding: '1rem' }}>Comments</th>
@@ -378,22 +404,32 @@ function JobPage(props) {
                             <td><Checkbox id={`new-isHourly`} checked={newJob.isHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             {!newJob.isHourly ? <>
                                 <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
-                                <td>
-                                    <input type='number'
-                                        className='hourly_goal'
-                                        id={`new-hourly_goal`}
-                                        placeholder='Target'
-                                        onBlur={e => { numberValidatorEventListener(e); handleTextInputChange('new', e) }}
-                                        onKeyDown={e => { handleKeyDown('new', e) }}
-                                        style={{ width: '7rem', padding: '1rem' }} />
+                                <td><input type='number'
+                                    className='hourly_goal'
+                                    id={`new-hourly_goal`}
+                                    placeholder='Target'
+                                    onBlur={e => { numberValidatorEventListener(e); handleTextInputChange('new', e) }}
+                                    onKeyDown={e => { handleKeyDown('new', e) }}
+                                    style={{ width: '7rem', padding: '1rem' }} />
                                 </td>
                                 <td><Select menuPlacement='auto' options={multiSelectOptions}
                                     isMulti
                                     closeMenuOnSelect={false}
                                     styles={selectStyles}
                                     isSearchable
-                                    onChange={e => selectionChange('new', e)} /></td>
-                            </> : <><td /><td /><td /></>}
+                                    onChange={e => selectionChange('new', e)} />
+                                </td>
+                                <td><SelectSearch
+                                    options={usageRulesOptions}
+                                    search
+                                    placeholder="Group"
+                                    value={newJob.usageRuleGroup && newJob.usageRuleGroup !== 'remove' ? newJob.usageRuleGroup : undefined}
+                                    className='job_list'
+                                    filterOptions={fuzzySearch}
+                                    autoComplete='on'
+                                    onChange={e => handeUsageRulesChange('new', e)} />
+                                </td>
+                            </> : <><td /><td /><td /><td /></>}
                             <td>
                                 <Checkbox id={`new-statusOnly`}
                                     borderWidth='2px'
@@ -441,6 +477,16 @@ const multiSelectOptions = [
     { value: 'Phone', label: 'Phone' },
     { value: 'Tablet', label: 'Tablet' },
     { value: 'MiFi', label: 'MiFi' },
+]
+
+const usageRulesOptions = [
+    { value: 'remove', name: 'Remove' },
+    { value: 'chkn', name: 'Check-in' },
+    { value: 'ship', name: 'Ship' },
+    { value: 'deploy', name: 'Deploy' },
+    { value: 'decom', name: 'Decommission' },
+    { value: 'work', name: 'Work' },
+    { value: 'new', name: 'New Asset' },
 ]
 
 const multiSelectIndexer = {}

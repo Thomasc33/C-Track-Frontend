@@ -28,7 +28,7 @@ function AssetPage(props) {
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
-    const [newJob, setNewJob] = useState({ newJobCode: 0, newAssetTag: '', newComment: '' })
+    const [newJob, setNewJob] = useState({ newJobCode: 0, newAssetTag: '', newComment: '', newBranch: '' })
     const [missingAssetId, setMissingAssetId] = useState(null)
     const [modelSelect, setModelSelect] = useState(null)
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
@@ -129,6 +129,7 @@ function AssetPage(props) {
             let job_code = newJob.newJobCode;
             let asset = newJob.newAssetTag;
             let comment = newJob.newComment;
+            let branch = newJob.newBranch;
             if (!isNaN(parseInt(e))) { setNewJob({ ...newJob, newJobCode: parseInt(e) }); job_code = parseInt(e) }
             else if (fromSelect) { comment = e.map(m => m.value).join(','); setNewJob({ ...newJob, newComment: comment }) }
             else switch (e.target.id) {
@@ -139,6 +140,10 @@ function AssetPage(props) {
                 case 'new-assetid':
                     asset = e.target.value
                     setNewJob({ ...newJob, newAssetTag: asset })
+                    break;
+                case 'new-branch':
+                    branch = e.target.value
+                    setNewJob({ ...newJob, newBranch: branch })
                     break;
                 default:
                     console.log('Default Case hit for new in new asset')
@@ -172,6 +177,7 @@ function AssetPage(props) {
                 job_code: job_code,
                 asset_id: asset,
                 notes: comment,
+                branch: branch,
                 uid: location.state && location.state.uid,
                 multiple
             }
@@ -185,6 +191,34 @@ function AssetPage(props) {
                 else if (res.error.message === 'Asset is Locked') {
                     console.log('locked')
                     alert(`This asset is currently locked and cannot be modified. Contact a site admin for more information`)
+                } else if (res.error.ruleViolation) {
+                    confirmAlert({
+                        customUI: ({ onClose }) => {
+                            return (
+                                <div className='confirm-alert'>
+                                    <h1>Job Code Rule Violation</h1>
+                                    <br />
+                                    <h2>{res.error.message}</h2>
+                                    <br />
+                                    {res.error.previousRecord ? <>
+                                        <h2>Previous Record:</h2>
+                                        <h3>Date: {getDate(res.error.previousRecord.date)}</h3>
+                                        <h3>Time: {formatAMPM(res.error.previousRecord.time)}</h3>
+                                        <h3>Job Code: {res.error.previousRecord.job}</h3>
+                                        <h3>Technician: {res.error.previousRecord.user}</h3>
+                                    </>
+                                        : undefined}
+                                    <span style={{ margins: '1rem' }}>
+                                        <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                            onClose()
+                                        }}>Close</Button>
+                                    </span>
+                                </div>
+                            )
+                        },
+                        closeOnEscape: true,
+                        closeOnClickOutside: true
+                    })
                 }
                 else {
                     if (document.getElementById('new-assetid')) document.getElementById('new-assetid').classList.add('invalid')
@@ -207,11 +241,12 @@ function AssetPage(props) {
                     }
                 });
                 const d = await response.json();
-                let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes'), new_job = document.getElementById('new-jobcode')
+                let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes'), new_job = document.getElementById('new-jobcode'), new_branch = document.getElementById('new-branch')
                 if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
                 if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
                 if (new_job && new_job.classList.contains('invalid')) new_job.classList.remove('invalid')
-                setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '' })
+                if (new_branch) new_branch.value = ''
+                setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '', newBranch: '' })
                 setData(d);
             }
         } else for (let i of data.records) {
@@ -237,6 +272,9 @@ function AssetPage(props) {
                     case 'notes':
                         if (e.target.value !== i.notes) formData.change = 'notes'
                         break;
+                    case 'branch':
+                        if (e.target.value !== i.branch) formData.change = 'branch'
+                        break
                     default:
                         break;
                 }
@@ -257,9 +295,38 @@ function AssetPage(props) {
                         document.getElementById(`${id}-assetid`).value = ''
                         if (document.getElementById(`${id}-jobcode`)) document.getElementById(`${id}-jobcode`).classList.add('invalid')
                     }
-                    if (res.error.message === 'Asset is Locked') {
+                    else if (res.error.message === 'Asset is Locked') {
                         console.log('locked')
                         alert(`This asset is currently locked and cannot be modified. Contact a site admin for more information`)
+                    }
+                    else if (res.error.ruleViolation) {
+                        confirmAlert({
+                            customUI: ({ onClose }) => {
+                                return (
+                                    <div className='confirm-alert'>
+                                        <h1>Job Code Rule Violation</h1>
+                                        <br />
+                                        <h2>{res.error.message}</h2>
+                                        <br />
+                                        {res.error.previousRecord ? <>
+                                            <h2>Previous Record:</h2>
+                                            <h3>Date: {getDate(res.error.previousRecord.date)}</h3>
+                                            <h3>Time: {formatAMPM(res.error.previousRecord.time)}</h3>
+                                            <h3>Job Code: {res.error.previousRecord.job}</h3>
+                                            <h3>Technician: {res.error.previousRecord.user}</h3>
+                                        </>
+                                            : undefined}
+                                        <span style={{ margins: '1rem' }}>
+                                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                                onClose()
+                                            }}>Close</Button>
+                                        </span>
+                                    </div>
+                                )
+                            },
+                            closeOnEscape: true,
+                            closeOnClickOutside: true
+                        })
                     }
                     if (e.target) {
                         e.target.classList.add('invalid')
@@ -561,6 +628,15 @@ function AssetPage(props) {
                 <i className="material-icons delete-icon" onClickCapture={e => handleDelete(row.id, e, row)}>
                     delete_outline</i>
             </td>
+            <td><div style={{ padding: 0, margin: 0, display: 'flex', alignContent: 'center' }}><input type='text'
+                style={{ border: duplicate ? '3px solid #b8680d' : undefined }}
+                defaultValue={row.branch}
+                placeholder='Branch'
+                className='branch'
+                id={`${row.id}-branch`}
+                onBlur={e => handleTextInputChange(row.id, e)}
+                onKeyDown={e => handleKeyDown(row.id, e)}></input>
+            </div></td>
         </tr >)
     }
 
@@ -602,6 +678,7 @@ function AssetPage(props) {
                             <th>Job Code</th>
                             <th>Asset Tag / IMEI</th>
                             <th>Comments</th>
+                            <th style={{ width: '10%' }}>Branch</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -645,6 +722,9 @@ function AssetPage(props) {
 
                                     <input type='text' placeholder='Comments' className='notes' id={`new-notes`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
                                 }
+                            </td>
+                            <td style={{ borderBottom: newestOnTop ? '1px solid #ddd' : '' }}>
+                                <input type='text' placeholder='Branch' className='branch' id={`new-branch`} onBlur={(e) => handleTextInputChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input>
                             </td>
                         </tr>
                         {newestOnTop ? data.records ? data.records.slice(0).reverse().map(m => RenderRow(m)) : undefined : undefined}
