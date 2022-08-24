@@ -1,7 +1,6 @@
 // Imports
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Button } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import axios from 'axios'
