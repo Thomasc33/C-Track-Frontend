@@ -29,7 +29,7 @@ function PartInventoryPage(props) {
 
 
     // Permission Check
-    if (!props.permissions.use_importer && !props.isAdmin) return <Navigate to='/' />
+    if (!props.permissions.view_part_inventory && !props.isAdmin) return <Navigate to='/' />
 
     // Event Handlers
 

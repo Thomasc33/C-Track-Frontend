@@ -51,6 +51,7 @@ const PartCategoriesPage = lazy(() => import('./Pages/Part Types'));
 const PartInventoryPage = lazy(() => import('./Pages/Part Inventory'));
 const PartManagementPage = lazy(() => import('./Pages/Part Management'));
 const RepairLogPage = lazy(() => import('./Pages/Repair Log'));
+const LocationsPage = lazy(() => import('./Pages/Locations'));
 
 // Import App Settings
 const settings = require('./settings.json')
@@ -159,6 +160,7 @@ function App(props) {
           <Route exact path="/inventory" element={<PartInventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/parts" element={<PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/parttypes" element={<PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/locations" element={<LocationsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         </Routes>
       </Suspense>

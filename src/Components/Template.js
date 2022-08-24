@@ -254,6 +254,9 @@ function PageTemplate(props) {
                                 {isAdmin || (permissions && permissions.view_models) ? <li>
                                     <p style={{ color: highlight === "models" ? accent : 'white' }} onClickCapture={(e) => nav('/models')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/models', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/models' }) }}>Models</p>
                                 </li> : <></>}
+                                {isAdmin || (permissions && permissions.view_assets) ? <li>
+                                    <p style={{ color: highlight === "locations" ? accent : 'white' }} onClickCapture={(e) => nav('/locations')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/locations', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/locations' }) }}>Assets</p>
+                                </li> : <></>}
                             </ul>
                         </li>
                         : undefined}
