@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import axios from 'axios'
+import { Button } from '@material-ui/core';
 
 function PartInventoryPage(props) {
     // MSAL stuff
@@ -52,7 +53,7 @@ function PartInventoryPage(props) {
     function RenderHome() {
         let keys = []
         if (data.data) keys = Object.keys(data.data)
-        keys = keys.sort((a, b) => data[a] > data[b] ? -1 : 1)
+        keys = keys.sort((a, b) => +data[a] > +data[b] ? -1 : 1)
         return <><h1>Asset Locations</h1>
             <hr />
             <div className='AssetLocationBlobContainer'>
@@ -62,7 +63,12 @@ function PartInventoryPage(props) {
     }
 
     function RenderLocation() {
-        return <><h1>Asset In {selectedLocation}</h1>
+        return <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '90%' }}>
+                <Button style={{ left: 0 }} variant='contained' color='primary' onClick={() => { setSelectedLocation(null); setLocationData([]) }}>Back</Button>
+                <h1>Asset In {selectedLocation}</h1>
+                <p></p>
+            </div>
             <hr />
             <div className='AssetLocationBlobContainer'>
                 {locationData.map(RenderLocationRow)}
