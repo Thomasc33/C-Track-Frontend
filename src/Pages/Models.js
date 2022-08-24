@@ -67,17 +67,13 @@ function ModelPage(props) {
                 setNewInfo(z)
             }
 
-            console.log(e, isSelect)
-
-            console.log(z)
-
             // Check to see if its ready to send to DB
             if (!(z.model_number && z.model_name && z.manufacturer && z.category && z.category.length)) return
 
             //send to api
             let formData = z
             formData.category = z.category.map(m => m.value).join(',')
-            console.log(formData)
+            
             let res = await ModelService.add(formData, token)
             if (res.isErrored) {
                 document.getElementById('new-model_number').classList.add('invalid')
