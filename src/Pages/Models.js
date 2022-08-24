@@ -14,7 +14,7 @@ function ModelPage(props) {
     const { token, tokenLoading } = useMSAL()
     const [catalog, setCatalog] = useState([])
     const [pageNumber, setPageNumber] = useState(1)
-    const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
+    const [newInfo, setNewInfo] = useState({ model_number: '', model_name: '', manufacturer: '', image: '', category: [] })
 
     // Effects
     useEffect(() => { // Gets catalog of models
@@ -61,17 +61,23 @@ function ModelPage(props) {
         if (id === 'new') {
             // Update state
             const z = { ...newInfo }
-            if (isSelect) { z.category = e.value; setNewInfo(z) }
+            if (isSelect) { z.category = [...e]; setNewInfo(z) }
             else if (e.target.value !== newInfo[e.target.classList[0]]) {
                 z[e.target.classList[0]] = e.target.value
                 setNewInfo(z)
             }
 
+            console.log(e, isSelect)
+
+            console.log(z)
+
             // Check to see if its ready to send to DB
-            if (!(z.model_number && z.model_name && z.manufacturer && z.category)) return
+            if (!(z.model_number && z.model_name && z.manufacturer && z.category && z.category.length)) return
 
             //send to api
             let formData = z
+            formData.category = z.category.map(m => m.value).join(',')
+            console.log(formData)
             let res = await ModelService.add(formData, token)
             if (res.isErrored) {
                 document.getElementById('new-model_number').classList.add('invalid')
@@ -84,7 +90,7 @@ function ModelPage(props) {
                 document.getElementById('new-image').value = ''
                 alert(`Model ${z.model_number} has been added.`)
                 getCatalog((pageNumber - 1) * 50)
-                setNewInfo({ model_number: '', model_name: '', manufacturer: '', image: '', category: '' })
+                setNewInfo({ model_number: '', model_name: '', manufacturer: '', image: '', category: [] })
             }
         } else for (let i of catalog) {
             if (id === i.model_number) {
@@ -201,7 +207,7 @@ function ModelPage(props) {
         </tr >)
     }
 
-    if(tokenLoading) return <></>
+    if (tokenLoading) return <></>
     return (
         <>
             <div className='PageNavigation'>
@@ -238,6 +244,7 @@ function ModelPage(props) {
                             <td key={`new-category`}>
                                 <Select
                                     isMulti
+                                    value={newInfo.category}
                                     options={multiSelectOptions}
                                     closeMenuOnSelect
                                     styles={selectStyles}
