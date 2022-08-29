@@ -336,7 +336,7 @@ function AssetsPage(props) {
                                             defaultValue={val}
                                             id={`${row}`}
                                             style={{ margin: '.5rem', width: '79%' }}
-                                            readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                                            readOnly={!notEditable.includes(row) ? false : true}
                                             onBlur={e => handleTextInputChange(row, e)}
                                             onKeyDown={e => handleKeyDown(row, e)} />
                     }
