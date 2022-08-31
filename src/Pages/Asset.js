@@ -209,9 +209,13 @@ function AssetPage(props) {
                                     </>
                                         : undefined}
                                     <span style={{ margins: '1rem' }}>
-                                        <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                        <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
                                             onClose()
                                         }}>Close</Button>
+                                        <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                            onClose()
+                                            handleOverrideResend(formData, false)
+                                        }}>Override</Button>
                                     </span>
                                 </div>
                             )
@@ -317,9 +321,13 @@ function AssetPage(props) {
                                         </>
                                             : undefined}
                                         <span style={{ margins: '1rem' }}>
-                                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
                                                 onClose()
                                             }}>Close</Button>
+                                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                                onClose()
+                                                handleOverrideResend(formData, true)
+                                            }}>Override</Button>
                                         </span>
                                     </div>
                                 )
@@ -470,6 +478,31 @@ function AssetPage(props) {
         if (res.isErrored) {
             alert('Failed to delete. Try again or see Thomas if it continues to fail')
             console.log(res.error)
+        }
+    }
+
+    const handleOverrideResend = async (formData, isEdit) => {
+        formData.ruleOverride = true
+        let res = isEdit ? await assetService.edit(formData, token) : await assetService.add(formData, token)
+        if (res.isErrored) {
+            console.log(res.error)
+        } else if (!isEdit) {
+            const response = await fetch(APILink.concat(getDate(date)), {
+                mode: 'cors',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Access-Control-Allow-Origin': '*',
+                    'X-Version': require('../backendVersion.json').version
+                }
+            });
+            const d = await response.json();
+            let new_assetid = document.getElementById('new-assetid'), new_notes = document.getElementById('new-notes'), new_job = document.getElementById('new-jobcode'), new_branch = document.getElementById('new-branch')
+            if (new_assetid) { new_assetid.value = ''; if (new_assetid.classList.contains('invalid')) new_assetid.classList.remove('invalid') }
+            if (new_notes) { new_notes.value = ''; if (new_notes.classList.contains('invalid')) new_notes.classList.remove('invalid') }
+            if (new_job && new_job.classList.contains('invalid')) new_job.classList.remove('invalid')
+            if (new_branch) new_branch.value = ''
+            setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '', newBranch: '' })
+            setData(d);
         }
     }
 

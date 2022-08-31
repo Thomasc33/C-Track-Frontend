@@ -287,7 +287,7 @@ function AssetsPage(props) {
                             defaultValue={val}
                             id={`${row}`}
                             style={{ padding: '1rem', margin: '.5rem', height: '10rem', width: '87.5%' }}
-                            readOnly={!notEditable.includes(row) && (props.permissions.edit_assets || props.isAdmin) ? false : true}
+                            readOnly={notEditable.includes(row)}
                             onBlur={e => handleTextInputChange(row, e)}
                             onKeyDown={e => handleKeyDown(row, e)} />
                         :
@@ -336,7 +336,7 @@ function AssetsPage(props) {
                                             defaultValue={val}
                                             id={`${row}`}
                                             style={{ margin: '.5rem', width: '79%' }}
-                                            readOnly={!notEditable.includes(row) ? false : true}
+                                            readOnly={notEditable.includes(row)}
                                             onBlur={e => handleTextInputChange(row, e)}
                                             onKeyDown={e => handleKeyDown(row, e)} />
                     }
