@@ -155,13 +155,13 @@ function AssetsPage(props) {
 
     // Main Function for editing rows
     const handleTextInputChange = async (row, e) => {
-        if (notEditable.includes(row) || !(props.permissions.edit_assets || props.isAdmin) || modelInfo) return
+        if (notEditable.includes(row) || modelInfo) return
         if (e.target && e.target.value === asset[row]) return
         if (!e.target && !e) return
         let formData = {
             id: search,
             change: row,
-            value: e.target ? e.target.value : e
+            value: e.target ? e.target.value ? e.target.value.trim() : e.target.value : e
         }
         if (!formData.value) formData.value = ''
         let res = await AssetService.singleEdit(formData, token)
@@ -376,6 +376,7 @@ function AssetsPage(props) {
             <tr key={row.id}>
                 <td><p>{row.name}</p></td>
                 <td><p>{jobCodes[row.job_code]}</p></td>
+                <td><p>{row.branch || '​'}</p></td>
                 <td><p>{date} {time}</p></td>
                 <td style={{ maxWidth: '20vw' }}><p>{row.notes || 'None'}</p></td>
             </tr>
@@ -487,7 +488,7 @@ function AssetsPage(props) {
                                     <h1>Status History</h1>
                                     <hr />
                                     <div style={{ display: 'flex' }}>
-                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Date</th><th>Notes</th></thead><tbody>{assetHistory.map(m => renderHistoryRow(m))}</tbody></table> : <h2 style={{ width: '100%', textAlign: 'center' }}>No Changes Found</h2>}
+                                        {assetHistory && assetHistory.length > 0 ? <table className='HistoryTable'><thead><th>Technician</th><th>Status</th><th>Branch</th><th>Date</th><th>Notes</th></thead><tbody>{assetHistory.map(m => renderHistoryRow(m))}</tbody></table> : <h2 style={{ width: '100%', textAlign: 'center' }}>No Changes Found</h2>}
                                     </div>
                                     <hr />
                                     <br />
