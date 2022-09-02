@@ -279,6 +279,9 @@ function AssetPage(props) {
                     case 'branch':
                         if (e.target.value !== i.branch) formData.change = 'branch'
                         break
+                    case 'time':
+                        if (e.target.value !== i.time) formData.change = 'time'
+                        break;
                     default:
                         break;
                 }
@@ -608,7 +611,13 @@ function AssetPage(props) {
                 size='30px'
                 icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
                 onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>
-            {showTimestamp ? <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
+            {showTimestamp ? location.state && location.state.isReport ? <td><input
+                type='time'
+                className='time'
+                defaultValue={row.time.substr(11, 5)}
+                onBlur={e => { handleTextInputChange(row.id, e) }}
+            /></td>
+                : <td><p style={{ fontSize: '20px' }}>{formatAMPM(row.time)}</p></td> : undefined}
             <td>
                 <SelectSearch
                     options={getJobArray()}
