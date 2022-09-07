@@ -1,7 +1,6 @@
 // Imports
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import * as timeago from 'timeago.js'
 import axios from 'axios'
@@ -13,7 +12,6 @@ function PartInventoryPage(props) {
     const { token } = useMSAL()
 
     // Hooks
-    const nav = useNavigate()
     const location = useLocation()
 
     // States

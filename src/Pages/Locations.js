@@ -1,7 +1,6 @@
 // Imports
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import axios from 'axios'
 import { Button } from '@material-ui/core';
@@ -12,11 +11,12 @@ function PartInventoryPage(props) {
 
     // Hooks
     const nav = useNavigate()
+    const location = useLocation()
 
     // States
     const [data, setData] = useState({})
     const [locationData, setLocationData] = useState([])
-    const [selectedLocation, setSelectedLocation] = useState(null)
+    const [selectedLocation, setSelectedLocation] = useState(new URLSearchParams(location.search).get('q'))
 
     // Effects
     useEffect(() => {

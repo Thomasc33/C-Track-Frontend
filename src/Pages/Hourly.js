@@ -27,6 +27,7 @@ function HourlyPage(props) {
     // States
     const [date, setDate] = useState(location.state ? location.state.date || Date.now() : Date.now())
     const [newestOnTop, setNewestOnTop] = useState(localStorage.getItem('newestOnTop') === 'true' || false)
+    const [fancyClock, setFancyClock] = useState(localStorage.getItem('fancyClock') === 'true' || false)
     const [jobCodes, setJobCodes] = useState(null);
     const [favorites, setFavorites] = useState([])
     const [indexedJobCodes, setIndexJobCodes] = useState({})
@@ -350,6 +351,47 @@ function HourlyPage(props) {
         }
     }
 
+    // Handles the changing of the boring time select element
+    const handleBoringTimeSelectChange = async (id, isStart, e) => {
+        if (e.target.value === '') return
+        if (!['00', '15', '30', '45'].includes(e.target.value.substr(3))) {
+            let t = e.target.value.split(':')
+            t[1] = Math.round(+t[1] / 15) * 15
+            e.target.value = t.join(':')
+        }
+        let target = document.getElementById(`${id}-${isStart ? 'Start' : 'End'}`)
+        if (target && target.classList && target.classList.contains('invalid')) target.classList.remove('invalid')
+        let sendToAPI = false
+        if (id === 'new')
+            if (times.new) {
+                //update 'new' time
+                let temp = { ...times }
+                if (isStart) temp.new.startTime = e.target.value
+                else temp.new.endTime = e.target.value
+                setTimes(temp)
+            } else {
+                //create 'new'
+                let time = { startTime: null, endTime: null }
+                if (isStart) time.startTime = e.target.value
+                else time.endTime = e.target.value
+                let temp = { ...times }
+                temp['new'] = time
+                setTimes(temp)
+            }
+        else {
+            //update 'id' time
+            let temp = { ...times }
+            if (isStart) temp[`${id}`].startTime = e.target.value
+            else temp[`${id}`].endTime = e.target.value
+            setTimes(temp)
+            sendToAPI = true
+        }
+
+        if (sendToAPI) {
+            handleChange(id, null, `${id}-${isStart ? 'start' : 'end'}`)
+        }
+    }
+
     // Called every time data is updated. Converts the start and end time to usable data for react-timekeeper
     const parseTime = () => {
         let temp = { ...times }
@@ -360,8 +402,8 @@ function HourlyPage(props) {
         if (!temp.new) temp.new = {}
         if (!temp.new.startTime) {
             if (data.records.length > Object.keys(times).length)
-                temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '8:30'
-            else temp.new.startTime = '8:30'
+                temp.new.startTime = temp.new.startTime = data.records[data.records.length - 1].end_time.substr(11, 5) || '08:30'
+            else temp.new.startTime = '08:30'
             temp.new.endTime = '17:00'
         }
         setTimes(temp)
@@ -404,24 +446,30 @@ function HourlyPage(props) {
                         {indexedJobCodes[optionProps.value]}
                     </button>} />
             </td>
-            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-Start`}
+            <td><div className={fancyClock ? "TimeKeeper Minimized-Time" : "TimeKeeper"} id={`${row.id}-Start`}
                 style={{ border: (parseInt(row.start_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.start_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 3px #b8680d' : undefined, paddingBottom: '10px' }}>
-                <TimeKeeper
-                    coarseMinutes='15'
-                    time={row.start_time.substr(11, 5)}
-                    css={{ color: localStorage.getItem('accentColor') || '#00c6fc' }}
-                    forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
-                    onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
-                /></div></td>
-            <td><div className="TimeKeeper Minimized-Time" id={`${row.id}-End`}
-                style={{ border: (parseInt(row.end_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.end_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 3px #b8680d' : undefined, paddingBottom: '10px' }}>
-                {row.in_progress ? undefined :
+                {fancyClock ?
                     <TimeKeeper
                         coarseMinutes='15'
-                        time={row.end_time.substr(11, 5)}
+                        time={row.start_time.substr(11, 5)}
+                        css={{ color: localStorage.getItem('accentColor') || '#00c6fc' }}
                         forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
-                        onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
-                    />}</div></td>
+                        onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
+                    /> :
+                    <input type='time' step='900' min='05:00' max='20:00' value={row.start_time.substr(11, 5)} onChange={e => handleBoringTimeSelectChange(`${row.id}`, true, e)} />
+                }</div></td>
+            <td><div className={fancyClock ? "TimeKeeper Minimized-Time" : "TimeKeeper"} id={`${row.id}-End`}
+                style={{ border: (parseInt(row.end_time.split('T')[1].substr(0, 2)) < normalTimeRange[0] || parseInt(row.end_time.split('T')[1].substr(0, 2)) > normalTimeRange[1] || row.hours >= 10) ? 'solid 3px #b8680d' : undefined, paddingBottom: '10px' }}>
+                {row.in_progress ? undefined :
+                    fancyClock ?
+                        <TimeKeeper
+                            coarseMinutes='15'
+                            time={row.end_time.substr(11, 5)}
+                            forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
+                            onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
+                        /> :
+                        <input type='time' step='900' min='05:00' max='20:00' value={row.end_time.substr(11, 5)} onChange={e => handleBoringTimeSelectChange(`${row.id}`, false, e)} />
+                }</div></td>
             <td>
                 <Checkbox
                     id={`${row.id}-inProgress`}
@@ -460,6 +508,7 @@ function HourlyPage(props) {
             </div>
 
             <div style={{ position: 'absolute', top: '8vh', right: '4vw', display: 'inline-flex', alignItems: 'center' }}>
+                <i className='material-icons DateArrows' style={{ padding: '1rem' }} onClickCapture={() => { localStorage.setItem('fancyClock', !fancyClock); setFancyClock(!fancyClock) }}>schedule</i>
                 <i className='material-icons DateArrows' onClickCapture={() => { localStorage.setItem('newestOnTop', !newestOnTop); setNewestOnTop(!newestOnTop) }}>sort</i>
             </div>
 
@@ -503,8 +552,8 @@ function HourlyPage(props) {
                             </td>
                             <td><div className="TimeKeeper" id='new-Start'
                                 style={{ border: times.new && times.new.startTime && (parseInt(times.new.startTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.startTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new.endTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
-                                <TimeKeeper
-                                    time={times.new && times.new.startTime ? times.new.startTime : '8:30'}
+                                {fancyClock ? <TimeKeeper
+                                    time={times.new && times.new.startTime ? times.new.startTime : '08:30'}
                                     coarseMinutes='15'
                                     forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                                     onChange={e => handleTimeSelectChange('new', true, e)}
@@ -513,21 +562,30 @@ function HourlyPage(props) {
                                             <i className="material-icons">done</i>
                                         </div>
                                     )}
-                                /></div></td>
+                                /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <i className='material-icons' style={{ cursor: 'pointer', fontSize: '2rem', paddingRight: '.5rem' }} onClick={e => { handleChange('new', null, 'new-start') }}>done</i>
+                                    <input type='time' step='900' min='05:00' max='20:00' value={times.new.startTime} onChange={e => handleBoringTimeSelectChange('new', true, e)} />
+                                </div>
+
+                                }
+                            </div></td>
                             <td><div className="TimeKeeper" id='new-End'
                                 style={{ border: times.new && times.new.endTime && (parseInt(times.new.endTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.endTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new.startTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
                                 {times.new && times.new && times.new.in_progress ? undefined :
-                                    <TimeKeeper
-                                        time={times.new && times.new.endTime ? times.new.endTime : '17:00'}
-                                        coarseMinutes='15'
-                                        forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
-                                        onChange={e => handleTimeSelectChange('new', false, e)}
-                                        doneButton={(newTime) => (
-                                            <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleChange('new', null, 'new-start')}>
-                                                <i className="material-icons">done</i>
-                                            </div>
-                                        )}
-                                    />}</div></td>
+                                    fancyClock ?
+                                        <TimeKeeper
+                                            time={times.new && times.new.endTime ? times.new.endTime : '17:00'}
+                                            coarseMinutes='15'
+                                            forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
+                                            onChange={e => handleTimeSelectChange('new', false, e)}
+                                            doneButton={(newTime) => (
+                                                <div style={{ textAlign: 'center', padding: '8px 0', backgroundColor: '#141414a6', borderBottomLeftRadius: '.5rem', borderBottomRightRadius: '.5rem', boxShadow: '0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)' }} onClickCapture={e => handleChange('new', null, 'new-start')}>
+                                                    <i className="material-icons">done</i>
+                                                </div>
+                                            )}
+                                        /> :
+                                        <input type='time' step='900' min='05:00' max='20:00' value={times.new.endTime} onChange={e => handleBoringTimeSelectChange('new', false, e)} />
+                                }</div></td>
                             <td>
                                 <Checkbox
                                     id={`new-inProgress`}
