@@ -84,7 +84,7 @@ function PartInventoryPage(props) {
     }
 
     function RenderLocationRow(row) {
-        return <div className='AssetLocationBlob' onClick={() => { console.log('add redirect here') }} key={row.id}>
+        return <div className='AssetLocationBlob' onClick={() => { nav(`/search?q=${row.id}`) }} key={row.id}>
             <h2>{row.id}</h2>
             <h3>{row.status}</h3>
             <h3>{row.model_number}</h3>

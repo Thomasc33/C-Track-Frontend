@@ -29,6 +29,7 @@ import './css/PartManagement.css';
 import './css/Reports.css';
 import './css/SingleAsset.css';
 import './css/User.css';
+require('./backendVersion.json')
 
 
 // Import the Pages
@@ -52,6 +53,7 @@ const PartInventoryPage = lazy(() => import('./Pages/Part Inventory'));
 const PartManagementPage = lazy(() => import('./Pages/Part Management'));
 const RepairLogPage = lazy(() => import('./Pages/Repair Log'));
 const LocationsPage = lazy(() => import('./Pages/Locations'));
+const InventoryPage = lazy(() => import('./Pages/Inventory'));
 
 // Import App Settings
 const settings = require('./settings.json')
@@ -161,6 +163,7 @@ function App(props) {
           <Route exact path="/parts" element={<PartManagementPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/parttypes" element={<PartCategoriesPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/locations" element={<LocationsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/inv" element={<InventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         </Routes>
       </Suspense>

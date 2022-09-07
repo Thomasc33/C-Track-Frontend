@@ -27,6 +27,11 @@
     height: 0;
 }
 
+.PartManagementArea br {
+    margin: 1rem;
+    width: 100%;
+}
+
 .PartManagementArea h1,
 h2 {
     text-align: center;

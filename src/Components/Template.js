@@ -264,14 +264,17 @@ function PageTemplate(props) {
                         <li onClick={e => handleExpandLi(e, 'tools')} >
                             <span className='sideDropDown' style={{ justifyContent: 'space-between' }}>
                                 <span style={{ padding: 0 }} >
-                                    <i style={{ color: ['importer', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }} className='material-icons'>build</i>
-                                    <p style={{ color: ['importer', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }}>tools</p>
+                                    <i style={{ color: ['importer', 'inv', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }} className='material-icons'>build</i>
+                                    <p style={{ color: ['importer', 'inv', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }}>tools</p>
                                 </span>
                                 <i className='material-icons DropDownArrow'>{SideBarExpanded.tools ? 'expand_more' : 'expand_less'}</i>
                             </span>
                             <ul className={`DropDown${SideBarExpanded.tools ? ' Show' : ''}`} id='ToolsUL'>
                                 {isAdmin || (permissions && permissions.use_importer) ? <li>
                                     <p style={{ color: highlight === "importer" ? accent : 'white' }} onClickCapture={(e) => nav('/importer')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/importer', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/importer' }) }}>Importer</p>
+                                </li> : <></>}
+                                {isAdmin || (permissions && permissions.use_inventory_scan) ? <li>
+                                    <p style={{ color: highlight === "inv" ? accent : 'white' }} onClickCapture={(e) => nav('/inv')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/inv', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/inv' }) }}>Inventory</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ? <li>
                                     <p style={{ color: highlight === "jobs" ? accent : 'white' }} onClickCapture={(e) => nav('/jobs')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/jobs', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/jobs' }) }}>Job Codes</p>
