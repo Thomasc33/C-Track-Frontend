@@ -53,7 +53,7 @@ function PartInventoryPage(props) {
     function RenderHome() {
         let keys = []
         if (data.data) keys = Object.keys(data.data)
-        keys = keys.sort((a, b) => +data[a] > +data[b] ? -1 : 1)
+        keys = keys.sort((a, b) => +data.data[a] > +data.data[b] ? -1 : 1)
         return <><h1>Asset Locations</h1>
             <hr />
             <div className='AssetLocationBlobContainer'>

@@ -238,8 +238,8 @@ function PageTemplate(props) {
                         <li onClick={e => handleExpandLi(e, 'reports')} >
                             <span className='sideDropDown' style={{ justifyContent: 'space-between' }} >
                                 <span style={{ padding: 0 }}>
-                                    <i style={{ color: ['reports', 'assets', 'models'].includes(highlight) ? accent : 'white' }} className='material-icons'>insights</i>
-                                    <p style={{ color: ['reports', 'assets', 'models'].includes(highlight) ? accent : 'white' }}>reports</p>
+                                    <i style={{ color: ['reports', 'assets', 'models', 'locations'].includes(highlight) ? accent : 'white' }} className='material-icons'>insights</i>
+                                    <p style={{ color: ['reports', 'assets', 'models', 'locations'].includes(highlight) ? accent : 'white' }}>reports</p>
                                 </span>
                                 <i className='material-icons DropDownArrow'>{SideBarExpanded.reports ? 'expand_more' : 'expand_less'}</i>
                             </span>
