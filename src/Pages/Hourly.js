@@ -191,6 +191,7 @@ function HourlyPage(props) {
                 let temp = { ...times }
                 temp.new.startTime = temp.new.endTime
                 temp.new.endTime = '17:00'
+                temp.new.in_progress = false
                 setTimes(temp)
                 document.getElementById('new-Start').classList.remove('invalid')
                 document.getElementById('new-End').classList.remove('invalid')
@@ -356,7 +357,8 @@ function HourlyPage(props) {
         if (e.target.value === '') return
         if (!['00', '15', '30', '45'].includes(e.target.value.substr(3))) {
             let t = e.target.value.split(':')
-            t[1] = Math.round(+t[1] / 15) * 15
+            if (!(0 < +t[1] && +t[1] < 5)) t[1] = Math.round(+t[1] / 15) * 15
+            if (!t[1]) t[1] = '00'
             e.target.value = t.join(':')
         }
         let target = document.getElementById(`${id}-${isStart ? 'Start' : 'End'}`)
@@ -384,7 +386,7 @@ function HourlyPage(props) {
             if (isStart) temp[`${id}`].startTime = e.target.value
             else temp[`${id}`].endTime = e.target.value
             setTimes(temp)
-            sendToAPI = true
+            if (['00', '15', '30', '45'].includes(e.target.value.substr(3))) sendToAPI = true
         }
 
         if (sendToAPI) {
@@ -416,6 +418,8 @@ function HourlyPage(props) {
             let temp = { ...times }
             if (!temp.new) temp.new = {}
             temp.new.in_progress = e
+            if (!temp.new.startTime) temp.new.startTime = '08:30'
+            if (!temp.new.endTime) temp.new.endTime = addHourToTime(temp.new.startTime)
             setTimes(temp)
             handleChange('new', null)
         } else {
@@ -468,7 +472,7 @@ function HourlyPage(props) {
                             forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                             onChange={e => handleTimeSelectChange(`${row.id}`, false, e)}
                         /> :
-                        <input type='time' step='900' min='05:00' max='20:00' value={row.end_time.substr(11, 5)} onChange={e => handleBoringTimeSelectChange(`${row.id}`, false, e)} />
+                        <input type='time' step='900' min='05:00' max='20:00' defaultValue={row.end_time.substr(11, 5)} onChange={e => handleBoringTimeSelectChange(`${row.id}`, false, e)} />
                 }</div></td>
             <td>
                 <Checkbox
@@ -564,7 +568,7 @@ function HourlyPage(props) {
                                     )}
                                 /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <i className='material-icons' style={{ cursor: 'pointer', fontSize: '2rem', paddingRight: '.5rem' }} onClick={e => { handleChange('new', null, 'new-start') }}>done</i>
-                                    <input type='time' step='900' min='05:00' max='20:00' value={times.new.startTime} onChange={e => handleBoringTimeSelectChange('new', true, e)} />
+                                    <input type='time' step='900' min='05:00' max='20:00' defaultValue={times.new.startTime} onChange={e => handleBoringTimeSelectChange('new', true, e)} />
                                 </div>
 
                                 }
@@ -594,6 +598,7 @@ function HourlyPage(props) {
                                     borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
                                     style={{ cursor: 'pointer' }}
                                     size='30px'
+                                    checked={times.new && times.new.in_progress}
                                     icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
                                     onChange={e => handleCurrentChange('new', e)} />
                             </td>
