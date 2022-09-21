@@ -122,6 +122,7 @@ function AssetsPage(props) {
         } else {
             let assets = new Set()
             let results = []
+            let modelCache = {}
             for (let i of res.data.resu) {
                 if (assets.has(i.info.id)) continue
                 if (i.type === 'model') {
@@ -136,15 +137,21 @@ function AssetsPage(props) {
                 } else {
                     assets.add(i.info.id)
                     let info = { history: i.history, type: i.type, repairs: i.repairs }
-                    res = await axios.get(`${settings.APIBase}/model/get?q=${i.info.model_number}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            'Access-Control-Allow-Origin': '*',
-                            'X-Version': require('../backendVersion.json').version
+                    if (modelCache[i.info.model_number]) info.data = modelCache[i.info.model_number]
+                    else {
+                        res = await axios.get(`${settings.APIBase}/model/get?q=${i.info.model_number}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Access-Control-Allow-Origin': '*',
+                                'X-Version': require('../backendVersion.json').version
+                            }
+                        })
+                        if (res.isErrored) console.log(res)
+                        else {
+                            modelCache[i.info.model_number] = { ...i.info, ...res.data.resu }
+                            info.data = { ...i.info, ...res.data.resu }
                         }
-                    })
-                    if (res.isErrored) console.log(res)
-                    else info.data = { ...i.info, ...res.data.resu }
+                    }
                     results.push(info)
                 }
             }
