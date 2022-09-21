@@ -236,6 +236,8 @@ function AssetPage(props) {
                     catch (er) { }
                 }
             } else {
+                if (res.data.watching && res.data.watching.length) alert(`This asset is being watched by:\n${res.data.watching.join(', ')}`)
+
                 const response = await fetch(APILink.concat(getDate(date)), {
                     mode: 'cors',
                     headers: {
@@ -490,6 +492,7 @@ function AssetPage(props) {
         if (res.isErrored) {
             console.log(res.error)
         } else if (!isEdit) {
+            if (!isEdit && res.data.watching && res.data.watching.length) alert(`This asset is being watched by:\n${res.data.watching.join(', ')}`)
             const response = await fetch(APILink.concat(getDate(date)), {
                 mode: 'cors',
                 headers: {
