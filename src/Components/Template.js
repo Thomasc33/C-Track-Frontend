@@ -260,12 +260,12 @@ function PageTemplate(props) {
                             </ul>
                         </li>
                         : undefined}
-                    {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users)) ?
+                    {isAdmin || (permissions && (permissions.use_importer || permissions.view_jobcodes || permissions.view_users || permissions.view_branches)) ?
                         <li onClick={e => handleExpandLi(e, 'tools')} >
                             <span className='sideDropDown' style={{ justifyContent: 'space-between' }}>
                                 <span style={{ padding: 0 }} >
-                                    <i style={{ color: ['importer', 'inv', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }} className='material-icons'>build</i>
-                                    <p style={{ color: ['importer', 'inv', 'jobs', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }}>tools</p>
+                                    <i style={{ color: ['importer', 'inv', 'jobs', 'branch', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }} className='material-icons'>build</i>
+                                    <p style={{ color: ['importer', 'inv', 'jobs', 'branch', 'users', 'admin', 'adas'].includes(highlight) ? accent : 'white' }}>tools</p>
                                 </span>
                                 <i className='material-icons DropDownArrow'>{SideBarExpanded.tools ? 'expand_more' : 'expand_less'}</i>
                             </span>
@@ -278,6 +278,9 @@ function PageTemplate(props) {
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_jobcodes) ? <li>
                                     <p style={{ color: highlight === "jobs" ? accent : 'white' }} onClickCapture={(e) => nav('/jobs')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/jobs', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/jobs' }) }}>Job Codes</p>
+                                </li> : <></>}
+                                {isAdmin || (permissions && permissions.view_branches) ? <li>
+                                    <p style={{ color: highlight === "branch" ? accent : 'white' }} onClickCapture={(e) => nav('/branch')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/branch', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/branch' }) }}>Branches</p>
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.view_users) ? <li>
                                     <p style={{ color: highlight === "users" ? accent : 'white' }} onClickCapture={(e) => nav('/users')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/users', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/users' }) }}>Users</p>
