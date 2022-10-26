@@ -25,7 +25,7 @@ function AssetsPage(props) {
     const nav = useNavigate()
 
     const reportAuth = !!(props.permissions.view_reports || props.isAdmin)
-    const buttonStyle = { backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }
+    const buttonStyle = { backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '.5rem' }
 
     // Effects
     useEffect(() => { // Gets job codes and catalog of assets
@@ -85,16 +85,16 @@ function AssetsPage(props) {
         setCustomReportOptions(data.customReportOptions)
     }
 
-    const generateReport = async () => {
+    const generateReport = async (options = customReportSelected) => {
         setGeneratingReport(true)
         let res = await axios.post(`${APILink}/report`, {
-            attributes: [...customReportSelected.attributes],
-            status: [...customReportSelected.status].map(m => [...m.match(/\(([^()]+)\)/g)].pop().replace(/[()]/g, '')),
-            type: [...customReportSelected.type],
-            last_updated: [...customReportSelected.last_updated],
-            location: [...customReportSelected.location],
-            locked: [...customReportSelected.locked],
-            user: [...customReportSelected.user].map(m => [...m.match(/\(([^()]+)\)/g)].pop().replace(/[()]/g, '')),
+            attributes: [...options.attributes],
+            status: [...options.status].map(m => [...m.match(/\(([^()]+)\)/g)].pop().replace(/[()]/g, '')),
+            type: [...options.type],
+            last_updated: [...options.last_updated],
+            location: [...options.location],
+            locked: [...options.locked],
+            user: [...options.user].map(m => [...m.match(/\(([^()]+)\)/g)].pop().replace(/[()]/g, '')),
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -266,12 +266,15 @@ function AssetsPage(props) {
                             <h1>Reports</h1>
                             <hr style={{ width: '95%' }} />
                             <h2>Preset Reports</h2>
-                            <Button disabled={true} variant='contained' color='primary' size='large' style={buttonStyle} onClick={() => {
-
-                            }}>In house assets (tbi)</Button>
-                            <Button disabled={true} variant='contained' color='primary' size='large' style={buttonStyle} onClick={() => {
-
-                            }}>All Assets (tbi)</Button>
+                            <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={buttonStyle} onClick={() => {
+                                generateReport(presetReports['In House'])
+                            }}>In House Assets</Button>
+                            <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={buttonStyle} onClick={() => {
+                                generateReport(presetReports['All'])
+                            }}>All Assets</Button>
+                            <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={buttonStyle} onClick={() => {
+                                generateReport(presetReports['All With History'])
+                            }}>All Assets With Tracking History</Button>
                             <hr style={{ width: '95%' }} />
                             <h2>Custom Report</h2>
                             {renderCustomReport()}
@@ -285,3 +288,35 @@ function AssetsPage(props) {
 
 export default AssetsPage
 
+const presetReports = {
+    'In House': {
+        attributes: new Set(),
+        status: new Set(['(2)', '(8)', '(12)', '(13)', '(15)', '(18)', '(19)', '(39)', '(40)', '(41)', '(42)', '(43)', '(50)', '(51)', '(97)', '(108)', '(121)']),
+        type: new Set(),
+        last_updated: new Set(['All Time']),
+        location: new Set(['MDCentric']),
+        locked: new Set(),
+        user: new Set(),
+        job_code: new Set()
+    },
+    'All': {
+        attributes: new Set(),
+        status: new Set(),
+        type: new Set(),
+        last_updated: new Set(),
+        location: new Set(),
+        locked: new Set(),
+        user: new Set(),
+        job_code: new Set()
+    },
+    'All With History': {
+        attributes: new Set(),
+        status: new Set(),
+        type: new Set(),
+        last_updated: new Set(['All Time']),
+        location: new Set(),
+        locked: new Set(),
+        user: new Set(),
+        job_code: new Set()
+    }
+}
