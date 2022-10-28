@@ -104,12 +104,11 @@ function AssetsPage(props) {
         })
         setGeneratingReport(false)
         if (res.isErrored) return console.log(res)
-        console.log(res.data.assets)
         if (res.data.assets.length === 0) return alert('No assets match your criteria. Please try again.')
         let csv = Object.keys(res.data.assets[0]).join(',')
         for (let i of res.data.assets) {
             csv += '\n'
-            csv += Object.values(i).join(',')
+            csv += Object.values(i).map(m => m ? `${m}`.replace(',', '.') : m).join(',')
         }
         let blob = new Blob([csv], { type: 'text/csv' })
         let link = document.createElement('a')

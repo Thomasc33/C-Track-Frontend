@@ -316,6 +316,20 @@ function PageTemplate(props) {
                             </ul>
                         </li>
                         : undefined}
+                    <li onClick={e => handleExpandLi(e, 'links')} >
+                        <span className='sideDropDown' style={{ justifyContent: 'space-between' }} >
+                            <span style={{ padding: 0 }}>
+                                <i className='material-icons'>link</i>
+                                <p>links</p>
+                            </span>
+                            <i className='material-icons DropDownArrow'>{SideBarExpanded.parts ? 'expand_more' : 'expand_less'}</i>
+                        </span>
+                        <ul className={`DropDown${SideBarExpanded.links ? ' Show' : ''}`} id='LinksUL'>
+                            {require('../data/QuickLinks.json').map(l => <li>
+                                <a href={l.url} target='_blank' rel='noreferrer'><p>{l.name}</p></a>
+                            </li>)}
+                        </ul>
+                    </li>
                     <li onClickCapture={(e) => nav('/guide')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/guide', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/guide' }) }} >
                         <span>
                             <i style={{ color: highlight === "guide" ? accent : 'white' }} className='material-icons'>help</i>
