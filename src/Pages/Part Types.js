@@ -161,18 +161,18 @@ const selectStyles = {
             color: 'white',
             ':active': {
                 ...styles[':active'],
-                backgroundColor: localStorage.getItem('accentColor') || '#003994',
+                backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67',
             },
             ':hover': {
                 ...styles[':hover'],
-                backgroundColor: localStorage.getItem('accentColor') || '#003994'
+                backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67'
             }
         };
     },
     multiValue: (styles, { data }) => {
         return {
             ...styles,
-            backgroundColor: localStorage.getItem('accentColor') || '#003994',
+            backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67',
         };
     },
     multiValueLabel: (styles, { data }) => ({

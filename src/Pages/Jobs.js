@@ -35,8 +35,8 @@ function JobPage(props) {
         menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
         noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
         menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }; },
         multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }

@@ -68,8 +68,8 @@ function AssetPage(props) {
         menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
         noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
         menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#003994', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#003994' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#003994', }; },
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }; },
         multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
@@ -781,8 +781,8 @@ function AssetPage(props) {
                 <h3 id='missingAssetId' style={{ color: 'white', padding: '1rem', backgroundColor: '#1b1b1b', borderRadius: '.5rem', border: 'white solid 3px', fontFamily: 'Consolas, monaco, monospace' }}>Asset</h3>
                 {props.permissions.edit_assets || props.isAdmin ? <ModelSelect setModelSelect={setModelSelect} modelSelect={modelSelect} /> : <></>}
                 <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'space-evenly' }}>
-                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
-                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc' }} onClick={() => {
+                    {props.permissions.edit_assets || props.isAdmin ? <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { handleAssetAdding() }}>Add</Button> : <></>}
+                    <Button variant='contained' color='primary' size='large' style={{ padding: 0, margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
                         document.getElementById('missingAssetBox').classList.remove('ShowAssetAddingPrompt')
                     }}>Back</Button>
                 </div>

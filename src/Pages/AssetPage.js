@@ -236,8 +236,9 @@ function AssetsPage(props) {
     // Constant for the columns of the data grid
     const columns = [
         { field: 'id', headerName: 'Asset Tag', width: 250 },
-        { field: 'status', headerName: 'Status', width: 350, valueGetter: params => job_codes[params.value] || params.value },
-        { field: 'model_number', headerName: 'Model', width: 400 },
+        { field: 'status', headerName: 'Status', width: 300, valueGetter: params => job_codes[params.value] || params.value },
+        { field: 'model_number', headerName: 'Model', width: 300 },
+        { field: 'company', headerName: 'Company', width: 200 },
         { field: 'notes', headerName: 'Notes', width: 800 }
     ]
 
