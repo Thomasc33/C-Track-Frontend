@@ -302,29 +302,29 @@ function AssetsPage(props) {
                             <Checkbox id={`${row}`}
                                 checked={asset && asset.watching ? asset.watching.includes(`${uid}`) : false}
                                 borderWidth='2px'
-                                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                 style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                 size='30px'
-                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                 onChange={(e) => handleWatchUnWatch(e)} /> :
                             row.toLowerCase() === 'locked' ?
                                 <Checkbox id={`${row}`}
                                     checked={asset && asset.locked ? true : false}
                                     borderWidth='2px'
-                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                     style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                     size='30px'
-                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                     onChange={(e) => handleLocking(e)} /> :
                                 row.toLowerCase() === 'hold_type' ?
                                     <Checkbox id={`${row}-hold`}
                                         checked={asset && asset.hold_type}
                                         disabled={!asset || !asset.hold_type}
                                         borderWidth='2px'
-                                        borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                        borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                         style={{ margin: '1rem', marginLeft: '3rem', backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                         size='30px'
-                                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                         onChange={(e) => handleUnhold(e)} /> :
                                     row.toLowerCase() === 'company' ?
                                         <div style={{ paddingLeft: '1.4rem', margin: '.5rem', width: '94%' }}>

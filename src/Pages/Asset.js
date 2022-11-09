@@ -609,10 +609,10 @@ function AssetPage(props) {
             <td><Checkbox id={`${row.id}-isHourly`}
                 checked={selected.includes(row.id)}
                 borderWidth='2px'
-                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                 style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                 size='30px'
-                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                 onChange={e => { e ? setSelected([...selected, row.id]) : setSelected([...selected].filter(i => i !== row.id)) }} /></td>
             {showTimestamp ? location.state && location.state.isReport ? <td><input
                 type='time'
@@ -714,10 +714,10 @@ function AssetPage(props) {
                         <tr>
                             <th style={{ margin: '0', padding: '1rem', width: '2rem' }}><Checkbox checked={selected.length === data.records.length}
                                 borderWidth='2px'
-                                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                 style={{ backgroundColor: '#1b1b1b67' }}
                                 size='30px'
-                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                 onChange={e => { e ? setSelected(data.records.map(m => m.id)) : setSelected([]) }} /></th>
                             {showTimestamp ? <th>Time</th> : undefined}
                             <th>Job Code</th>

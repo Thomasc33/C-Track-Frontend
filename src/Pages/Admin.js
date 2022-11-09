@@ -51,10 +51,10 @@ function AdminPage(props) {
                     className='isAdmin'
                     checked={row.is_admin}
                     borderWidth='5px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={36} />}
                     onChange={e => handlePermissionChange(e, row.id, 'isAdmin')} />
             </td>
             <td>
@@ -63,10 +63,10 @@ function AdminPage(props) {
                     className='isArchived'
                     checked={row.is_archived}
                     borderWidth='5px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={36} />}
                     onChange={e => handlePermissionChange(e, row.id, 'isArchived')} />
             </td>
         </tr >)

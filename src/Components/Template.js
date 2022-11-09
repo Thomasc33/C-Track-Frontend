@@ -20,7 +20,7 @@ function PageTemplate(props) {
     const nav = useNavigate()
     const permissions = props.permissions
     const isAdmin = props.isAdmin
-    const accent = localStorage.getItem('accentColor') || '#00c6fc'
+    const accent = localStorage.getItem('accentColor') || '#e67c52'
 
     // States
     const [SideBarExpanded, setSideBarExpanded] = useState({

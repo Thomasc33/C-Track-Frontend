@@ -8,7 +8,7 @@ function GuidePage(props) {
     const nav = useNavigate()
 
     // State for color picker
-    const [color, setColor] = useState(localStorage.getItem('accentColor') || '#00c6fc')
+    const [color, setColor] = useState(localStorage.getItem('accentColor') || '#e67c52')
 
     // Functional handling of changing the color picker
     const handleColorChange = c => {

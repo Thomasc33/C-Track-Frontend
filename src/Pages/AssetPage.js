@@ -206,10 +206,10 @@ function AssetsPage(props) {
             <Checkbox
                 checked={customReportSelected[sector].has(row)}
                 borderWidth='2px'
-                borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                 style={{ cursor: 'pointer', display: 'inline', float: 'left' }}
                 size='15px'
-                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={36} />}
                 onChange={e => {
                     let temp = customReportSelected
                     if (row === 'All') {

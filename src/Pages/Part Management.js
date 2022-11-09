@@ -221,10 +221,10 @@ function PartManagementPage(props) {
                 <Checkbox id={`${row.id}-watched`}
                     checked={row.watching}
                     borderWidth='2px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                     onChange={e => handleWatchToggle(row.id, e, row)} />
             </td>
         </tr>

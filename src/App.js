@@ -142,7 +142,7 @@ function App(props) {
   // If user is authenticated, and data is still loading, give the Routes
   if (isAuthenticated && !loading) return (
     <>
-      <Particles {...props} permissions={permissions} color={localStorage.getItem('accentColor') || '#00c6fc'} />
+      <Particles {...props} permissions={permissions} color={localStorage.getItem('accentColor') || '#e67c52'} />
       <PageTemplate {...props} permissions={permissions} isAdmin={isAdmin} />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
@@ -179,7 +179,7 @@ function App(props) {
 
   // If user is authenticated, but data is still loading, give the loading screen (blank particle screen)
   else return (
-    <Particles color={localStorage.getItem('accentColor') || '#00c6fc'} />
+    <Particles color={localStorage.getItem('accentColor') || '#e67c52'} />
   )
 }
 

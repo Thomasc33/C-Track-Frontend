@@ -201,7 +201,7 @@ function ReportsPage(props) {
 
     // --- Renderers --- //
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#00c6fc'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#00c6fc67', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#00c6fc67'
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#00c6fc67', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#00c6fc67'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
@@ -229,7 +229,7 @@ function ReportsPage(props) {
     }
 
     function renderSingleUserRow(k, v) {
-        let accent = localStorage.getItem('accentColor') || '#00c6fc'
+        let accent = localStorage.getItem('accentColor') || '#e67c52'
         return (
             <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${accent} 0%, ${blendColors(accent, '#1b1b1b', .95)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((parseInt(v) / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : accent : 'inherit' }}>
                 <h1>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
@@ -274,7 +274,7 @@ function ReportsPage(props) {
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
-                        <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#00c6fc']} />
+                        <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#e67c52']} />
                         <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getGraphCSVData()}><Button variant='contained' color='primary' size='large' style={{ marginTop: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} >Download CSV</Button></CSVLink>
                         {tsheetsData.length ?
                             <>

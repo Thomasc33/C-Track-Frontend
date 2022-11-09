@@ -456,7 +456,7 @@ function HourlyPage(props) {
                     <TimeKeeper
                         coarseMinutes='15'
                         time={row.start_time.substr(11, 5)}
-                        css={{ color: localStorage.getItem('accentColor') || '#00c6fc' }}
+                        css={{ color: localStorage.getItem('accentColor') || '#e67c52' }}
                         forceCoarseMinutes closeOnMinuteSelect switchToMinuteOnHourDropdownSelect switchToMinuteOnHourSelect
                         onChange={e => handleTimeSelectChange(`${row.id}`, true, e)}
                     /> :
@@ -480,10 +480,10 @@ function HourlyPage(props) {
                     className='inProgress'
                     checked={row.in_progress}
                     borderWidth='5px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={36} />}
                     onChange={e => handleCurrentChange(row.id, e)} />
             </td>
             <td style={{ display: 'inline-flex', justifyContent: 'flex-start', alignItems: 'center', width: '100%' }}>
@@ -595,11 +595,11 @@ function HourlyPage(props) {
                                     id={`new-inProgress`}
                                     className='inProgress'
                                     borderWidth='5px'
-                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                     style={{ cursor: 'pointer' }}
                                     size='30px'
                                     checked={times.new && times.new.in_progress}
-                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={36} />}
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={36} />}
                                     onChange={e => handleCurrentChange('new', e)} />
                             </td>
                             <td><input type='text' className='notes' id={`new-notes`} placeholder='Notes / Comments' onBlur={(e) => handleChange('new', e)} onKeyDown={e => handleKeyDown('new', e)}></input></td>

@@ -273,10 +273,10 @@ function JobPage(props) {
                 <Checkbox id={`${row.id}-isHourly`}
                     checked={row.is_hourly}
                     borderWidth='2px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                     onChange={e => { row.is_hourly = e; setUpdated(updated + 1); handleTextInputChange(row.id, { isHourly: true, selection: e }) }} />
             </td>
 
@@ -285,10 +285,10 @@ function JobPage(props) {
                     <Checkbox id={`${row.id}-isAsset`}
                         checked={row.requires_asset}
                         borderWidth='2px'
-                        borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                        borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                         style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                         size='30px'
-                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                        icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                         onChange={e => handleTextInputChange(row.id, { isAsset: true, selection: e })} />
                 </td>
                     <td>
@@ -327,20 +327,20 @@ function JobPage(props) {
                 <Checkbox id={`${row.id}-statusOnly`}
                     checked={row.status_only}
                     borderWidth='2px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                     onChange={e => { row.status_only = e; setUpdated(updated + 1); handleTextInputChange(row.id, { statusOnly: true, selection: e }) }} />
             </td>
             <td >
                 <Checkbox id={`${row.id}-promptCount`}
                     checked={row.prompt_count}
                     borderWidth='2px'
-                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                     size='30px'
-                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                     onChange={e => { row.prompt_count = e; setUpdated(updated + 1); handleTextInputChange(row.id, { promptCount: true, selection: e }) }} />
             </td>
             <td>
@@ -401,9 +401,9 @@ function JobPage(props) {
                             {props.permissions.view_reports || props.isAdmin ?
                                 <td><input type='number' placeholder='0' className='price' id={`new-price`} onBlur={(e) => { numberValidatorEventListener(e); handleTextInputChange('new', e) }} onKeyDown={e => { handleKeyDown('new', e) }} style={{ width: '5rem', padding: '1rem' }} step='0.01'></input></td>
                                 : undefined}
-                            <td><Checkbox id={`new-isHourly`} checked={newJob.isHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
+                            <td><Checkbox id={`new-isHourly`} checked={newJob.isHourly} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e67c52'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />} onChange={e => handleTextInputChange('new', { isHourly: true, selection: e })} style={{ backgroundColor: '#1b1b1b67' }} /></td>
                             {!newJob.isHourly ? <>
-                                <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#00c6fc'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
+                                <td><Checkbox id={`new-isHourly`} checked={true} borderWidth='2px' borderColor={localStorage.getItem('accentColor') || '#e67c52'} size='30px' icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />} onChange={e => handleTextInputChange('new', { isAsset: true, selection: e })} style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }} /></td>
                                 <td><input type='number'
                                     className='hourly_goal'
                                     id={`new-hourly_goal`}
@@ -433,19 +433,19 @@ function JobPage(props) {
                             <td>
                                 <Checkbox id={`new-statusOnly`}
                                     borderWidth='2px'
-                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                     size='30px'
-                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                     onChange={e => { handleTextInputChange('new', { statusOnly: true, selection: e }) }} />
                             </td>
                             <td>
                                 <Checkbox id={`new-promptCount`}
                                     borderWidth='2px'
-                                    borderColor={localStorage.getItem('accentColor') || '#00c6fc'}
+                                    borderColor={localStorage.getItem('accentColor') || '#e67c52'}
                                     style={{ backgroundColor: '#1b1b1b67', cursor: 'pointer' }}
                                     size='30px'
-                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#00c6fc'} size={30} />}
+                                    icon={<Icon.FiCheck color={localStorage.getItem('accentColor') || '#e67c52'} size={30} />}
                                     onChange={e => { handleTextInputChange('new', { promptCount: true, selection: e }) }} />
                             </td>
                             <td className='comments'>
