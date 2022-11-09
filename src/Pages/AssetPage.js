@@ -108,7 +108,7 @@ function AssetsPage(props) {
         let csv = Object.keys(res.data.assets[0]).join(',')
         for (let i of res.data.assets) {
             csv += '\n'
-            csv += Object.values(i).map(m => m ? `${m}`.replace(/,/g, '.').replace(/\n/g, ' ') : m).join(',')
+            csv += Object.values(i).map(m => m ? `${m}`.replace(/,/g, '.').replace(/\n/g, ' ').replace(/\r/g, '') : m).join(',')
         }
         let blob = new Blob([csv], { type: 'text/csv' })
         let link = document.createElement('a')
