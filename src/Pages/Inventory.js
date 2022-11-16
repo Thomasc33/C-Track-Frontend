@@ -115,11 +115,11 @@ function PartInventoryPage(props) {
         <>
             <div className='PartManagementArea'>
                 <span style={{ display: 'flex', justifyContent: 'space-between', width: '95%' }}>
-                    <Button variant='contained' color='primary' size='large' style={{ visibility: onHistory || searchId ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
+                    <Button variant='contained' color='primary' size='large' style={{ visibility: onHistory || searchId ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => {
                         if (searchId) { setSearchId(undefined); location.search = ''; } else setOnHistory(false)
                     }}>Back</Button>
                     <h1>{searchId ? 'Inventory Report' : onHistory ? 'Inventory Scan History' : 'Inventory Scanning'}</h1>
-                    <Button variant='contained' color='primary' size='large' style={{ visibility: onHistory || searchId ? 'hidden' : 'visible', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { setOnHistory(true) }}>View History</Button>
+                    <Button variant='contained' color='primary' size='large' style={{ visibility: onHistory || searchId ? 'hidden' : 'visible', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { setOnHistory(true) }}>View History</Button>
                 </span>
                 <hr />
                 {searchId ?
@@ -135,7 +135,7 @@ function PartInventoryPage(props) {
                             <div className='break' />
                             <textarea id='scantext' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', width: '90%', height: '20rem', padding: '1rem', margin: '1rem', backgroundColor: '#1b1b1b', borderColor: 'white', borderWidth: '3px', color: 'white', fontSize: '16px', verticalAlign: 'top' }} />
                             <div className='break' />
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { handleSubmit() }}>Submit</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSubmit() }}>Submit</Button>
                         </>
                 }
             </div>

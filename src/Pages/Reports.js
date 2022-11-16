@@ -201,7 +201,7 @@ function ReportsPage(props) {
 
     // --- Renderers --- //
     function renderUserRow(row) {
-        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#00c6fc67', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#00c6fc67'
+        let grad = row.dailydollars / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#e67c52', '#1b1b1b', .95)} ${row.dailydollars / 650 * 100 || 0}%, #1b1b1b ${Math.floor(((row.dailydollars / 650 * 100) + 100) / 2)}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#e67c52'
         return <div key={row.name} className='UserReport' style={{ background: grad }} onClick={e => handleUserClick(e, row.id)}>
             <h1>{row.name}</h1>
             <h1>${row.dailydollars}</h1>
@@ -253,15 +253,15 @@ function ReportsPage(props) {
     // Base JSX for the page
     return (<>
         <div className='TopNav'>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => handleBackClick()}>Back</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => handleBackClick()}>Back</Button>
             <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(removeDay(date)) }}>navigate_before</i>
                 <input type='date' className='ReportDate' id='date_selector' value={getDate(date)} onChange={() => handleDateChange()} />
                 <i className='material-icons DateArrows' onClickCapture={() => { setDate(addDay(date)) }}>navigate_next</i>
             </div>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { nav('/asset', { state: { isReport: true, uid: onUser, date, name: userNames[onUser] } }) }}>View Asset Tracker</Button>
-            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { nav('/hourly', { state: { isReport: true, uid: onUser, date, name: userNames[onUser] } }) }}>View Hourly Tracker</Button>
-            <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getCSVData()}><Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} >Download CSV</Button></CSVLink>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { nav('/asset', { state: { isReport: true, uid: onUser, date, name: userNames[onUser] } }) }}>View Asset Tracker</Button>
+            <Button variant='contained' color='primary' size='large' style={{ visibility: onUser ? 'visible' : 'hidden', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { nav('/hourly', { state: { isReport: true, uid: onUser, date, name: userNames[onUser] } }) }}>View Hourly Tracker</Button>
+            <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getCSVData()}><Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} >Download CSV</Button></CSVLink>
         </div >
         <div className='AssetArea'>
             {onUser ?
@@ -275,7 +275,7 @@ function ReportsPage(props) {
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
                         <LineChart data={lineChartData} prefix="$" colors={[localStorage.getItem('accentColor') || '#e67c52']} />
-                        <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getGraphCSVData()}><Button variant='contained' color='primary' size='large' style={{ marginTop: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} >Download CSV</Button></CSVLink>
+                        <CSVLink filename={`${date}-EXPORT.csv`} target='_blank' data={getGraphCSVData()}><Button variant='contained' color='primary' size='large' style={{ marginTop: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} >Download CSV</Button></CSVLink>
                         {tsheetsData.length ?
                             <>
                                 <hr style={{ width: '95%' }} />
@@ -301,27 +301,27 @@ function ReportsPage(props) {
                         {reportData.length > 0 ? <CSVLink filename={'depracated.csv'} target='_blank' data={reportData} ref={reportRef}></CSVLink> : undefined}
                         <h2>Today - {getDate(date).substring(5).replace('-', '/')}</h2>
                         <br />
-                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getExcelReport(e, getDate(date))}>Download Report</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getAssetSummary(e, getDate(date))}>Asset Summary</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getHourlySummary(e, getDate(date))}>Hourly Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Yesterday - {getDateSubtractDay(date).substring(5).replace('-', '/')}</h2>
-                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getExcelReport(e, getDateSubtractDay(date))}>Download Report</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getAssetSummary(e, getDateSubtractDay(date))}>Asset Summary</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getHourlySummary(e, getDateSubtractDay(date))}>Hourly Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Past Week - {getDateSubtractWeek(date).substring(5).replace('-', '/')} {'➝'} {getDate(date).substring(5).replace('-', '/')}</h2>
-                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getExcelReport(e, getDate(date), getDateSubtractWeek(date))}>Download Report</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getAssetSummary(e, getDateSubtractWeek(date), getDate(date))}>Asset Summary</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getHourlySummary(e, getDateSubtractWeek(date), getDate(date))}>Hourly Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Custom Date Range</h2>
@@ -329,17 +329,17 @@ function ReportsPage(props) {
                             <input type='date' className='ReportDate' id='from_selector' value={graphDate.from} onChange={(e) => handleGraphDateChange(e)} />
                             <input type='date' className='ReportDate' id='to_selector' value={graphDate.to} onChange={(e) => handleGraphDateChange(e)} />
                         </div>
-                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button disabled={generatingReport} variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getExcelReport(e, getDate(graphDate.to), getDate(graphDate.from))}>Download Report</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getAssetSummary(e, getDate(graphDate.from), getDate(graphDate.to))}>Asset Summary</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getHourlySummary(e, getDate(graphDate.from), getDate(graphDate.to))}>Hourly Summary</Button>
                         <hr style={{ width: '95%' }} />
                         <h2>Job Code Usage</h2>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getJobSummary('at')}>All Time</Button>
-                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }}
+                        <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }}
                             onClick={e => getJobSummary('ytd')}>YTD</Button>
                     </div>
                 </>

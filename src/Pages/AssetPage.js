@@ -25,7 +25,7 @@ function AssetsPage(props) {
     const nav = useNavigate()
 
     const reportAuth = !!(props.permissions.view_reports || props.isAdmin)
-    const buttonStyle = { backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '.5rem' }
+    const buttonStyle = { backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '.5rem' }
 
     // Effects
     useEffect(() => { // Gets job codes and catalog of assets
@@ -227,7 +227,7 @@ function AssetsPage(props) {
     }
 
     const renderOverviewLine = (row) => {
-        return <div key={row.name} className='UserReport' style={{ background: localStorage.getItem('accentColor') || '#00c6fc67', cursor: 'default' }} >
+        return <div key={row.name} className='UserReport' style={{ background: localStorage.getItem('accentColor') || '#e67c52', cursor: 'default' }} >
             <h1>{row.name}</h1>
             <h1>{row.value}</h1>
         </div>

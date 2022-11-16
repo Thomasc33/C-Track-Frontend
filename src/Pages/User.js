@@ -33,7 +33,7 @@ function UserPage(props) {
         noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
         menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
         option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#e67c52', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#e67c52' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#e67c52', }; },
         multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
@@ -69,7 +69,7 @@ function UserPage(props) {
                         <h2>'Do you also want to change the user's permissions to reflect this title's permissions?</h2>
                         <br />
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
                                 onClose()
                                 handleTitleChange(e, id, false)
                             }}

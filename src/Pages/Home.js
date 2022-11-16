@@ -46,7 +46,7 @@ function HomePage(props) {
                             <br />
                             <p>Checking all discrepancies will send every extra notifications on top of the automtically scheduled checks at 11:45am and 4:45pm. Avoid sending too many notifications to users.</p>
                             <span style={{ margins: '1rem' }}>
-                                <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => {
+                                <Button variant='contained' color='primary' size='large' style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => {
                                     UserService.discrepancyCheckAll(token)
                                     onClose()
                                 }}
@@ -71,7 +71,7 @@ function HomePage(props) {
     // --- Render --- //
     function renderStatsData(k, v) {
         if (k === 'Daily Dollars' && (!props.permissions || !props.permissions.view_reports) && !props.isAdmin) return <></>
-        return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#00c6fc67', '#1b1b1b', .9)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#00c6fc67' : '#1b1b1b67' }}>
+        return <div key={k} className='UserReport' style={{ cursor: 'default', background: k === 'Daily Dollars' ? parseInt(v) / 650 < 1 ? `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#e67c52', '#1b1b1b', .9)} ${parseInt(v) / 650 * 100 || 0}%, #1b1b1b 100%)` : localStorage.getItem('accentColor') || '#e67c52' : '#1b1b1b67' }}>
             <h1 style={{ float: 'left' }}>{k.replace('ppd_', '').replace('hrly_', '')}</h1>
             <h1 style={{ float: 'right' }}>{k === 'Daily Dollars' ? `$${v}` : `${v.is_hourly ? `${v.count} ${v.count > 1 ? `hours` : `hour`}` : `${v.count}`}`}</h1>
         </div >
@@ -81,7 +81,7 @@ function HomePage(props) {
         let created = new Date(row.createdDateTime)
         let due = new Date(row.dueDateTime)
         let now = new Date()
-        let background = localStorage.getItem('accentColor') || '#00c6fc67'
+        let background = localStorage.getItem('accentColor') || '#e67c52'
         if (row.dueDateTime && (due.getMonth() < now.getMonth() || due.getDate() < now.getDate())) background = '#a33c00e2'
         if (row.percentComplete) background = `linear-gradient(90deg, ${localStorage.getItem('accentColor') || '#e67c52'} 0%, ${blendColors(localStorage.getItem('accentColor') || '#e67c52', '#1b1b1b', .9)} ${row.percentComplete}%, #1b1b1b 100%)`
         return <div key={row.id} className='UserReport' style={{ background: background, cursor: 'default' }}>
@@ -104,10 +104,10 @@ function HomePage(props) {
                 <div className='UserReports'>
                     <h1 style={{ textDecoration: 'underline', padding: '1rem', paddingTop: '2rem' }}>Daily Statistics</h1>
                     {props.isAdmin || (props.permissions && props.permissions.use_discrepancy_check) ?
-                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} size='large' onClick={() => handleDiscrepancyCheck()}>Check For Discrepancies</Button>
+                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} size='large' onClick={() => handleDiscrepancyCheck()}>Check For Discrepancies</Button>
                         : undefined}
                     {props.isAdmin || (props.permissions && props.permissions.use_all_discrepancy_check) ?
-                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} size='large' onClick={() => handleDiscrepancyCheck(true)}>Check For All Discrepancies</Button>
+                        <Button variant='contained' disabled={isGettingDiscrepancy} style={{ margin: '1rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} size='large' onClick={() => handleDiscrepancyCheck(true)}>Check For All Discrepancies</Button>
                         : undefined}
                     {Object.keys(data).map(m => renderStatsData(m, data[m]))}
                 </div>

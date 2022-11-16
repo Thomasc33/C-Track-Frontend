@@ -28,8 +28,8 @@ function PartManagementPage(props) {
         control: (styles, { selectProps: { width } }) => ({ ...styles, backgroundColor: 'transparent', width }),
         menu: (provided, state) => ({ ...provided, width: state.selectProps.width, }),
         noOptionsMessage: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }),
-        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }), option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' } }; },
-        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', }; },
+        menuList: (styles) => ({ ...styles, backgroundColor: '#1b1b1b' }), option: (styles, { data, isDisabled, isFocused, isSelected }) => { return { ...styles, backgroundColor: '#1b1b1b', color: 'white', ':active': { ...styles[':active'], backgroundColor: localStorage.getItem('accentColor') || '#e67c52', }, ':hover': { ...styles[':hover'], backgroundColor: localStorage.getItem('accentColor') || '#e67c52' } }; },
+        multiValue: (styles, { data }) => { return { ...styles, backgroundColor: localStorage.getItem('accentColor') || '#e67c52', }; },
         multiValueLabel: (styles, { data }) => ({ ...styles, color: data.color, }),
         multiValueRemove: (styles, { data }) => ({ ...styles, color: 'white', ':hover': { color: 'red', }, }),
     }
@@ -150,7 +150,7 @@ function PartManagementPage(props) {
                         <h1>Confirm the deletion</h1>
                         <br />
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
                                 sendDelete(id, e, row)
                                 onClose()
                             }}
@@ -236,7 +236,7 @@ function PartManagementPage(props) {
             {selectedModel ?
                 <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', width: '98%' }}>
-                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
+                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { setSelectedModel(null); setPartsList(null) }}>Back</Button>
                         <h1>Parts for {selectedModel}</h1>
                         <div />
                     </div>
@@ -297,7 +297,7 @@ function PartManagementPage(props) {
                     <hr />
                     <h2>Add Model</h2>
                     <ModelSelect setModelSelect={setModelAddSelect} modelSelect={modelAddSelect} />
-                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
+                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={handleModelAddButton} disabled={!modelAddSelect}>Add Model</Button>
                 </>
             }
         </div>

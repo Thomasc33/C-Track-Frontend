@@ -263,7 +263,7 @@ function HourlyPage(props) {
                         <h3>Job: {jc}</h3>
                         {row.notes ? <p>{row.notes}</p> : undefined}
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
                                 sendDelete(id, e)
                                 onClose()
                             }}

@@ -63,7 +63,7 @@ function RepairLogPage(props) {
                         <h3>Repair Type: {supplementaryData[row.part_id].type}</h3>
                         <h3>Part Number: {supplementaryData[row.part_id].part_number}</h3>
                         <span style={{ margins: '1rem' }}>
-                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={() => {
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
                                 PartsService.deleteLog(id, token)
                                     .then(getData())
                                 onClose()
@@ -231,7 +231,7 @@ function RepairLogPage(props) {
                         : <input type='text' disabled placeholder='No Repairs Known' /> : <input type='text' disabled placeholder='Enter Asset First' />}
                 </div>
                 <div className='break' />
-                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#00c6fc67', margin: '1rem' }} onClick={handleSubmitButton}>Submit</Button>
+                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={handleSubmitButton}>Submit</Button>
                 <div className='break' />
                 <hr />
                 <div className='break' />
