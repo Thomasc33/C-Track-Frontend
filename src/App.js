@@ -55,6 +55,7 @@ const RepairLogPage = lazy(() => import('./Pages/Repair Log'));
 const LocationsPage = lazy(() => import('./Pages/Locations'));
 const InventoryPage = lazy(() => import('./Pages/Inventory'));
 const BranchPage = lazy(() => import('./Pages/Branches'));
+const RFFPage = lazy(() => import('./Pages/RFF'));
 
 // Import App Settings
 const settings = require('./settings.json')
@@ -166,6 +167,7 @@ function App(props) {
           <Route exact path="/locations" element={<LocationsPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/inv" element={<InventoryPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/branch" element={<BranchPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
+          <Route exact path="/rff" element={<RFFPage {...props} permissions={permissions} isAdmin={isAdmin} />} />
           <Route exact path="/" element={<HomePage {...props} permissions={permissions} isAdmin={isAdmin} />} />
         </Routes>
       </Suspense>

@@ -216,8 +216,8 @@ function PageTemplate(props) {
                         <li onClick={e => handleExpandLi(e, 'tracking')} >
                             <span className='sideDropDown' style={{ justifyContent: 'space-between' }} >
                                 <span style={{ padding: 0 }} >
-                                    <i className='material-icons' style={{ color: ['asset', 'hourly', 'repair'].includes(highlight) ? accent : 'white' }}>edit</i>
-                                    <p style={{ color: ['asset', 'hourly', 'repair'].includes(highlight) ? accent : 'white' }}>tracking</p>
+                                    <i className='material-icons' style={{ color: ['asset', 'hourly', 'repair', 'rff'].includes(highlight) ? accent : 'white' }}>edit</i>
+                                    <p style={{ color: ['asset', 'hourly', 'repair', 'rff'].includes(highlight) ? accent : 'white' }}>tracking</p>
                                 </span>
                                 <i className='material-icons DropDownArrow'>{SideBarExpanded.tracking ? 'expand_more' : 'expand_less'}</i>
                             </span>
@@ -231,6 +231,9 @@ function PageTemplate(props) {
                                 </li> : <></>}
                                 {isAdmin || (permissions && permissions.use_repair_log) ? <li>
                                     <p style={{ color: highlight === "repair" ? accent : 'white' }} onClickCapture={(e) => nav('/repair')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/repair', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/repair' }) }}>Repair</p>
+                                </li> : <></>}
+                                {isAdmin || (permissions && permissions.use_rff_tracking) ? <li>
+                                    <p style={{ color: highlight === "rff" ? accent : 'white' }} onClickCapture={(e) => nav('/rff')} onAuxClickCapture={e => { if (e.button === 1) { window.open('/rff', '_blank'); e.preventDefault() } }} onContextMenu={e => { e.preventDefault(); setContextMenu({ mouseX: e.clientX + 2, mouseY: e.clientY - 6, link: '/rff' }) }}>RFF</p>
                                 </li> : <></>}
                             </ul>
                         </li>
