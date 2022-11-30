@@ -254,6 +254,11 @@ function AssetPage(props) {
                 if (new_branch) new_branch.value = ''
                 setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '', newBranch: '' })
                 setData(d);
+
+                // If the job code is a replacement, prompt for return
+                for (let i of jobCodes)
+                    if (i.id === job_code && i.usage_rule_group === 'deploy' && i.job_code.toLowerCase().includes('replace'))
+                        handleReturn(formData)
             }
         } else for (let i of data.records) {
             if (id === i.id) {
@@ -412,6 +417,59 @@ function AssetPage(props) {
         })
     }
 
+    // Handle logic behind adding to rff call list
+    const handleReturn = async (formData) => {
+        let r = await promptForReturn(formData.branch)
+        if (!r) return
+        let data = r.assets.map(m => ({ ...r, asset: m, assets: undefined }))
+        for (let i of data) {
+            let r = await assetService.newRFF(i, token)
+            if (r.isErrored) alert(`Error adding ${i.asset} to RFF call list\n${r.error.error}`)
+        }
+    }
+
+    // Handles the prompt for adding information about return devices
+    const promptForReturn = async (branch = undefined) => {
+        return new Promise(async res => {
+            let returnData = { branch, assets: [] }
+            confirmAlert({
+                customUI: ({ onClose }) => {
+                    return (
+                        <div className='confirm-alert'>
+                            <h1>Return Device?</h1>
+                            <br />
+                            <label for='return-branch'>Branch: </label>
+                            <input id='return-branch' type='text' onChange={e => returnData.branch = e.target.value} defaultValue={branch} />
+                            <label for='return-ticket'>Ticket: </label>
+                            <input id='return-ticket' type='text' onChange={e => returnData.ticket = e.target.value} />
+                            <label for='return-user'>User: </label>
+                            <input id='return-user' type='text' onChange={e => returnData.user = e.target.value} />
+                            <br />
+                            <label for='return-asset-id'>Comma Seperated Asset ID(s): </label>
+                            <input id='return-asset-id' type='text' onChange={e => returnData.assets = e.target.value.replace(/\s/g, '').split(',')} />
+                            <br />
+                            <span style={{ margins: '1rem' }}>
+                                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
+                                    if (returnData.assets.length < 1) return alert('Must add at least one asset')
+                                    if (!returnData.branch) return alert('Must add a branch')
+                                    if (!returnData.ticket) return alert('Must add a ticket')
+                                    if (!returnData.user) return alert('Must add a user')
+                                    res(returnData)
+                                    onClose()
+                                }}
+                                >Confirm</Button>
+                                <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                    onClose()
+                                    res(null)
+                                }}>No</Button>
+                            </span>
+                        </div>
+                    )
+                }
+            }, returnData)
+        })
+    }
+
     // Handles adding a new asset to the database if the inputed model wasn't found
     const handleAssetAdding = async () => {
         // Get model
@@ -509,6 +567,11 @@ function AssetPage(props) {
             if (new_branch) new_branch.value = ''
             setNewJob({ newJobCode: newJob.newJobCode, newAssetTag: '', newComment: '', newBranch: '' })
             setData(d);
+
+            // If deploying a replacement, prompt for return info
+            for (let i of jobCodes)
+                if (i.id === formData.job_code && i.usage_rule_group === 'deploy' && i.job_code.toLowerCase().includes('replace'))
+                    handleReturn(formData)
         }
     }
 

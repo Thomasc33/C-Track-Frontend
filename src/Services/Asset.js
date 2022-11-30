@@ -85,5 +85,10 @@ export default {
         let res = await axios.delete(`${BaseApiUrl}/asset/alter?column=${column}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
+    },
+    newRFF: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/misc/rff`, FormData, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
     }
 }
