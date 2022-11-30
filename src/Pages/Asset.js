@@ -438,16 +438,28 @@ function AssetPage(props) {
                         <div className='confirm-alert'>
                             <h1>Return Device?</h1>
                             <br />
-                            <label for='return-branch'>Branch: </label>
-                            <input id='return-branch' type='text' onChange={e => returnData.branch = e.target.value} defaultValue={branch} />
-                            <label for='return-ticket'>Ticket: </label>
-                            <input id='return-ticket' type='text' onChange={e => returnData.ticket = e.target.value} />
-                            <label for='return-user'>User: </label>
-                            <input id='return-user' type='text' onChange={e => returnData.user = e.target.value} />
+                            <h3 style={{ fontSize: '1rem' }}>Fill in this information if there is a deviec that is supposed to be returned from the replacement ticket. This will add it to the rff list. If there isn't a device to come back, press No below.</h3>
                             <br />
-                            <label for='return-asset-id'>Comma Seperated Asset ID(s): </label>
-                            <input id='return-asset-id' type='text' onChange={e => returnData.assets = e.target.value.replace(/\s/g, '').split(',')} />
+                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', margins: '1rem' }}>
+                                <h3 style={{ marginRight: '1rem' }}>Branch: </h3>
+                                <input id='return-branch' type='text' onChange={e => returnData.branch = e.target.value} defaultValue={branch} />
+                            </span>
                             <br />
+                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', margins: '1rem' }}>
+                                <h3 style={{ marginRight: '1rem' }}>Ticket: </h3>
+                                <input id='return-ticket' type='text' onChange={e => returnData.ticket = e.target.value} />
+                            </span>
+                            <br />
+                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', margins: '1rem' }}>
+                                <h3 style={{ marginRight: '1rem' }}>User: </h3>
+                                <input id='return-user' type='text' onChange={e => returnData.user = e.target.value} />
+                            </span>
+                            <br />
+                            <span style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', margins: '1rem' }}>
+                                <h3 style={{ marginRight: '1rem' }}>Comma Seperated Asset ID(s): </h3>
+                                <input id='return-asset-id' type='text' onChange={e => returnData.assets = e.target.value.replace(/\s/g, '').split(',')} />
+                                <br />
+                            </span>
                             <span style={{ margins: '1rem' }}>
                                 <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
                                     if (returnData.assets.length < 1) return alert('Must add at least one asset')

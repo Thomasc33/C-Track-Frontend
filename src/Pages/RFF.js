@@ -123,6 +123,16 @@ function RFFPage(props) {
         }
     }
 
+    const handleCloseLostStolen = async (id) => {
+        let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/closeloststolen`, { id }, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+        }).catch(er => { return { isErrored: true, error: er } })
+        if (res.isErrored) { console.log(res); alert(res.error.response.data.error) }
+        if (res.status === 200) {
+            setDoUpdateData(true)
+        }
+    }
+
     // Renderers
     function RenderHome() {
         return <><h1 id='homeh1'>New RFF Record</h1>
@@ -184,13 +194,13 @@ function RFFPage(props) {
             </div>
             <hr />
             <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', width: '90%', padding: '1rem', borderRadius: '.3rem' }}>
-                <h2 style={{ width: '15%' }}>Asset</h2>
-                <h2 style={{ width: '10%' }}>Ticket</h2>
-                <h2 style={{ width: '20%' }}>User</h2>
-                <h2 style={{ width: '13%' }}>Ticket Date</h2>
-                <h2 style={{ width: '10%' }}>Calls Made</h2>
-                <h2 style={{ width: '13%' }}>Last Call</h2>
-                <h2 style={{ width: '17%' }}>Actions</h2>
+                <h2>Asset</h2>
+                <h2>Ticket</h2>
+                <h2>User</h2>
+                <h2>Ticket Date</h2>
+                <h2>Calls Made</h2>
+                <h2>Last Call</h2>
+                <h2>Actions</h2>
             </div>
             {data.rffs[selectedBranch] ? data.rffs[selectedBranch].map(RenderBranchRow) : undefined}
         </>
@@ -231,7 +241,7 @@ function RFFPage(props) {
         for (let i of data.rffs[branch]) users.add(i.user)
         let lastCall = undefined
         if (data.rffs[branch].some(s => s.last_call)) lastCall = new Date(Math.max(...data.rffs[branch].map(m => new Date(m.last_call))))
-        return <div className='ResultSection' onClick={() => { setSelectedBranch(branch) }} key={branch} >
+        return <div className='ResultSection' onClick={() => { setSelectedBranch(branch) }} key={branch} style={{ margin: '0.5rem' }} >
             <h2 style={{ width: '25%', textAlign: 'left' }}>{branch}</h2>
             <h2 style={{ width: '25%' }}>{data.rffs[branch].length}</h2>
             <h2 style={{ width: '25%' }}>{users.size}</h2>
@@ -242,13 +252,13 @@ function RFFPage(props) {
     function RenderBranchRow(row) {
         let added = new Date(row.added).toISOString().split('T')[0], last_call
         if (row.last_call) last_call = new Date(row.last_call).toISOString().split('T')[0]
-        return <div className='ResultSection' onClick={() => { }} key={row.id} style={{ cursor: 'default', alignItems: 'center' }}>
+        return <div className='ResultSection' key={row.id} style={{ cursor: 'default', alignItems: 'center', margin: '0.5rem', padding: '0.5rem' }}>
             <h3>{row.asset_id}</h3>
             <h3>{row.ticket}</h3>
             <h3>{row.user}</h3>
             <h3>{added}</h3>
             <h3>{row.call_count}</h3>
-            <h3>{last_call ? `${last_call} by ${data.users[row.last_caller]}` : 'None'}</h3>
+            <h3>{last_call ? `${last_call}${row.last_caller && row.last_caller !== 19 ? ` by ${data.users[row.last_caller]}` : ''}` : 'None'}</h3>
             <div>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(row.id) }}>Snooze</Button>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleLostStolen(row.id) }}>Lost/Stolen</Button>
@@ -259,7 +269,7 @@ function RFFPage(props) {
     function RenderLostStolenRow(row) {
         let added = new Date(row.added).toISOString().split('T')[0], last_call
         if (row.last_call) last_call = new Date(row.last_call).toISOString().split('T')[0]
-        return <div className='ResultSection' onClick={() => { }} key={row.id} style={{ cursor: 'default', alignItems: 'center' }}>
+        return <div className='ResultSection' onClick={() => { }} key={row.id} style={{ cursor: 'default', alignItems: 'center', margin: '0.5rem', padding: '0.5rem' }}>
             <h3>{row.asset_id}</h3>
             <h3>{row.ticket}</h3>
             <h3>{row.branch}</h3>
@@ -267,7 +277,10 @@ function RFFPage(props) {
             <h3>{added}</h3>
             <h3>{row.call_count}</h3>
             <h3>{last_call ? `${last_call} by ${data.users[row.last_caller]}` : 'None'}</h3>
-            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleRemoveLostStolen(row.id) }}>Revert</Button>
+            <div>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleRemoveLostStolen(row.id) }}>Revert</Button>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleCloseLostStolen(row.id) }}>Close</Button>
+            </div>
         </div>
     }
 
