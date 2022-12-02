@@ -6,7 +6,7 @@ const useMSAL = () => {
     // MSAL stuff
     const { instance, accounts } = useMsal()
     async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: false }
+        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send'], account: instance.getAccountByLocalId(accounts[0].localAccountId) }//, forceRefresh: false }
         let res = await instance.acquireTokenSilent(SilentRequest)
             .catch(async er => {
                 if (er instanceof InteractionRequiredAuthError) {

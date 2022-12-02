@@ -150,7 +150,7 @@ function BranchPage(props) {
             <td>
                 <input type='text'
                     placeholder='Entity Number'
-                    defaultValue={row.entity_number}
+                    defaultValue={zeroPad(row.entity_number, 5)}
                     id={`${row.id}-entity_number`}
                     onBlur={(e) => handleTextInputChange(row.id, e)}
                     onKeyDown={e => handleKeyDown(row.id, e)} />
@@ -318,3 +318,5 @@ function BranchPage(props) {
 }
 
 export default BranchPage
+
+const zeroPad = (num, places) => String(num).padStart(places, '0')
