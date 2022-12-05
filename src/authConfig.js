@@ -15,7 +15,7 @@ export const msalConfig = {
     auth: {
         clientId: "88412894-2b14-42d2-90ba-97b77fe14b2b",
         authority: "https://login.microsoftonline.com/ce219fb0-e20a-47dc-aa98-c0f67f8dd28c",
-        redirectUri: "https://localhost:3000/"
+        redirectUri: process.env.REDIRECT_URI,
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored

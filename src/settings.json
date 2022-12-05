@@ -1,5 +1,5 @@
 {
-    "APIBase": "http://localhost:3005/a",
+    "APIBase": "https://192.168.205.76:3005/a",
     "graphUrl": "https://graph.microsoft.com/v1.0",
     "tsheets": {
         "clientId": "24485ea4b5fc699934d244a4558ac841",

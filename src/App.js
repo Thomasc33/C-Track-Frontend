@@ -11,6 +11,7 @@ import { InteractionRequiredAuthError } from '@azure/msal-common';
 import UserService from './Services/User'
 import PageTemplate from './Components/Template';
 import Particles from './Components/Particles';
+import './Helpers/MSAL'
 
 // Import CSS files in main since lazy loading breaks styling otherwise
 import './App.css';
@@ -29,8 +30,7 @@ import './css/PartManagement.css';
 import './css/Reports.css';
 import './css/SingleAsset.css';
 import './css/User.css';
-require('./backendVersion.json')
-
+require('./backendVersion.json') // Load this so no single lazy split will claim it when they all use it
 
 // Import the Pages
 // Using lazy loading to avoid loading the pages until they are needed
@@ -59,7 +59,6 @@ const RFFPage = lazy(() => import('./Pages/RFF'));
 
 // Import App Settings
 const settings = require('./settings.json')
-require('./backendVersion.json') // Load this so no single lazy split will claim it when they all use it
 
 function App(props) {
   // States and hooks

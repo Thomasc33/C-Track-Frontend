@@ -18,10 +18,3 @@ root.render(<React.StrictMode>
     </BrowserRouter>
   </MsalProvider>
 </React.StrictMode>)
-
-
-
-// ReactDOM.render(
-//   ,
-//   document.getElementById('root')
-// );

@@ -48,9 +48,9 @@ function BranchPage(props) {
             setData(d);
             setDoUpdate(false)
         }
-        if (doUpdate) getData()
+        if (doUpdate && token) getData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [doUpdate])
+    }, [doUpdate, token])
 
     // Return to home page if user can't view route
     if (!props.permissions.view_jobcodes && !props.isAdmin) return <Navigate to='/' />
