@@ -16,6 +16,7 @@ function RFFPage(props) {
     const [data, setData] = useState([])
     const [onRFFList, setOnRFFList] = useState(false)
     const [onLostStolenList, setOnLostStolenList] = useState(false)
+    const [onCheckTickets, setOnCheckTickets] = useState(false)
     const [selectedBranch, setSelectedBranch] = useState(null)
     const [newRecord, setNewRecord] = useState({ asset: null, ticket: null, branch: null, user: null })
     const [branches, setBranches] = useState([])
@@ -133,6 +134,57 @@ function RFFPage(props) {
         }
     }
 
+    const handleCheckTicketButton = async () => {
+        // Get input text
+        let csv_text = document.getElementById('csv-text').value
+        if (!csv_text) return
+
+        // Split into array and into set
+        let csv = csv_text.replace(/,/g, '\n').split('\n')
+        let input = new Set(csv)
+        // If set is empty, return
+        if (input.size === 0) return
+
+        // Get all tickets
+        let tickets = await axios.get(`${require('../settings.json').APIBase}/misc/rff/tickets`, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+        }).catch(er => { return { isErrored: true, error: er } }).then(res => res.data)
+        if (tickets.isErrored) { console.log(tickets); alert(tickets.error.response.data.error) }
+        if (!tickets.tickets) return
+
+        // Create sets
+        let all = new Set()
+        let closed = new Set()
+        for (let i of tickets.tickets) {
+            all.add(i.ticket)
+            if (i.returned) closed.add(i.ticket)
+        }
+
+        // Find tickets in input that are not in all
+        let notInAll = new Set([...input].filter(x => !all.has(x)))
+        notInAll = [...notInAll]
+
+        // Find tickets in input that are in closed
+        let inClosed = new Set([...input].filter(x => closed.has(x)))
+        inClosed = [...inClosed]
+
+        // Find tickets in all that arent in input
+        let notInInput = new Set([...all].filter(x => !input.has(x)))
+        notInInput = [...notInInput]
+        console.log(notInAll, inClosed, notInInput)
+        // Add to csv and download
+        let csvString = 'Not in All,,Tickets in Closed,,Not in Input\n'
+        let max = Math.max(notInAll.length, inClosed.length, notInInput.length)
+        for (let i = 0; i < max; i++) {
+            csvString += `${notInAll[i] || ''},,${inClosed[i] || ''},,${notInInput[i] || ''}\n`
+        }
+        let blob = new Blob([csvString], { type: 'text/csv' })
+        let url = URL.createObjectURL(blob)
+        let a = document.createElement('a')
+        a.href = url
+        a.click()
+    }
+
     // Renderers
     function RenderHome() {
         return <><h1 id='homeh1'>New RFF Record</h1>
@@ -158,6 +210,7 @@ function RFFPage(props) {
             <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={handleNewSubmit}>Submit</Button>
             <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => setOnRFFList(true)}>Open RFF Call List</Button>
             <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => setOnLostStolenList(true)}>Open Lost Stolen List</Button>
+            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => setOnCheckTickets(true)}>Check Tickets</Button>
             <div className='break' />
             <hr />
             <h1>RFF Stats</h1>
@@ -228,6 +281,22 @@ function RFFPage(props) {
         </>
     }
 
+    function RenderCheckTickets() {
+        return <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '90%' }}>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { setOnRFFList(false) }}>Back</Button>
+                <h1>Check Tickets</h1>
+                <div style={{ width: '5rem' }}></div>
+            </div>
+            <hr />
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 100 }}>Paste all open tickets from manage engine and service now to see all tickets that aren't currently being tracked.</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 100 }}>Comma or new line seperated.</h3>
+            <textarea id='csv-text' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', width: '90%', height: '20rem', padding: '1rem', margin: '1rem', backgroundColor: '#1b1b1b', borderColor: 'white', borderWidth: '3px', color: 'white', fontSize: '16px', verticalAlign: 'top' }} />
+            <div className='break' />
+            <Button variant='contained' color='primary' size='large' style={{ boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.2)', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => handleCheckTicketButton()}>Parse</Button>
+        </>
+    }
+
     function RenderHomeStat(row) {
         let val = data.stats[row]
         return <div className='ResultSection' style={{ width: '75%', cursor: 'default', margin: '.5rem' }} key={row}>
@@ -289,7 +358,7 @@ function RFFPage(props) {
     return (
         <>
             <div className='PartManagementArea' style={{ paddingTop: '0', paddingBottom: '0', height: '92vh' }}>
-                {onRFFList ? selectedBranch ? RenderBranch() : RenderBranches() : onLostStolenList ? RenderLostStolenPage() : RenderHome()}
+                {onRFFList ? selectedBranch ? RenderBranch() : RenderBranches() : onLostStolenList ? RenderLostStolenPage() : onCheckTickets ? RenderCheckTickets() : RenderHome()}
             </div>
         </>
     )
