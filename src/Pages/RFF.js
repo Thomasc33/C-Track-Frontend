@@ -284,7 +284,7 @@ function RFFPage(props) {
     function RenderCheckTickets() {
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '90%' }}>
-                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { setOnRFFList(false) }}>Back</Button>
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { setOnCheckTickets(false) }}>Back</Button>
                 <h1>Check Tickets</h1>
                 <div style={{ width: '5rem' }}></div>
             </div>
