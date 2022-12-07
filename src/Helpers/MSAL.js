@@ -26,7 +26,13 @@ const useMSAL = () => {
 
     // Effects
     useEffect(() => {
+        // Get token initially
         getTokenSilently().then(t => { setToken(t); setLoading(false) })
+
+        // Refresh token every minute
+        let timeout = setInterval(() => getTokenSilently(true).then(t => { setToken(t); setLoading(false) }), 60000)
+        return () => clearInterval(timeout)
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
