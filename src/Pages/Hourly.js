@@ -568,13 +568,13 @@ function HourlyPage(props) {
                                     )}
                                 /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <i className='material-icons' style={{ cursor: 'pointer', fontSize: '2rem', paddingRight: '.5rem' }} onClick={e => { handleChange('new', null, 'new-start') }}>done</i>
-                                    <input type='time' step='900' min='05:00' max='20:00' defaultValue={times.new.startTime} onChange={e => handleBoringTimeSelectChange('new', true, e)} />
+                                    <input type='time' step='900' min='05:00' max='20:00' defaultValue={times.new && times.new.startTime ? times.new.startTime : '8:30'} onChange={e => handleBoringTimeSelectChange('new', true, e)} />
                                 </div>
 
                                 }
                             </div></td>
                             <td><div className="TimeKeeper" id='new-End'
-                                style={{ border: times.new && times.new.endTime && (parseInt(times.new.endTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.endTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new.startTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
+                                style={{ border: times.new && times.new.endTime && (parseInt(times.new.endTime.substr(0, 2).replace(':', '')) < normalTimeRange[0] || parseInt(times.new.endTime.substr(0, 2).replace(':', '')) > normalTimeRange[1] || (times.new && times.new.startTime && getTotalHours(times.new.startTime, times.new.endTime) >= 10)) ? 'solid 1px #b8680d' : undefined, paddingBottom: '10px' }}>
                                 {times.new && times.new && times.new.in_progress ? undefined :
                                     fancyClock ?
                                         <TimeKeeper
@@ -588,7 +588,7 @@ function HourlyPage(props) {
                                                 </div>
                                             )}
                                         /> :
-                                        <input type='time' step='900' min='05:00' max='20:00' value={times.new.endTime} onChange={e => handleBoringTimeSelectChange('new', false, e)} />
+                                        <input type='time' step='900' min='05:00' max='20:00' value={times.new ? times.new.endTime : '5:00'} onChange={e => handleBoringTimeSelectChange('new', false, e)} />
                                 }</div></td>
                             <td>
                                 <Checkbox
