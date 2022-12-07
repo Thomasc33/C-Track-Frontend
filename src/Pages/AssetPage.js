@@ -294,7 +294,7 @@ const presetReports = {
         status: new Set(['(2)', '(8)', '(12)', '(13)', '(15)', '(18)', '(19)', '(39)', '(40)', '(41)', '(42)', '(43)', '(50)', '(51)', '(97)', '(108)', '(121)']),
         type: new Set(),
         last_updated: new Set(['All Time']),
-        location: new Set(['MDCentric']),
+        location: new Set(['In-House']),
         locked: new Set(),
         user: new Set(),
         job_code: new Set()

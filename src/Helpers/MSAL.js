@@ -5,8 +5,8 @@ import { InteractionRequiredAuthError } from '@azure/msal-common';
 const useMSAL = () => {
     // MSAL stuff
     const { instance, accounts } = useMsal()
-    async function getTokenSilently() {
-        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send', 'email'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh: false }
+    async function getTokenSilently(forceRefresh = false) {
+        const SilentRequest = { scopes: ['User.Read', 'TeamsActivity.Send', 'email'], account: instance.getAccountByLocalId(accounts[0].localAccountId), forceRefresh }
         let res = await instance.acquireTokenSilent(SilentRequest)
             .catch(async er => {
                 if (er instanceof InteractionRequiredAuthError) {
@@ -15,10 +15,12 @@ const useMSAL = () => {
                     console.log('Unable to get token')
                 }
             })
+        setResponse(res)
         return res.accessToken
     }
 
     // States
+    const [response, setResponse] = useState(null)
     const [token, setToken] = useState(null)
     const [tokenLoading, setLoading] = useState(true)
 
@@ -27,6 +29,18 @@ const useMSAL = () => {
         getTokenSilently().then(t => { setToken(t); setLoading(false) })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+    // Set token to refresh after the new token expires
+    useEffect(() => {
+        if (!response) return
+
+        let expires = new Date(response.expiresOn)
+        // execute getTokenSilently 5 minutes before the token expires
+        let timeout = setTimeout(() => getTokenSilently(true).then(t => { setToken(t); setLoading(false) }), expires - new Date() - 300000)
+
+        return () => clearTimeout(timeout)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [response])
 
     return { token, instance, accounts, getTokenSilently, tokenLoading }
 }
