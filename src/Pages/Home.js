@@ -25,7 +25,8 @@ function HomePage(props) {
         async function getTasks() {
             let d = await fetch(`${settings.graphUrl}/me/planner/tasks`, { headers: { 'Authorization': `Bearer ${token}` } })
                 .then(re => re.json())
-                .catch(er => console.warn(er.text()))
+                .catch(er => { console.warn(er.text()); return null })
+            if (!d) return
             setTasks(d.value)
         }
         if (token) getTasks()
