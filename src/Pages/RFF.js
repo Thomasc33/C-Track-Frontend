@@ -1,6 +1,7 @@
 // Imports
 import React, { useState, useEffect } from 'react';
 import SelectSearch, { fuzzySearch } from 'react-select-search';
+import { confirmAlert } from 'react-confirm-alert';
 import { CircularProgress } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@material-ui/core';
@@ -94,8 +95,8 @@ function RFFPage(props) {
         }
     }
 
-    const handleSnooze = async (id) => {
-        let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/snooze`, { id }, {
+    const handleSnooze = async (id, snoozeTime) => {
+        let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/snooze`, { id, snoozeTime }, {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         }).catch(er => { return { isErrored: true, error: er } })
         if (res.isErrored) { console.log(res); alert(res.error.response.data.error) }
@@ -106,6 +107,17 @@ function RFFPage(props) {
 
     const handleLostStolen = async (id) => {
         let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/loststolen`, { id }, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+        }).catch(er => { return { isErrored: true, error: er } })
+        if (res.isErrored) { console.log(res); alert(res.error.response.data.error) }
+        if (res.status === 200) {
+            setDoUpdateData(true)
+        }
+    }
+
+    const handleForceReturn = async (id) => {
+        if (!props.isAdmin && !props.permissions.edit_models) return
+        let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/return`, { id }, {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
         }).catch(er => { return { isErrored: true, error: er } })
         if (res.isErrored) { console.log(res); alert(res.error.response.data.error) }
@@ -185,6 +197,41 @@ function RFFPage(props) {
         a.click()
     }
 
+    const handleNoteChange = async (id, note) => {
+        let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/note`, { id, note }, {
+            headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
+        }).catch(er => { return { isErrored: true, error: er } })
+        if (res.isErrored) { console.log(res); alert(res.error.response.data.error) }
+        if (res.status === 200) {
+            setDoUpdateData(true)
+        }
+    }
+
+    const promptSnoozeTime = (id) => {
+        console.log(190)
+        return confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>How long should the snooze be?</h1>
+                        <br />
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(id, 1); onClose() }}>1 Day</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(id, 2); onClose() }}>2 Days</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(id, 7); onClose() }}>1 Week</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(id, 14); onClose() }}>2 Weeks</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(id, 30); onClose() }}>1 Month</Button>
+                        </span>
+                        <br />
+                        <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: '#fc0349' }} onClick={() => { onClose() }}>Cancel</Button>
+                    </div>
+                )
+            },
+            closeOnEscape: true,
+            closeOnClickOutside: true
+        })
+    }
+
     // Renderers
     function RenderHome() {
         return <><h1 id='homeh1'>New RFF Record</h1>
@@ -253,7 +300,6 @@ function RFFPage(props) {
                 <h2>Ticket Date</h2>
                 <h2>Calls Made</h2>
                 <h2>Last Call</h2>
-                <h2>Actions</h2>
             </div>
             {data.rffs[selectedBranch] ? data.rffs[selectedBranch].map(RenderBranchRow) : undefined}
         </>
@@ -321,16 +367,21 @@ function RFFPage(props) {
     function RenderBranchRow(row) {
         let added = new Date(row.added).toISOString().split('T')[0], last_call
         if (row.last_call) last_call = new Date(row.last_call).toISOString().split('T')[0]
-        return <div className='ResultSection' key={row.id} style={{ cursor: 'default', alignItems: 'center', margin: '0.5rem', padding: '0.5rem' }}>
+        return <div className='ResultSection' key={row.id} style={{ cursor: 'default', alignItems: 'center', display: 'flex', flexWrap: 'wrap' }}>
             <h3>{row.asset_id}</h3>
             <h3>{row.ticket}</h3>
             <h3>{row.user}</h3>
             <h3>{added}</h3>
             <h3>{row.call_count}</h3>
             <h3>{last_call ? `${last_call}${row.last_caller && row.last_caller !== 19 ? ` by ${data.users[row.last_caller]}` : ''}` : 'None'}</h3>
-            <div>
-                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleSnooze(row.id) }}>Snooze</Button>
+            <div className='break' />
+            <div style={{ width: '100%', display: 'inline-flex', justifyContent: 'center', margin: '1rem' }}>
+                <input defaultValue={row.notes || undefined} style={{ marginRight: '4rem', width: '50%' }} placeholder='Notes' onBlur={e => handleNoteChange(row.id, e.target.value)} />
+                <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { promptSnoozeTime(row.id) }}>Snooze</Button>
                 <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleLostStolen(row.id) }}>Lost/Stolen</Button>
+                {props.permissions.edit_models || props.isAdmin ?
+                    <Button variant='contained' color='primary' size='large' style={{ boxShadow: 'box-shadow: 0 0 25px rgba(0, 0, 0, .1), 0 5px 10px -3px rgba(0, 0, 0, .13)', padding: '.5rem', margin: '.5rem', backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} onClick={() => { handleForceReturn(row.id) }}>Force Close</Button>
+                    : undefined}
             </div>
         </div>
     }
