@@ -16,6 +16,10 @@ const useMSAL = () => {
                 }
             })
         setResponse(res)
+        if (!res || !res.accessToken) {
+            if (forceRefresh) return null
+            return getTokenSilently(true)
+        }
         return res.accessToken
     }
 
