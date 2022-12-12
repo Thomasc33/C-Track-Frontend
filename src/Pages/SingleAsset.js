@@ -205,7 +205,7 @@ function AssetsPage(props) {
         if (res.isErrored) {
             alert(`Model not added: ${res.error.message}`)
             console.warn(res.error)
-        } else { let s = search; setSearch(null); setSearch(s) }
+        } else getAssetInfo()
     }
 
     // Enter event listener
