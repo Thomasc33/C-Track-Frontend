@@ -265,5 +265,7 @@ const multiSelectOptions = [
     { value: 'Thick', label: 'Thick' },
     { value: 'Tablet', label: 'Tablet' },
     { value: 'Phone', label: 'Phone' },
-    { value: 'MiFi', label: 'MiFi' }
+    { value: 'MiFi', label: 'MiFi' },
+    { value: 'LFF', label: 'LFF' },
+    { value: 'SFF', label: 'SFF' },
 ]
