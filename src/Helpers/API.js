@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { InteractionRequiredAuthError } from '@azure/msal-common';
 
-const useFetch = (url, timeout = 5000) => {
+const useFetch = (url, interval = 5000) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const { instance, accounts } = useMsal()
@@ -38,9 +38,9 @@ const useFetch = (url, timeout = 5000) => {
             setLoading(false);
         }
         callFetch()
-        if (timeout) setInterval(callFetch, timeout)
+        if (interval) setInterval(callFetch, interval)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [url, timeout])
+    }, [url, interval])
 
     return { data, loading, setData, setLoading }
 }

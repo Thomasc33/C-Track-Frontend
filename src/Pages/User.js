@@ -66,7 +66,7 @@ function UserPage(props) {
                     <div className='confirm-alert'>
                         <h1>Change Permissions</h1>
                         <br />
-                        <h2>'Do you also want to change the user's permissions to reflect this title's permissions?</h2>
+                        <h2>Do you also want to change the user's permissions to reflect this title's permissions?</h2>
                         <br />
                         <span style={{ margins: '1rem' }}>
                             <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
@@ -96,9 +96,6 @@ function UserPage(props) {
         return (<tr id={`${row.id}-row`} key={`${row.id}-row`}>
             <td>
                 <p>{row.name}</p>
-            </td>
-            <td>
-                <p>{row.email}</p>
             </td>
             <td>
                 {(props.isAdmin || props.permissions.edit_users) ?
@@ -144,7 +141,6 @@ function UserPage(props) {
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Email</th>
                             <th>Title</th>
                             {(props.isAdmin || props.permissions.edit_users) ? <th>Permissions</th> : <></>}
                         </tr>

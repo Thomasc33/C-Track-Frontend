@@ -405,7 +405,6 @@ function RFFPage(props) {
     }
 
     // Base JSX
-
     return (
         <>
             <div className='PartManagementArea' style={{ paddingTop: '0', paddingBottom: '0', height: '92vh' }}>

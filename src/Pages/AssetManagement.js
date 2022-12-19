@@ -15,7 +15,7 @@ const settings = require('../settings.json')
 // --- Global Constants --- //
 
 // dontRender is a list of fields that won't show on this page due to being required for the site to function
-const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type', 'location']
+const dontRender = ['id', 'status', 'model_number', 'notes', 'watching', 'hold_type', 'location', 'locked', 'company']
 // dataTypes is a list of different datatypes accepted by SQL Server and would actually be used
 const dataTypes = [{ name: 'varchar(50)', value: 'varchar(50)' }, { name: 'varchar(255)', value: 'varchar(255)' }, { name: 'varchar(15)', value: 'varchar(15)' },
 { name: 'text', value: 'text' }, { name: 'tinyint', value: 'tinyint' }, { name: 'int(11)', value: 'int(11)' },
