@@ -48,6 +48,16 @@ function PartInventoryPage(props) {
     if (!props.permissions.view_assets && !props.isAdmin) return <Navigate to='/' />
 
     // Event Handlers
+    const handleDownload = () => {
+        let csv = 'ID,Status,Model Number'
+        locationData.forEach(row => {
+            csv += `\n${row.id},${row.status},${row.model_number}`
+        })
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+        element.setAttribute('download', `${selectedLocation}.csv`);
+        element.click()
+    }
 
     // Renderers
     function RenderHome() {
@@ -65,9 +75,9 @@ function PartInventoryPage(props) {
     function RenderLocation() {
         return <>
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '90%' }}>
-                <Button style={{ left: 0 }} variant='contained' color='primary' onClick={() => { setSelectedLocation(null); setLocationData([]) }}>Back</Button>
+                <Button style={{ left: 0, backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} variant='contained' color='primary' onClick={() => { setSelectedLocation(null); setLocationData([]) }}>Back</Button>
                 <h1>Asset In {selectedLocation}</h1>
-                <p></p>
+                <Button style={{ right: 0, backgroundColor: localStorage.getItem('accentColor') || '#e67c52' }} variant='contained' color='primary' onClick={() => { handleDownload() }}>Download</Button>
             </div>
             <hr />
             <div className='AssetLocationBlobContainer'>
