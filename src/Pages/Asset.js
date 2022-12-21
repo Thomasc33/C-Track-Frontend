@@ -749,7 +749,7 @@ function AssetPage(props) {
                     delete_outline</i>
             </td>
             <td><div style={{ padding: 0, margin: 0, display: 'flex', alignContent: 'center' }}><input type='text'
-                style={{ border: duplicate ? '3px solid #b8680d' : undefined }}
+                style={{ border: duplicate || (job.usage_rule_group === 'ship' && !row.branch) ? '3px solid #b8680d' : undefined }}
                 defaultValue={row.branch}
                 placeholder='Branch'
                 className='branch'

@@ -329,7 +329,7 @@ function PageTemplate(props) {
                             <i className='material-icons DropDownArrow'>{SideBarExpanded.parts ? 'expand_more' : 'expand_less'}</i>
                         </span>
                         <ul className={`DropDown${SideBarExpanded.links ? ' Show' : ''}`} id='LinksUL'>
-                            {require('../data/QuickLinks.json').map(l => <li>
+                            {require('../data/QuickLinks.json').map(l => <li key={l.name}>
                                 <a href={l.url} target='_blank' rel='noreferrer'><p>{l.name}</p></a>
                             </li>)}
                         </ul>
