@@ -87,6 +87,38 @@ function UserPage(props) {
         })
     }
 
+    const handleKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            e.stopPropagation()
+            handleTextInputChange(e, id)
+        } else {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '')
+        }
+    }
+
+    const handleTextInputChange = async (e, id) => {
+        // Validate the input is a number
+        if (isNaN(e.target.value)) {
+            alert('Please enter a valid number')
+            return
+        }
+
+        // Validate the input is less than 11 characters
+        if (e.target.value.length > 10) {
+            alert('Input is too long')
+            return
+        }
+
+        // Call the API to update the user's data
+        let form = { id, tsheets: e.target.value }
+        let res = await UserService.updateTSheetsID(form, token)
+        if (res.isErrored) {
+            if (res.error && res.error.message) alert(res.error.message)
+            return
+        }
+    }
+
     // --- Render --- //
     function RenderRow(row) {
         let defaultOptions = []
@@ -110,6 +142,15 @@ function UserPage(props) {
                         onChange={e => confirmTitleChange(e, row.id)}
                     />
                     : <p>{row.title}</p>}
+            </td>
+            <td>
+                {(props.isAdmin || props.permissions.edit_users) ?
+                    <input type='text'
+                        placeholder='TSheets ID'
+                        defaultValue={row.tsheets_id}
+                        onBlur={(e) => handleTextInputChange(e, row.id)}
+                        onKeyDown={e => handleKeyDown(e, row.id)} />
+                    : <p>{row.tsheets_id}</p>}
             </td>
             {(props.isAdmin || props.permissions.edit_users) ?
                 <td>
@@ -142,6 +183,7 @@ function UserPage(props) {
                         <tr>
                             <th>Name</th>
                             <th>Title</th>
+                            <th>T-Sheets ID</th>
                             {(props.isAdmin || props.permissions.edit_users) ? <th>Permissions</th> : <></>}
                         </tr>
                     </thead>

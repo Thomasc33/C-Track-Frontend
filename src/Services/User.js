@@ -68,4 +68,9 @@ export default {
             .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
         return res
     },
+    updateTSheetsID: async (FormData, token) => {
+        let res = await axios.post(`${BaseApiUrl}/user/tsheets`, FormData, { headers: { 'Authorization': `Bearer ${token}`, 'X-Version': require('../backendVersion.json').version } })
+            .catch(e => { console.warn(e.response.data); return { isErrored: true, error: e.response.data } })
+        return res
+    }
 }
