@@ -4,6 +4,7 @@ import SelectSearch, { fuzzySearch } from 'react-select-search';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useMSAL } from '../Helpers/MSAL';
 import { Button } from '@material-ui/core';
+import { confirmAlert } from 'react-confirm-alert';
 import { getDate } from './Asset';
 import CircularProgress from '@mui/material/CircularProgress';
 import settings from '../settings.json'
@@ -185,6 +186,33 @@ function AssetsPage(props) {
 
     // Handles toggling lock on an asset
     const handleLocking = async e => {
+        if (e) confirmAlert({
+            customUI: ({ onClose }) => {
+                return (
+                    <div className='confirm-alert'>
+                        <h1>Are you sure you want to lock this device?</h1>
+                        <br />
+                        <h2>Asset: {asset.id}</h2>
+                        <span style={{ margins: '1rem' }}>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: localStorage.getItem('accentColor') || '#e67c52', margin: '1rem' }} onClick={() => {
+                                sendLock(e)
+                                onClose()
+                            }}
+                            >Confirm</Button>
+                            <Button variant='contained' color='primary' size='large' style={{ backgroundColor: '#fc0349', margin: '1rem' }} onClick={() => {
+                                onClose()
+                            }}>Nevermind</Button>
+                        </span>
+                    </div>
+                )
+            },
+            closeOnEscape: true,
+            closeOnClickOutside: true
+        })
+        else sendLock(e)
+    }
+
+    const sendLock = async e => {
         const FormData = { id: asset.id }
         if (e) await AssetService.lock(FormData, token)
         else await AssetService.unlock(FormData, token)
