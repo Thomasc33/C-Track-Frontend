@@ -219,7 +219,6 @@ function JobPage(props) {
     }
 
     const handeUsageRulesChange = async (id, e) => {
-        console.log(e)
         if (id === 'new') setNewJob({ ...newJob, usageRuleGroup: e })
         else handleTextInputChange(id, { selection: e, isSelect: true, isUsage: true })
     }

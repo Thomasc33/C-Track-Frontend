@@ -15,7 +15,7 @@ function UserPage(props) {
     const { token, tokenLoading } = useMSAL()
     const APILink = `${settings.APIBase}/user/`
     const { loading, data = [] } = useFetch(APILink.concat('all'), null)
-    console.log(data)
+
     // Return to home page if user cannot access this page
     if (!props.permissions.view_users && !props.isAdmin) return <Navigate to='/' />
 

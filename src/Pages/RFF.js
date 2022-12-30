@@ -84,7 +84,6 @@ function RFFPage(props) {
     }
 
     const handleVoicemail = async (branch) => {
-        console.log(branch)
         let ids = [...data.rffs[branch].map(r => r.id)]
         let res = await axios.post(`${require('../settings.json').APIBase}/misc/rff/voicemail`, { branch, ids }, {
             headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': '*', 'X-Version': require('../backendVersion.json').version }
@@ -208,7 +207,6 @@ function RFFPage(props) {
     }
 
     const promptSnoozeTime = (id) => {
-        console.log(190)
         return confirmAlert({
             customUI: ({ onClose }) => {
                 return (

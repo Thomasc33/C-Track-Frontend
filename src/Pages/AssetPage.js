@@ -87,7 +87,6 @@ function AssetsPage(props) {
 
     const generateReport = async (options = customReportSelected) => {
         setGeneratingReport(true)
-        console.log(options)
         let res = await axios.post(`${APILink}/report`, {
             attributes: [...options.attributes],
             status: [...options.status].map(m => [...m.match(/\(([^()]+)\)/g)].pop().replace(/[()]/g, '')),

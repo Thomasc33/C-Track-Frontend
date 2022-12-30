@@ -89,7 +89,6 @@ function AssetManagement(props) {
     // Handles adding a new column
     const handleNew = async (e) => {
         if (!updatedRows.new || !updatedRows.new.COLUMN_NAME || !updatedRows.new.DATA_TYPE || ![true, false].includes(updatedRows.new.IS_NULLABLE)) {
-            console.log(updatedRows)
             alert('Missing information for the new data')
             return
         }
